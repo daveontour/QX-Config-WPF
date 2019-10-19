@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views.PipeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" Background="LightBlue"
+             xmlns:common="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common"
+             d:DesignHeight="450" d:DesignWidth="800">
+ 
+    <UserControl.Resources>
+        <Style x:Key="attribPanel" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="0,3,0,0"/>
+        </Style>
+        <Style x:Key="attribTitle" TargetType="TextBlock">
+            <Setter Property="Width" Value="160" />
+        </Style>
+        <Style x:Key="attribValue" TargetType="TextBox">
+            <Setter Property="Width" Value="300" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
+            <Setter Property="FontFamily" Value="Verdana" />
+            <Setter Property="Background" Value="AliceBlue" />
+        </Style>
+        <common:OutModeConverter x:Key="enumConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <Grid Background="LightBlue" Grid.Column="1">
+            
+            <StackPanel Margin="0,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <StackPanel>
+                    <TextBlock Text="Pipe Configuration"  FontSize="18" Margin="0,0,0,10"/>
+                </StackPanel>
+                <StackPanel  Style = "{StaticResource attribPanel}">
+                    <TextBlock Text="*Pipe Name" Style = "{StaticResource attribTitle}" />
+                    <TextBox Text="{Binding Path=PipeName, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                </StackPanel>
+
+                
+                <StackPanel Style = "{StaticResource attribPanel}">
+                    <TextBlock Text="Output Mode"  Style = "{StaticResource attribTitle}"></TextBlock>
+                    <StackPanel  Orientation="Horizontal" >
+                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="All" IsChecked="{Binding Path=OutputMode, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=All}"/>
+                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="Round Robin" IsChecked="{Binding Path=OutputMode, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=Round}"/>
+                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="Random" IsChecked="{Binding Path=OutputMode, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=Random}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel  Style = "{StaticResource attribPanel}">
+                    <TextBlock Text="Output Isolation" Style = "{StaticResource attribTitle}" />
+                    <CheckBox IsChecked="{Binding Path=OutputIsolation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+
+                <StackPanel  Style = "{StaticResource attribPanel}">
+                    <TextBlock Text="Enable Logging" Style = "{StaticResource attribTitle}" />
+                    <CheckBox IsChecked="{Binding Path=EnableLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+
+                <StackPanel  Style = "{StaticResource attribPanel}">
+                    <TextBlock Text="Max Messages Per Minute" Style = "{StaticResource attribTitle}" />
+                    <Slider Value="{Binding MaxMess, Mode=TwoWay}" Width="300" Minimum="-1" Maximum="240" />
+                    <TextBlock Text="{Binding MaxMessString, Mode=OneWay}" Style = "{StaticResource attribTitle}" />
+                </StackPanel>
+
+
+            </StackPanel>
+        </Grid>
+     </Grid>
+</UserControl>
