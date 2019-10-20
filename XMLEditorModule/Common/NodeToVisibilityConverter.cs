@@ -15,27 +15,35 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             string epType = (string)values[1];
             string param = (string)values[2];
 
-            int conf = ParamConfig.ParamDict[nodeType][param];
-            int inQ = conf & ParamConfig.InputVis;
-            int outQ = conf & ParamConfig.OutputVis;
+            Console.WriteLine($"{nodeType}, {epType}, {param}");
 
-            if (epType == "logger" || epType == "monitor") {
-                epType = "output";
+            try {
+                int conf = ParamConfig.ParamDict[nodeType][param];
+                int inQ = conf & ParamConfig.InputVis;
+                int outQ = conf & ParamConfig.OutputVis;
+
+                if (epType == "logger" || epType == "monitor" || epType == "altqueue") {
+                    epType = "output";
+                }
+
+                bool isInput = false;
+
+                if (epType == "input") {
+                    isInput = true;
+                } else {
+                    isInput = false;
+                }
+
+                if (isInput && inQ > 0 || !isInput && outQ > 0) {
+                    return Visibility.Visible;
+                } else {
+                    return Visibility.Collapsed;
+                };
+
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                return true;
             }
-
-            bool isInput = false;
-
-            if (epType == "input") {
-                isInput = true;
-            } else {
-                isInput = false;
-            }
-
-            if (isInput && inQ > 0 || !isInput && outQ > 0) {
-                return Visibility.Visible;
-            } else {
-                return Visibility.Collapsed;
-            };
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) {

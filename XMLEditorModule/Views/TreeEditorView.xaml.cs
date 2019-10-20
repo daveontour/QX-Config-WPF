@@ -86,7 +86,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
 
             if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor") {
-                nodeEditorCntrl.Content = new UserControl1(selectedItem, this);
+                nodeEditorCntrl.Content = new NodeControl(selectedItem, this);
             } else if (selectedItem.Name == "pipe" ) {
                 nodeEditorCntrl.Content = new PipeControl(selectedItem, this);
             } else if (selectedItem.Name == "namespace") {

@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:editorModule="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;assembly=WXE.Internal.Tools.ConfigEditor.XMLEditorModule"
-        Title="XmlConfigEditor" Height="600" Width="1000" WindowStartupLocation="CenterScreen">
+        Title="XmlConfigEditor" Height="600" Width="1000" WindowStartupLocation="CenterScreen" Background="WhiteSmoke">
     <Window.Resources>
         
     </Window.Resources>
@@ -15,8 +15,7 @@
         </Grid.RowDefinitions>
        
        
-        <editorModule:CommandsBarView Name="commandBarView"  Grid.Row="0" Background="LightBlue"></editorModule:CommandsBarView>
-       <!--<TabControl x:Name="configEditorTabControl" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black"></TabControl>-->
+        <editorModule:CommandsBarView Name="commandBarView"  Grid.Row="0"></editorModule:CommandsBarView>
         <editorModule:TreeEditorsView Grid.Row="1" x:Name="editorsView"></editorModule:TreeEditorsView>
           </Grid>
 </Window>

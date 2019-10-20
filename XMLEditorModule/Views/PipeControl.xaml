@@ -7,6 +7,7 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Background="LightBlue"
              xmlns:common="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common"
+             xmlns:common1="clr-namespace:WXE.Internal.Tools.ConfigEditor.Common"
              d:DesignHeight="450" d:DesignWidth="800">
  
     <UserControl.Resources>
@@ -27,6 +28,7 @@
             <Setter Property="Background" Value="AliceBlue" />
         </Style>
         <common:OutModeConverter x:Key="enumConverter" />
+        <common1:TextStringToBoolConverter x:Key="TextToBoolConverter" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -63,13 +65,13 @@
 
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="Output Isolation" Style = "{StaticResource attribTitle}" />
-                    <CheckBox IsChecked="{Binding Path=OutputIsolation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <CheckBox IsChecked="{Binding Path=OutputIsolation, Converter={StaticResource TextToBoolConverter}, FallbackValue=false,  Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
 
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="Enable Logging" Style = "{StaticResource attribTitle}" />
-                    <CheckBox IsChecked="{Binding Path=EnableLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox IsChecked="{Binding Path=EnableLogging, Converter={StaticResource TextToBoolConverter}, FallbackValue=false, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel  Style = "{StaticResource attribPanel}">

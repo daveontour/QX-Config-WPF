@@ -15,33 +15,60 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public static readonly Dictionary<string, Dictionary<string, int>> ParamDict = new Dictionary<string, Dictionary<string, int>>() {
             {
                 "MSMQ", new Dictionary<string, int>() {
-                    {"Queue", InputRequired | InputVis | OutputRequired | OutputVis  },
-                    {"Name", InputRequired | InputVis | OutputRequired | OutputVis  },
-                    {"Priority",  InputVis },
-                    {"StyleSheet",  InputVis |  OutputVis  },
-                    {"XSLVersion",  InputVis |  OutputVis  },
-                    {"Connection",  None  },
-              }
-            },
-            {
-                "MQ", new Dictionary<string, int>() {
-                    {"Queue",  InputVis | OutputRequired | OutputVis  },
-                    {"Name", InputRequired | InputVis | OutputRequired | OutputVis  },
-                    {"Priority",  InputVis },
-                    {"StyleSheet",  InputVis |  OutputVis  },
-                    {"XSLVersion",  InputVis |  OutputVis  },
-                    {"Connection",   InputRequired | InputVis | OutputRequired | OutputVis   },
+                    {"queue", InputRequired | InputVis | OutputRequired | OutputVis  },
+                    {"name", InputRequired | InputVis | OutputRequired | OutputVis  },
+                    {"priority",  InputVis },
+                    {"stylesheet",  InputVis |  OutputVis  },
+                    {"xslVersion",  InputVis |  OutputVis  },
+                    {"connection",  None  },
+                    {"createQueue", OutputVis},
+                    {"retryInterval", OutputVis},
+                    {"getTimeout", OutputVis},
+                    {"pause", OutputVis},
+                    {"maxRetry", OutputVis},
+                    {"undeliverableQueue", OutputVis},
+                    {"bufferQueueName", OutputVis},
+                    {"xpathDestination", None},
+                    {"xpathContentDestination", None},
              }
             },
             {
+                "MQ", new Dictionary<string, int>() {
+                    {"queue",  InputVis | OutputRequired | OutputVis  },
+                    {"name", InputRequired | InputVis | OutputRequired | OutputVis  },
+                    {"priority",  InputVis },
+                    {"stylesheet",  InputVis |  OutputVis  },
+                    {"xslVersion",  InputVis |  OutputVis  },
+                    {"connection",   InputRequired | InputVis | OutputRequired | OutputVis   },
+                    {"createQueue", None},
+                    {"retryInterval", OutputVis},
+                    {"getTimeout", OutputVis},
+                    {"pause", OutputVis},
+                    {"maxRetry", OutputVis},
+                    {"undeliverableQueue", OutputVis},
+                    {"bufferQueueName", OutputVis},
+                    {"xpathDestination", None},
+                    {"xpathContentDestination", None},
+           }
+            },
+            {
                 "Kafka", new Dictionary<string, int>() {
-                    {"Queue", None  },
-                    {"Name", InputRequired | InputVis | OutputRequired | OutputVis  },
-                    {"Priority",  InputVis },
-                    {"StyleSheet",  InputVis |  OutputVis  },
-                    {"XSLVersion",  InputVis |  OutputVis  },
-                    {"Connection",   InputRequired | InputVis | OutputRequired | OutputVis  },
-              }
+                    {"queue", None  },
+                    {"name", InputRequired | InputVis | OutputRequired | OutputVis  },
+                    {"priority",  InputVis },
+                    {"stylesheet",  InputVis |  OutputVis  },
+                    {"xslVersion",  InputVis |  OutputVis  },
+                    {"connection",   InputRequired | InputVis | OutputRequired | OutputVis  },
+                    {"createQueue", None},
+                    {"retryInterval", OutputVis},
+                    {"getTimeout", OutputVis},
+                    {"pause", OutputVis},
+                    {"maxRetry", OutputVis},
+                    {"undeliverableQueue", OutputVis},
+                    {"bufferQueueName", OutputVis},
+                    {"xpathDestination", OutputVis},
+                    {"xpathContentDestination", OutputVis},
+             }
             }
         };
     }

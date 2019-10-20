@@ -23,7 +23,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             _node = selectedItem;
             _treeEditorView = treeEditorView;
         }
+        private string GetAttribute(string attribName) {
 
+            if (_node.Attributes[attribName] != null) {
+                return _node.Attributes[attribName].Value;
+            } else {
+                return "";
+            }
+        }
 
 
         public string PipeName {
@@ -106,14 +113,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
-        public bool OutputIsolation {
-            get {
-                if (_node.Attributes["outputIsolation"].Value.ToLower() == "true") {
-                    return true;
-                } else {
-                    return false;
-                }; ;
-            }
+        public string OutputIsolation {
+            get { return GetAttribute("outputIsolation");}
             set {
                 if (_node.Attributes["outputIsolation"] == null) {
                     XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("outputIsolation");
@@ -126,14 +127,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
-        public bool EnableLogging {
-            get {
-                if (_node.Attributes["enableLog"].Value.ToLower() == "true") {
-                    return true;
-                } else {
-                    return false;
-                }; ;
-            }
+        public string EnableLogging {
+            get { return GetAttribute("enableLog"); }
             set {
                 if (_node.Attributes["enableLog"] == null) {
                     XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("enableLog");

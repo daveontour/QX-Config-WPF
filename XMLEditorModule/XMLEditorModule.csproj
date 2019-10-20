@@ -56,6 +56,8 @@
     <Compile Include="Common\ParamConfig.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\TaskListDataTemplateSelector.cs" />
+    <Compile Include="Common\TextStringToBoolConverter.cs" />
+    <Compile Include="Common\TextToBoolConverter.cs" />
     <Compile Include="ViewModels\ChildViewModel.cs" />
     <Compile Include="ViewModels\NodeEndPointEditorViewModel.cs" />
     <Compile Include="ViewModels\SelectedElementViewModel.cs" />
@@ -87,8 +89,8 @@
     <Compile Include="Views\PipeControl.xaml.cs">
       <DependentUpon>PipeControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
+    <Compile Include="Views\NodeControl.xaml.cs">
+      <DependentUpon>NodeControl.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -120,7 +122,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\UserControl1.xaml">
+    <Page Include="Views\NodeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

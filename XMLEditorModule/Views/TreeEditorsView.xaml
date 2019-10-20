@@ -5,7 +5,7 @@
              xmlns:views="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Background="Black">
+             d:DesignHeight="300" d:DesignWidth="300" Background="WhiteSmoke">
     <UserControl.Resources>
 
         <Style x:Key="TabItemFocusVisual">
@@ -195,11 +195,11 @@
     </UserControl.Resources>
   
     <Grid >
+   
         <views:CloseableTabControl x:Name="configEditorTabControl" SelectedIndex="{Binding Path=ActiveEditorIndex, Mode=TwoWay}"
             Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-            Background="Transparent"  ItemsSource="{Binding Path=TreeEditors}"     
-                                       >
+            Background="Transparent"  ItemsSource="{Binding Path=TreeEditors}" >
           </views:CloseableTabControl>
-     
+ 
     </Grid>
 </UserControl>
