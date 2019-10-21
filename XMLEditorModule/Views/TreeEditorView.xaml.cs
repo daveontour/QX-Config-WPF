@@ -85,7 +85,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             XmlNode selectedItem  = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
 
-            if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor") {
+            if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 nodeEditorCntrl.Content = new NodeControl(selectedItem, this);
             } else if (selectedItem.Name == "pipe" ) {
                 nodeEditorCntrl.Content = new PipeControl(selectedItem, this);
@@ -152,6 +152,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
 
             this.xmlTreeView.ContextMenu.Items.Add(new Separator());
 
+            contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].Command = ViewModel.AddAltQueueCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Command = ViewModel.AddDataFilterCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter]);
+
+            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
 
             contextMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.Delete]);
@@ -295,8 +304,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
                 }
                 return isSelected;
             }
-
-
         }
         #endregion
     }

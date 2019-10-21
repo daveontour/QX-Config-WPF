@@ -72,7 +72,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="{Binding Path=QueueTitle, Mode=OneWay}" Style = "{StaticResource attribTitle}" />
-                        <TextBox Text="{Binding Path=Queue, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=Queue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
 
@@ -89,7 +89,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="{Binding Path=NameTitle, Mode=OneWay}"  Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=QName, Mode=TwoWay}"  Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=QName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">
@@ -105,7 +105,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="{Binding Path=ConnectionTitle, Mode=OneWay}"  Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=ConnectionString, Mode=TwoWay}"  Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=ConnectionString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">
@@ -121,7 +121,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="Priority" Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=Priority, Mode=TwoWay}" Width="100" Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=Priority, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="100" Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">
@@ -137,7 +137,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="Stylesheet" Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">
@@ -192,7 +192,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="Change Me" Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">
@@ -208,7 +208,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="Change Me" Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">
@@ -224,7 +224,7 @@
                             </MultiBinding>
                         </StackPanel.Visibility>
                         <TextBlock Text="Change Me" Style = "{StaticResource attribTitle}"></TextBlock>
-                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                        <TextBox Text="{Binding Path=Stylesheet, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                     </StackPanel>
 
                     <StackPanel Style = "{StaticResource attribPanel}">

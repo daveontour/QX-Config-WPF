@@ -21,7 +21,9 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         AddInput,
         AddOutput,
         AddFilter,
-        AddExpression
+        AddExpression,
+        AddAltQueue,
+        AddDataFilter
     }
 
     public enum ParamState {

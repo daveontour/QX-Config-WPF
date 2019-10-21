@@ -28,6 +28,8 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
             ContextMenus.Add(ContextMenuType.AddMonitor, new MenuItem { Header = "Add Monitor Queue" });
             ContextMenus.Add(ContextMenuType.AddLogger, new MenuItem { Header = "Add Logger Queue" });
             ContextMenus.Add(ContextMenuType.AddNamespace, new MenuItem { Header = "Add Namespace" });
+            ContextMenus.Add(ContextMenuType.AddAltQueue, new MenuItem { Header = "Add Alternative Queue" });
+            ContextMenus.Add(ContextMenuType.AddDataFilter, new MenuItem { Header = "Add Data Filter" });
         }
     }
 }

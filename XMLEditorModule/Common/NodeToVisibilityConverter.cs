@@ -15,9 +15,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             string epType = (string)values[1];
             string param = (string)values[2];
 
-            Console.WriteLine($"{nodeType}, {epType}, {param}");
-
-            try {
+             try {
                 int conf = ParamConfig.ParamDict[nodeType][param];
                 int inQ = conf & ParamConfig.InputVis;
                 int outQ = conf & ParamConfig.OutputVis;

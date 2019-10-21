@@ -40,11 +40,11 @@
                 </StackPanel>
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="Prefix" Style = "{StaticResource attribTitle}" />
-                    <TextBox Text="{Binding Path=Prefix, Mode=TwoWay}" Width="100" Style = "{StaticResource attribValue}" />
+                    <TextBox Text="{Binding Path=Prefix, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="100" Style = "{StaticResource attribValue}" />
                 </StackPanel>
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="URI" Style = "{StaticResource attribTitle}" />
-                    <TextBox Text="{Binding Path=URI, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                    <TextBox Text="{Binding Path=URI, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                 </StackPanel>
             
             </StackPanel>

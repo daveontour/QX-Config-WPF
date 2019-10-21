@@ -44,34 +44,30 @@
                 </StackPanel>
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="*Pipe Name" Style = "{StaticResource attribTitle}" />
-                    <TextBox Text="{Binding Path=PipeName, Mode=TwoWay}" Style = "{StaticResource attribValue}" />
+                    <TextBox Text="{Binding Path=PipeName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style = "{StaticResource attribValue}" />
                 </StackPanel>
 
                 
                 <StackPanel Style = "{StaticResource attribPanel}">
                     <TextBlock Text="Output Mode"  Style = "{StaticResource attribTitle}"></TextBlock>
+
                     <StackPanel  Orientation="Horizontal" >
-                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="All" IsChecked="{Binding Path=OutputMode, Mode=TwoWay, 
-                                 Converter={StaticResource enumConverter},
-                                 ConverterParameter=All}"/>
-                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="Round Robin" IsChecked="{Binding Path=OutputMode, Mode=TwoWay, 
-                                 Converter={StaticResource enumConverter},
-                                 ConverterParameter=Round}"/>
-                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="Random" IsChecked="{Binding Path=OutputMode, Mode=TwoWay, 
-                                 Converter={StaticResource enumConverter},
-                                 ConverterParameter=Random}" />
+                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="All" IsChecked="{Binding Path=OutputModeAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="Round Robin" IsChecked="{Binding Path=OutputModeRound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <RadioButton GroupName="outmode" Margin="5,0,0,0" Content="Random" IsChecked="{Binding Path=OutputModeRandom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
+
                 </StackPanel>
 
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="Output Isolation" Style = "{StaticResource attribTitle}" />
-                    <CheckBox IsChecked="{Binding Path=OutputIsolation, Converter={StaticResource TextToBoolConverter}, FallbackValue=false,  Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <CheckBox IsChecked="{Binding Path=OutputIsolation,  Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
 
                 <StackPanel  Style = "{StaticResource attribPanel}">
                     <TextBlock Text="Enable Logging" Style = "{StaticResource attribTitle}" />
-                    <CheckBox IsChecked="{Binding Path=EnableLogging, Converter={StaticResource TextToBoolConverter}, FallbackValue=false, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <CheckBox IsChecked="{Binding Path=EnableLogging, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
 
                 <StackPanel  Style = "{StaticResource attribPanel}">

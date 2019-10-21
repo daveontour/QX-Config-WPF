@@ -100,6 +100,16 @@
             </HierarchicalDataTemplate.ItemsSource>
         </HierarchicalDataTemplate>
 
+        <HierarchicalDataTemplate x:Key="AltQueueNodeTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="PaleVioletRed" Text="Alt Queue - "></TextBlock>
+                <TextBlock Foreground="PaleVioletRed" Text="{Binding XPath=@name}" />
+            </StackPanel>
+            <HierarchicalDataTemplate.ItemsSource>
+                <Binding XPath="child::node()" />
+            </HierarchicalDataTemplate.ItemsSource>
+        </HierarchicalDataTemplate>
+
         <HierarchicalDataTemplate x:Key="PipesNodeTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Pipes"  FontWeight="DemiBold"></TextBlock>

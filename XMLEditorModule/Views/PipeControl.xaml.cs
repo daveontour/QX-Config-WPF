@@ -32,6 +32,21 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
+        private void SetAttribute(string attribName, string value) {
+            if ((value == null || value == "") && _node.Attributes[attribName] != null) {
+                _node.Attributes.Remove(_node.Attributes[attribName]);
+            } else {
+
+                if (_node.Attributes[attribName] == null) {
+                    XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute(attribName);
+                    newAttribute.Value = value;
+                    _node.Attributes.Append(newAttribute);
+                } else {
+                    _node.Attributes[attribName].Value = value;
+                }
+            }
+        }
+
 
         public string PipeName {
             get { return _node.Attributes["name"].Value; ; }
@@ -49,17 +64,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public int MaxMess {
             get {
-                if (_node.Attributes["maxMsgPerMinute"] == null) {
-                    XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("maxMsgPerMinute");
-                    newAttribute.Value = "-1";
-                    _node.Attributes.Append(newAttribute);
-                    return -1;
-                } else {
+                if (_node.Attributes["maxMsgPerMinute"] != null) {
                     return int.Parse(_node.Attributes["maxMsgPerMinute"].Value);
+                } else {
+                    return -1;
                 }
+
             }
             set {
-                _node.Attributes["maxMsgPerMinute"].Value = value.ToString();
+                if (value == -1) {
+                    _node.Attributes.Remove(_node.Attributes["maxMsgPerMinute"]);
+                } else {
+                    SetAttribute("maxMsgPerMinute", value.ToString());
+                }
                 OnPropertyChanged("MaxMess");
                 OnPropertyChanged("MaxMessString");
             }
@@ -67,7 +84,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public string MaxMessString {
             get {
-                if (_node.Attributes["maxMsgPerMinute"].Value == "-1") {
+                if (_node.Attributes["maxMsgPerMinute"] == null) {
                     return "Unlimited";
                 } else {
                     return _node.Attributes["maxMsgPerMinute"].Value;
@@ -75,71 +92,91 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
-        public string OutputMode {
+        public bool OutputModeAll {
             get {
-                if (_node.Attributes["roundRobinDistribution"] == null) {
-                    XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("roundRobinDistribution");
-                    newAttribute.Value = "False";
-                    _node.Attributes.Append(newAttribute);
-                }
-                if (_node.Attributes["randomDistribution"] == null) {
-                    XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("randomDistribution");
-                    newAttribute.Value = "False";
-                    _node.Attributes.Append(newAttribute);
-                }
-
-                if (_node.Attributes["roundRobinDistribution"].Value.ToLower() == "true") {
-                    return "Round";
-                } else if (_node.Attributes["randomDistribution"].Value.ToLower() == "true") {
-                    return "Random";
+                if (_node.Attributes["roundRobinDistribution"] == null && _node.Attributes["randomDistribution"] == null) {
+                    return true;
                 } else {
-                    return "All";
+                    return false;
                 }
             }
             set {
-                if (value == "Random") {
-                    _node.Attributes["roundRobinDistribution"].Value = "false";
-                    _node.Attributes["randomDistribution"].Value = "true";
-                    OnPropertyChanged("OutputMode");
-                } else if (value == "Round") {
-                    _node.Attributes["roundRobinDistribution"].Value = "true";
-                    _node.Attributes["randomDistribution"].Value = "false";
-                    OnPropertyChanged("OutputMode");
-                } else {
-                    _node.Attributes["roundRobinDistribution"].Value = "false";
-                    _node.Attributes["randomDistribution"].Value = "false";
-                    OnPropertyChanged("OutputMode");
+                if (value) {
+                    _node.Attributes.Remove(_node.Attributes["roundRobinDistribution"]);
+                    _node.Attributes.Remove(_node.Attributes["randomDistribution"]);
                 }
+                OnPropertyChanged("OutputModeAll");
             }
         }
 
-        public string OutputIsolation {
-            get { return GetAttribute("outputIsolation");}
-            set {
-                if (_node.Attributes["outputIsolation"] == null) {
-                    XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("outputIsolation");
-                    newAttribute.Value = value.ToString();
-                    _node.Attributes.Append(newAttribute);
+        public bool OutputModeRound {
+            get {
+                if (_node.Attributes["roundRobinDistribution"] != null) {
+                    return true;
                 } else {
-                    _node.Attributes["outputIsolation"].Value = value.ToString();
+                    return false;
+                }
+            }
+            set {
+                if (value) {
+                    _node.Attributes.Remove(_node.Attributes["randomDistribution"]);
+                    SetAttribute("roundRobinDistribution", "true");
+                }
+                OnPropertyChanged("OutputModeRound");
+            }
+        }
+
+        public bool OutputModeRandom {
+            get {
+                if (_node.Attributes["randomDistribution"] != null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            set {
+                if (value) {
+                    _node.Attributes.Remove(_node.Attributes["roundRobinDistribution"]);
+                    SetAttribute("randomDistribution", "true");
+                }
+                OnPropertyChanged("OutputModeRandom");
+            }
+        }
+
+        public bool OutputIsolation {
+            get {
+                if (_node.Attributes["outputIsolation"] != null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            set {
+                if (value) {
+                    SetAttribute("outputIsolation", value.ToString());
+                } else {
+                    _node.Attributes.Remove(_node.Attributes["outputIsolation"]);
                 }
                 OnPropertyChanged("OutputIsolation");
             }
         }
 
-        public string EnableLogging {
-            get { return GetAttribute("enableLog"); }
-            set {
-                if (_node.Attributes["enableLog"] == null) {
-                    XmlAttribute newAttribute = this._treeEditorView.viewModel.DataModel.CreateAttribute("enableLog");
-                    newAttribute.Value = value.ToString();
-                    _node.Attributes.Append(newAttribute);
+        public bool EnableLogging {
+            get {
+                if (_node.Attributes["enableLog"] != null) {
+                    return true;
                 } else {
-                    _node.Attributes["enableLog"].Value = value.ToString();
+                    return false;
+                }
+            }
+            set {
+                if (value) {
+                    SetAttribute("enableLog", value.ToString());
+                } else {
+                    _node.Attributes.Remove(_node.Attributes["enableLog"]);
                 }
                 OnPropertyChanged("EnableLogging");
             }
         }
-
     }
 }

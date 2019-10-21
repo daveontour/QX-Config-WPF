@@ -119,7 +119,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 } else if (_node.Name == "monitor") {
                     return "Monitor Queue Configurarion";
                 } else if (_node.Name == "altqueue") {
-                    return "Alternative Queue Configurarion";
+                    return "Alternative Queue Configuration (messages that fail the filter)";
                 } else {
                     return "Configuration";
                 }

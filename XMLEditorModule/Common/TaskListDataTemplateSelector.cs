@@ -31,6 +31,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 return element.FindResource("FilterNodeTemplate") as DataTemplate;
             } else if (el.Name == "namespace") {
                 return element.FindResource("NamespaceNodeTemplate") as DataTemplate;
+            } else if (el.Name == "altqueue") {
+                return element.FindResource("AltQueueNodeTemplate") as DataTemplate;
             } else {
                 return element.FindResource("NodeTemplate") as DataTemplate;
             }

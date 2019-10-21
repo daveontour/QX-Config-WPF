@@ -23,6 +23,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.addOutputCommand = new RelayCommand<XmlNodeType>(AddOutput, CanAddOutput);
             this.addFilterCommand = new RelayCommand<XmlNodeType>(AddFilter, CanAddFilter);
             this.addExpressionCommand = new RelayCommand<XmlNodeType>(AddExpression, CanAddExpression);
+            this.addAltQueueCommand = new RelayCommand<XmlNodeType>(AddAltQueue, CanAddAltQueue);
+            this.addDataFilterCommand = new RelayCommand<XmlNodeType>(AddExpression, CanAddExpression);
             this.addMonitorCommand = new RelayCommand<XmlNodeType>(AddMonitor, CanAddMonitor);
             this.addLoggerCommand = new RelayCommand<XmlNodeType>(AddLogger, CanAddLogger);
             this.addNamespaceCommand = new RelayCommand<XmlNodeType>(AddNamespace, CanAddNamespace);
@@ -163,6 +165,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         public ICommand AddExpressionCommand {
             get { return addExpressionCommand; }
+        }
+
+
+        private ICommand addAltQueueCommand;
+
+        public ICommand AddAltQueueCommand {
+            get { return addAltQueueCommand; }
+        }
+
+        private ICommand addDataFilterCommand;
+
+        public ICommand AddDataFilterCommand {
+            get { return addDataFilterCommand; }
         }
         private ICommand copyElementCommand;
 
@@ -507,6 +522,53 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
         }
 
+        private void AddAltQueue(XmlNodeType newNodeType) {
+                XmlNode newNode = this.DataModel.CreateElement("altqueue");
+                XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
+                newAttribute.Value = "MSMQ";
+                XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
+                newAttribute2.Value = "Messages that fail the filter";
+                XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
+                newAttribute3.Value = @".\private$\QUEUENAME-ALTQUEUE";
+
+                newNode.Attributes.Append(newAttribute);
+                newNode.Attributes.Append(newAttribute2);
+                newNode.Attributes.Append(newAttribute3);
+
+                if (newNode == null)
+                    return;
+                if (newNode.NodeType == XmlNodeType.Attribute) {
+                    SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
+                    ViewAttributes(SelectedElement.DataModel);
+                } else {
+                    SelectedElement.DataModel.AppendChild(newNode);
+                }
+
+                OnPropertyChanged("XMLText");
+
+            }
+
+            private bool CanAddAltQueue(XmlNodeType newNodeType) {
+
+            if (SelectedElement == null || SelectedElement.DataModel == null) {
+                return false;
+            }
+            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
+                return false;
+            }
+
+            if (SelectedElement.DataModel.Name != "filter") {
+                return false;
+            }
+
+            foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
+                if (n.Name == "altqueue") {
+                    return false;
+                }
+            }
+
+            return true;
+        }
         private void AddMonitor(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("monitor");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
