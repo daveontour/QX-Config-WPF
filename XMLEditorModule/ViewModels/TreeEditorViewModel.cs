@@ -1,15 +1,181 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml;
-using System.Collections.ObjectModel;
+
 using System.Windows.Input;
 using WXE.Internal.Tools.ConfigEditor.Common;
+using System.ComponentModel;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
+
+    //[CategoryOrder("Required", 1)]
+    //[CategoryOrder("Optional", 2)]
+    //public class MyPropertyGrid {
+    //    public enum ETestEnum { MSMQ, IBMMQ, KAFKA }
+    //    public int maxMsgPerMinute = -1;
+    //    public int maxMsg = -1;
+    //    public ETestEnum type = ETestEnum.MSMQ;
+    //    public XmlNode _node;
+
+    //    private string GetAttribute(string attribName) {
+
+    //        if (_node.Attributes[attribName] != null) {
+    //            return _node.Attributes[attribName].Value;
+    //        } else {
+    //            return "";
+    //        }
+    //    }
+
+    //    private void SetAttribute(string attribName, string value) {
+    //        if ((value == null || value == "") && _node.Attributes[attribName] != null) {
+    //            _node.Attributes.Remove(_node.Attributes[attribName]);
+    //        } else {
+
+    //            if (_node.Attributes[attribName] == null) {
+    //                XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
+    //                newAttribute.Value = value;
+    //                _node.Attributes.Append(newAttribute);
+    //            } else {
+    //                _node.Attributes[attribName].Value = value;
+    //            }
+    //        }
+    //    }
+
+
+    //    [CategoryAttribute("Required"),
+    //    DisplayName("Node Type"),
+    //    PropertyOrder(1),
+    //    DescriptionAttribute("Type of the endpoint node")]
+    //    public ETestEnum ComboData {
+    //        get { return type; }
+    //    }
+
+    //    [CategoryAttribute("Optional"),
+    //    DisplayName("Maximum Messages/Minute"),
+    //    PropertyOrder(1),
+    //    DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
+    //    public int MessPerMinute {
+    //        get { return maxMsgPerMinute; }
+    //        set {
+    //            if (value < -1) {
+    //                maxMsgPerMinute = -1;
+    //            } else if (value > 250) {
+    //                maxMsgPerMinute = 250;
+    //            } else {
+    //                maxMsgPerMinute = value;
+    //            }
+    //        }
+    //    }
+    //    [CategoryAttribute("Optional"),
+    //    DisplayName("Maximum Messages"),
+    //    PropertyOrder(10),
+    //    DescriptionAttribute("The maximum number of messages in the output queue (-1 for unlimited)")]
+    //    public int MaxMess {
+    //        get { return maxMsg; }
+    //        set {
+    //            if (value < 1) {
+    //                maxMsg = 1;
+    //            } else {
+    //                maxMsg = value;
+    //            }
+    //        }
+    //    }
+    //    [CategoryAttribute("Required"),
+    //    DisplayName("Queue"),
+    //    PropertyOrder(2),
+    //    DescriptionAttribute("The MSMQ queue the message is sent to when the message has been processed")]
+    //    public string Queue {
+    //        get {
+    //            string queue = GetAttribute("queue");
+    //            return queue;
+    //            }
+    //        set { 
+    //              SetAttribute("queue", value);
+    //            }
+    //    }
+
+    //    [CategoryAttribute("Required"),
+    //     DisplayName("Name"),
+    //     PropertyOrder(1),
+    //     DescriptionAttribute("Descriptive name of the queue")]
+    //    public string Name {
+    //        get {
+    //            return GetAttribute("name");
+    //        }
+    //        set {
+    //            SetAttribute("name", value);
+    //        }
+    //    }
+    //}
+
+    //public class MQ : MyPropertyGrid {
+
+
+    //    public MQ() {
+
+    //    }
+
+    //    [CategoryAttribute("Required"),
+    //    DisplayName("Queue Manager"),
+    //    PropertyOrder(1),
+    //    DescriptionAttribute("IBM MQ Queue Manager Name")]
+    //    public string QManager {
+    //        get;
+    //        set;
+    //    }
+
+    //    [CategoryAttribute("Required"),
+    //    DisplayName("Host"),
+    //    PropertyOrder(2),
+    //    DescriptionAttribute("Host name")]
+    //    public string HostName {
+    //        get;
+    //        set;
+    //    }
+
+    //}
+
+    //public class PIPE : MyPropertyGrid {
+
+
+    //    public PIPE(XmlNode dataModel) {
+    //        this._node = dataModel;
+    //    }
+
+    //    [CategoryAttribute("Required"),
+    //    DisplayName("Queue Manager"),
+    //    PropertyOrder(1),
+    //    DescriptionAttribute("IBM MQ Queue Manager Name")]
+    //    public string QManager {
+    //        get;
+    //        set;
+    //    }
+
+    //    [CategoryAttribute("Required"),
+    //    DisplayName("Host"),
+    //    PropertyOrder(2),
+    //    DescriptionAttribute("Host name")]
+    //    public string HostName {
+    //        get;
+    //        set;
+    //    }
+
+    //}
+
+    //public class MSMQ : MyPropertyGrid {
+        
+
+    //    public MSMQ(XmlNode dataModel) {
+    //        this._node = dataModel;
+    //    }
+    //}
+
     public class TreeEditorViewModel : BaseViewModel {
         public TreeEditorViewModel(XmlDocument dataModel, string filePath, string fileName) {
+          //  this.myGrid = new MQ();
             this.DataModel = dataModel;
             this.path = filePath;
             this.fileName = fileName;
@@ -33,9 +199,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.deleteElementCommand = new RelayCommand<XmlNode>(p => { DeleteElement(SelectedElement.DataModel); }, p => { return CanDeleteElement(SelectedElement.DataModel); });
             this.unloadDocumentCommand = new RelayCommand(UnloadDocument);
         }
+
+        public MyPropertyGrid myGrid { get; set; }
         public XmlDocument DataModel { get; private set; }
 
         public static XmlNode CopiedElement;
+
+        public IView View { get; set; }
 
         private string path;
 
@@ -59,6 +229,24 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 selectedElement = value;
                 OnPropertyChanged("SelectedElement");
                 SelectedNodeXpath = GetXPathToNode(SelectedElement.DataModel);
+                UpdatePropertiesPanel(selectedElement.DataModel);
+                View.HightLightCanvas(selectedElement.DataModel);
+
+            }
+        }
+
+        private void UpdatePropertiesPanel(XmlNode selectedItem) {
+
+
+            if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
+                myGrid = new MSMQ(selectedItem);
+                OnPropertyChanged("myGrid");
+            } else if (selectedItem.Name == "pipe") {
+                myGrid = new PIPE(selectedItem);
+                OnPropertyChanged("myGrid");
+            } else {
+                myGrid = null;
+                OnPropertyChanged("myGrid");
             }
         }
 
@@ -72,7 +260,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 wr.Close();
                 return sb.ToString();
             }
-
         }
 
         private string selectedNodeXpath = string.Empty;
@@ -356,6 +543,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             SelectedElement.DataModel.AppendChild(newNode);
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -382,6 +570,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         private void AddInput(XmlNodeType newNodeType) {
+
+
 
             XmlNode newNode = this.DataModel.CreateElement("input");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
@@ -415,6 +605,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -456,6 +647,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             SelectedElement.DataModel.AppendChild(newNode);
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -496,6 +688,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
 
         }
@@ -523,32 +716,33 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         private void AddAltQueue(XmlNodeType newNodeType) {
-                XmlNode newNode = this.DataModel.CreateElement("altqueue");
-                XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
-                newAttribute.Value = "MSMQ";
-                XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
-                newAttribute2.Value = "Messages that fail the filter";
-                XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-                newAttribute3.Value = @".\private$\QUEUENAME-ALTQUEUE";
+            XmlNode newNode = this.DataModel.CreateElement("altqueue");
+            XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
+            newAttribute.Value = "MSMQ";
+            XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
+            newAttribute2.Value = "Messages that fail the filter";
+            XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
+            newAttribute3.Value = @".\private$\QUEUENAME-ALTQUEUE";
 
-                newNode.Attributes.Append(newAttribute);
-                newNode.Attributes.Append(newAttribute2);
-                newNode.Attributes.Append(newAttribute3);
+            newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute2);
+            newNode.Attributes.Append(newAttribute3);
 
-                if (newNode == null)
-                    return;
-                if (newNode.NodeType == XmlNodeType.Attribute) {
-                    SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                    ViewAttributes(SelectedElement.DataModel);
-                } else {
-                    SelectedElement.DataModel.AppendChild(newNode);
-                }
-
-                OnPropertyChanged("XMLText");
-
+            if (newNode == null)
+                return;
+            if (newNode.NodeType == XmlNodeType.Attribute) {
+                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
+                ViewAttributes(SelectedElement.DataModel);
+            } else {
+                SelectedElement.DataModel.AppendChild(newNode);
             }
 
-            private bool CanAddAltQueue(XmlNodeType newNodeType) {
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
+
+        }
+
+        private bool CanAddAltQueue(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
@@ -592,6 +786,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -639,6 +834,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -686,6 +882,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -724,6 +921,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -784,6 +982,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             currentNode.ParentNode.RemoveChild(currentNode);
             OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
 
         }
 
@@ -854,6 +1053,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 node.Name
                 );
         }
+
         #endregion
     }
 }

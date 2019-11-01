@@ -5,16 +5,28 @@
              xmlns:local="clr-namespace:WXE.Internal.Tools.ConfigEditor.Common"
              xmlns:views="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views"
              xmlns:xmlNS="clr-namespace:System.Xml;assembly=System.Xml"
-              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local1="clr-namespace:WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Name="loaderWindow"  >
+             d:DesignHeight="600" d:DesignWidth="1200" Name="loaderWindow"  >
+
     <UserControl.Resources>
 
         <local:AddChildVisibilityConverter x:Key="AddChildVisibilityConverter"/>
         <local:RemoveChildVisibilityConverter x:Key="RemoveChildVisibilityConverter"/>
         <local:XmlAttributesToLableConverter x:Key="XmlAttributesToLableConverter"/>
         <local1:TaskListDataTemplateSelector x:Key="myDataTemplateSelector"/>
+
+        <Canvas x:Key="bat" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="40" Height="47" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Path x:Name="path" Width="40.25" Height="47"  Stretch="Uniform" Fill="#FF000000" Data="F1 M 35,51L 51,51L 43,43L 49.25,43L 60.25,53.5L 50.25,64L 43,64L 51,56L 35,56L 35,51 Z M 20,17L 43.25,17L 56,29.75L 56,47.75L 52,43.75L 52,34L 39,34L 39,21L 24,21L 24,55L 33.75,55L 34.75,59L 20,59L 20,17 Z M 43,22.25L 43,30L 50.75,30L 43,22.25 Z "/>
+        </Canvas>
+
+        <Canvas x:Key="dup" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Name="appbar_page_duplicate" Width="38" Height="38">
+            <Path  x:Name="path2" Width="38" Height="38" Canvas.Left="0" Canvas.Top="0" Stretch="Fill" Fill="#FF000000" Data="F1 M 27,47L 31,47L 31,53L 55,53L 55,35L 43,35L 43,23L 31,23L 31,41L 27,41L 27,19L 47.25,19L 59,30.75L 59,57L 27,57L 27,47 Z M 22,42L 40,42L 33,36L 39,36L 48.2918,44.3334L 39,52L 33,52L 40,46L 22,46L 22,42 Z M 47,24.25L 47,31L 53.75,31L 47,24.25 Z "/>
+        </Canvas>
+        <Path x:Key="arrow" Stroke="Black" />
+        <Path x:Key="arrowHead" Stroke="Black" />
 
 
         <HierarchicalDataTemplate x:Key="NodeTemplate">
@@ -175,14 +187,17 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
-         <Grid Grid.Row="0" Margin="0,0,0,0">
+        <Grid Grid.Row="0" Margin="0,0,0,0">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="270"></ColumnDefinition>
                 <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="450"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
+            <!-- Column 0: Tree View of Config file -->
             <TreeView Name="xmlTreeView" Background="LightYellow"
                   ItemsSource="{Binding Source={StaticResource xmlDataProvider}, XPath=*}"
                   ItemTemplateSelector="{StaticResource myDataTemplateSelector}"
@@ -204,15 +219,34 @@
                 VerticalAlignment="Stretch"
                 Cursor="SizeWE"/>
 
-            <Grid Grid.Column="2" Background="LightBlue">
+            <!-- Column 2: Visual View of Config file -->
+            <Viewbox VerticalAlignment="Top" Stretch="Uniform"   Grid.Column="2">
+                <Grid HorizontalAlignment="Center">
+                    <StackPanel VerticalAlignment="Top" Panel.ZIndex="50" Grid.Column="0" Grid.ColumnSpan="2" x:Name="panel" Width="600" />
+                </Grid>
+            </Viewbox>
+
+
+            <GridSplitter 
+                Background="Gray" 
+                Grid.Column="3" 
+                Height="Auto" Width="Auto" 
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Cursor="SizeWE"/>
+
+            <!-- Column 4: Properties and XML view -->
+            <Grid Grid.Column="4">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="5*" />
+                    <RowDefinition Height="7*" />
                     <RowDefinition Height="5" />
-                    <RowDefinition Height="6*" />
+                    <RowDefinition Height="5*" />
                 </Grid.RowDefinitions>
-               
-                <UserControl x:Name="nodeEditorCntrl" Grid.Row="0"  Background="LightBlue" />
-               
+
+                <!-- Row 0: Properties of the selected Item -->
+                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="450" SelectedObject="{Binding myGrid}" AutoGenerateProperties="true" />
+
+
                 <GridSplitter 
                 Background="Gray" 
                 Grid.Row="1"
@@ -221,10 +255,10 @@
                 VerticalAlignment="Stretch"
                 Cursor="SizeNS"/>
 
+                <!-- Row 2: Raw XML -->
                 <ScrollViewer Grid.Row="2"  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" >
                     <TextBlock TextWrapping="NoWrap" Text="{Binding Path=XMLText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="White"  HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" />
                 </ScrollViewer>
-
             </Grid>
         </Grid>
 
@@ -236,6 +270,7 @@
             </StatusBar>
         </Grid>
     </Grid>
+
     <!--Visibility="{Binding Path=SelectedElement.DataModel, Converter={StaticResource AddChildVisibilityConverter}}"-->
 
 

@@ -4,7 +4,7 @@ using System.Xml;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
-    public partial class PipeControl : UserControl, INotifyPropertyChanged {
+    public partial class BooleanControl : UserControl, INotifyPropertyChanged {
 
         private XmlNode _node;
         TreeEditorView _treeEditorView;
@@ -17,7 +17,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 _treeEditorView.ControlPropertyChange();
             }
         }
-        public PipeControl(XmlNode selectedItem, TreeEditorView treeEditorView) {
+        public BooleanControl(XmlNode selectedItem, TreeEditorView treeEditorView) {
             InitializeComponent();
             this.DataContext = this;
             _node = selectedItem;
