@@ -11,167 +11,6 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
-    //[CategoryOrder("Required", 1)]
-    //[CategoryOrder("Optional", 2)]
-    //public class MyPropertyGrid {
-    //    public enum ETestEnum { MSMQ, IBMMQ, KAFKA }
-    //    public int maxMsgPerMinute = -1;
-    //    public int maxMsg = -1;
-    //    public ETestEnum type = ETestEnum.MSMQ;
-    //    public XmlNode _node;
-
-    //    private string GetAttribute(string attribName) {
-
-    //        if (_node.Attributes[attribName] != null) {
-    //            return _node.Attributes[attribName].Value;
-    //        } else {
-    //            return "";
-    //        }
-    //    }
-
-    //    private void SetAttribute(string attribName, string value) {
-    //        if ((value == null || value == "") && _node.Attributes[attribName] != null) {
-    //            _node.Attributes.Remove(_node.Attributes[attribName]);
-    //        } else {
-
-    //            if (_node.Attributes[attribName] == null) {
-    //                XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
-    //                newAttribute.Value = value;
-    //                _node.Attributes.Append(newAttribute);
-    //            } else {
-    //                _node.Attributes[attribName].Value = value;
-    //            }
-    //        }
-    //    }
-
-
-    //    [CategoryAttribute("Required"),
-    //    DisplayName("Node Type"),
-    //    PropertyOrder(1),
-    //    DescriptionAttribute("Type of the endpoint node")]
-    //    public ETestEnum ComboData {
-    //        get { return type; }
-    //    }
-
-    //    [CategoryAttribute("Optional"),
-    //    DisplayName("Maximum Messages/Minute"),
-    //    PropertyOrder(1),
-    //    DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
-    //    public int MessPerMinute {
-    //        get { return maxMsgPerMinute; }
-    //        set {
-    //            if (value < -1) {
-    //                maxMsgPerMinute = -1;
-    //            } else if (value > 250) {
-    //                maxMsgPerMinute = 250;
-    //            } else {
-    //                maxMsgPerMinute = value;
-    //            }
-    //        }
-    //    }
-    //    [CategoryAttribute("Optional"),
-    //    DisplayName("Maximum Messages"),
-    //    PropertyOrder(10),
-    //    DescriptionAttribute("The maximum number of messages in the output queue (-1 for unlimited)")]
-    //    public int MaxMess {
-    //        get { return maxMsg; }
-    //        set {
-    //            if (value < 1) {
-    //                maxMsg = 1;
-    //            } else {
-    //                maxMsg = value;
-    //            }
-    //        }
-    //    }
-    //    [CategoryAttribute("Required"),
-    //    DisplayName("Queue"),
-    //    PropertyOrder(2),
-    //    DescriptionAttribute("The MSMQ queue the message is sent to when the message has been processed")]
-    //    public string Queue {
-    //        get {
-    //            string queue = GetAttribute("queue");
-    //            return queue;
-    //            }
-    //        set { 
-    //              SetAttribute("queue", value);
-    //            }
-    //    }
-
-    //    [CategoryAttribute("Required"),
-    //     DisplayName("Name"),
-    //     PropertyOrder(1),
-    //     DescriptionAttribute("Descriptive name of the queue")]
-    //    public string Name {
-    //        get {
-    //            return GetAttribute("name");
-    //        }
-    //        set {
-    //            SetAttribute("name", value);
-    //        }
-    //    }
-    //}
-
-    //public class MQ : MyPropertyGrid {
-
-
-    //    public MQ() {
-
-    //    }
-
-    //    [CategoryAttribute("Required"),
-    //    DisplayName("Queue Manager"),
-    //    PropertyOrder(1),
-    //    DescriptionAttribute("IBM MQ Queue Manager Name")]
-    //    public string QManager {
-    //        get;
-    //        set;
-    //    }
-
-    //    [CategoryAttribute("Required"),
-    //    DisplayName("Host"),
-    //    PropertyOrder(2),
-    //    DescriptionAttribute("Host name")]
-    //    public string HostName {
-    //        get;
-    //        set;
-    //    }
-
-    //}
-
-    //public class PIPE : MyPropertyGrid {
-
-
-    //    public PIPE(XmlNode dataModel) {
-    //        this._node = dataModel;
-    //    }
-
-    //    [CategoryAttribute("Required"),
-    //    DisplayName("Queue Manager"),
-    //    PropertyOrder(1),
-    //    DescriptionAttribute("IBM MQ Queue Manager Name")]
-    //    public string QManager {
-    //        get;
-    //        set;
-    //    }
-
-    //    [CategoryAttribute("Required"),
-    //    DisplayName("Host"),
-    //    PropertyOrder(2),
-    //    DescriptionAttribute("Host name")]
-    //    public string HostName {
-    //        get;
-    //        set;
-    //    }
-
-    //}
-
-    //public class MSMQ : MyPropertyGrid {
-        
-
-    //    public MSMQ(XmlNode dataModel) {
-    //        this._node = dataModel;
-    //    }
-    //}
 
     public class TreeEditorViewModel : BaseViewModel {
         public TreeEditorViewModel(XmlDocument dataModel, string filePath, string fileName) {
@@ -239,15 +78,23 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
 
             if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
-                myGrid = new MSMQ(selectedItem);
-                OnPropertyChanged("myGrid");
+
+                switch (selectedItem.Attributes["type"].Value) {
+                    case "MSMQ":
+                        myGrid = new MSMQ(selectedItem, this.View);
+                        break;
+                    case "MQ":
+                        myGrid = new MQ(selectedItem, this.View);
+                        break;
+                }
             } else if (selectedItem.Name == "pipe") {
-                myGrid = new PIPE(selectedItem);
-                OnPropertyChanged("myGrid");
+                myGrid = new PIPE(selectedItem, this.View);
+            } else if (selectedItem.Name == "namespace") {
+                myGrid = new NameSpaceGrid(selectedItem, this.View);
             } else {
                 myGrid = null;
-                OnPropertyChanged("myGrid");
             }
+            OnPropertyChanged("myGrid");
         }
 
         public string XMLText {
@@ -421,7 +268,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         IEnumerator<XmlNode> enumerator;
-        private void HighlightElement(string xPath) {
+        public void HighlightElement(string xPath) {
+
+            
             //
             if (xPath != prevXPath) {
                 try {

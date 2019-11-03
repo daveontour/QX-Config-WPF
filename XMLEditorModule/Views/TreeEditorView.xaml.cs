@@ -20,7 +20,7 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
     public partial class TreeEditorView : UserControl, INotifyPropertyChanged, IView {
- 
+
         private ContextMenuProvider contextMenuProvider;
         private const int arrowHeadWidth = 5;
         private const int arrowHeadLength = 12;
@@ -39,7 +39,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             DataContextChanged += new DependencyPropertyChangedEventHandler(TreeEditorView_DataContextChanged);
             contextMenuProvider = new ContextMenuProvider();
             xmlTreeView.ContextMenu = new ContextMenu();
-      
+
         }
 
         public Canvas SelectedCanvas {
@@ -121,13 +121,62 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             return can;
         }
+
+        public Canvas GetMonitorCanvas() {
+
+            Canvas can = new Canvas();
+            Canvas monitorcanvas = GetResourceCopy<Canvas>("monitor");
+
+            can.Children.Add(monitorcanvas);
+
+            TextBlock txt = new TextBlock() {Text = "Monitor", FontSize = 8};
+            txt.SetValue(Canvas.LeftProperty, 0.0);
+            txt.SetValue(Canvas.TopProperty, (double)monitorcanvas.Height+2);
+
+            can.Children.Add(txt);
+
+            return can;
+        }
+
+        public Canvas GetLoggerCanvas() {
+
+            Canvas can = new Canvas();
+            Canvas monitorcanvas = GetResourceCopy<Canvas>("logger");
+
+            can.Children.Add(monitorcanvas);
+
+            TextBlock txt = new TextBlock() { Text = "Logger", FontSize = 8 };
+            txt.SetValue(Canvas.LeftProperty, 0.0);
+            txt.SetValue(Canvas.TopProperty, (double)monitorcanvas.Height + 2);
+
+            can.Children.Add(txt);
+
+            return can;
+        }
+
+        public Canvas GetNSCanvas() {
+
+            Canvas can = new Canvas();
+            Canvas nscanvas = GetResourceCopy<Canvas>("namespace");
+
+            can.Children.Add(nscanvas);
+
+            TextBlock txt = new TextBlock() { Text = "Namespace", FontSize = 8 };
+            txt.SetValue(Canvas.LeftProperty, 0.0);
+            txt.SetValue(Canvas.TopProperty, (double)32);
+
+            can.Children.Add(txt);
+
+            return can;
+        }
         public void DrawConfig(XmlDocument xmlDoc) {
 
             this.panel.Children.Clear();
+            this.settingspanel.Children.Clear();
             this.canvasToNode.Clear();
             this.nodeToCanvas.Clear();
 
-            XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
+           
 
             SolidColorBrush blackBrush = new SolidColorBrush();
             blackBrush.Color = Colors.Black;
@@ -141,7 +190,36 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             SolidColorBrush transBrush = new SolidColorBrush();
             transBrush.Color = Colors.Transparent;
 
+            XmlNodeList monitors = xmlDoc.SelectNodes("//monitor");
+            foreach (XmlNode monitor in monitors) {
+                Canvas monitorCanvas = GetMonitorCanvas();
+                monitorCanvas.PreviewMouseDown += Can_MouseDown;
+                this.nodeToCanvas.Add(monitor, monitorCanvas);
+                this.canvasToNode.Add(monitorCanvas, monitor);
+                settingspanel.Children.Add(monitorCanvas);
+            }
+
+            XmlNodeList loggers = xmlDoc.SelectNodes("//logger");
+            foreach (XmlNode logger in loggers) {
+                Canvas logCanvas = GetLoggerCanvas();
+                logCanvas.PreviewMouseDown += Can_MouseDown;
+                this.nodeToCanvas.Add(logger, logCanvas);
+                this.canvasToNode.Add(logCanvas, logger);
+                settingspanel.Children.Add(logCanvas);
+            }
+
+ 
+            XmlNodeList nss = xmlDoc.SelectNodes("//namespace");
+            foreach (XmlNode ns in nss) {
+                Canvas nsCanvas = GetNSCanvas();
+                nsCanvas.PreviewMouseDown += Can_MouseDown;
+                this.nodeToCanvas.Add(ns, nsCanvas);
+                this.canvasToNode.Add(nsCanvas, ns);
+                settingspanel.Children.Add(nsCanvas);
+            }
+
             int i = 0;
+            XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
             foreach (XmlNode pipeNode in pipes) {
 
                 Canvas canTop = new Canvas();
@@ -168,11 +246,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
 
 
-                rect.SetValue(Canvas.LeftProperty,  5.0);
+                rect.SetValue(Canvas.LeftProperty, 5.0);
                 rect.SetValue(Canvas.TopProperty, 4.0);
                 rect.Fill = bluishBrush;
                 rect.StrokeThickness = 1;
                 rect.Stroke = blackBrush;
+
+                TextBlock tb = new TextBlock();
+                tb.Text = pipeNode.Attributes["name"].Value;
+                tb.FontSize = 12;
+                tb.SetValue(Canvas.LeftProperty, 15.0);
+                tb.SetValue(Canvas.TopProperty, 4.0);
+
+
 
 
                 Ellipse end = new Ellipse() {
@@ -189,7 +275,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                     Height = 16,
                     Width = 10,
                 };
-                end2.SetValue(Canvas.LeftProperty, (double) rect.Width);
+                end2.SetValue(Canvas.LeftProperty, (double)rect.Width);
                 end2.SetValue(Canvas.TopProperty, 4.0);
                 end2.Fill = whiteBrush;
 
@@ -200,6 +286,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 pipeCan.Children.Add(rect);
                 pipeCan.Children.Add(end);
                 pipeCan.Children.Add(end2);
+                pipeCan.Children.Add(tb);
+               
 
                 canTop.Children.Add(pipeCan);
 
@@ -221,7 +309,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
                         canvasToNode.Add(can, inNode);
                         nodeToCanvas.Add(inNode, can);
-                        can.PreviewMouseDown+= Can_MouseDown;
+                        can.PreviewMouseDown += Can_MouseDown;
                         can.Background = transBrush;
 
                         canTop.Children.Add(can);
@@ -250,7 +338,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
                     int outNum = 0;
                     foreach (XmlNode outNode in outputNodes) {
-                        Canvas can = GetOutputCanvas((double)imHeight, outNode.Attributes["type"].Value );
+                        Canvas can = GetOutputCanvas((double)imHeight, outNode.Attributes["type"].Value);
 
                         can.SetValue(Canvas.LeftProperty, (double)(this.panel.Width - imHeight - 10));
                         can.SetValue(Canvas.TopProperty, (space / 2 + (space + imHeight) * outNum));
@@ -297,7 +385,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             XmlNode node = this.canvasToNode[sender as Canvas];
             ViewModel.ViewAttributesCommand.Execute(node);
             HightLightCanvas(sender as Canvas);
-         
+
         }
 
         public Tuple<int, int> GetSizing(int num, double height) {
@@ -521,9 +609,32 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.Delete]);
 
             ViewModel.AddXmlNode = AddNewNodeFromUI;
-            // ViewModel.HighlightNodeInUI = HighlightNode;
+            ViewModel.HighlightNodeInUI = HighlightNode;
         }
+        public void HighlightNode(XmlNode xmlNode) {
+            bool isSelected = false;
 
+            TreeViewItem rootNode = null;
+            try {
+                rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
+
+            } catch {
+
+            }
+            if (xmlNode == null) {
+                isSelected = SelectTreeViewItem(ref rootNode, "");
+            } else {
+                isSelected = SelectTreeViewItem(ref rootNode, xmlNode);
+            }
+            if (!isSelected) {
+                MessageBox.Show("Could not locate the node.");
+            }
+
+            //temp
+            //XmlNode childNode = (xmlTreeView.SelectedItem as XmlNode).FirstChild.CloneNode(true);
+            //SelectedNode.InsertAfter(childNode, SelectedNode.FirstChild);
+
+        }
         XmlNode AddNewNodeFromUI(XmlNodeType xmlNodeType) {
             AddChildView popup = new AddChildView(this.ViewModel.DataModel, xmlNodeType);
             popup.ShowDialog();
@@ -536,8 +647,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             if (selectedItem != null) {
                 selectedItem.IsSelected = true;
             }
-
-
         }
 
 
@@ -614,7 +723,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public void HightLightCanvas(XmlNode node) {
             if (node == null) {
                 return;
-                
+
             }
 
             Canvas c;
@@ -632,16 +741,72 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             bluishBrush.Color = Color.FromArgb(255, 255, 127, 200);
             c.Background = bluishBrush;
             SelectedCanvas = c;
+            HighlightNode(node);
         }
 
         public void HightLightCanvas(Canvas can) {
-            if (can == null || can == SelectedCanvas ) {
+            if (can == null || can == SelectedCanvas) {
                 return;
             }
             SolidColorBrush bluishBrush = new SolidColorBrush();
             bluishBrush.Color = Color.FromArgb(255, 255, 127, 200);
             can.Background = bluishBrush;
             SelectedCanvas = can;
+            HighlightNode(this.canvasToNode[can]);
+        }
+
+        public void UpdateParamBindings(string param) {
+            viewModel.OnPropertyChanged(param);
+        }
+
+        public void MSMQSource(XmlNode node) {
+            viewModel.myGrid = new MSMQ(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void MQSource(XmlNode node) {
+            viewModel.myGrid = new MQ(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+
+        }
+
+        /*
+         * Updates the title in the graphical representation of the node when the tpye is changed
+         */
+        public void UpdateSelectedNodecanvas(XmlNode node) {
+
+            // Dont update logger, monitor or namespace
+            string name = node.Name;
+            if (name == "logger" || name=="monitor" || name == "namespace") {
+                return;
+            }
+
+            Canvas can = this.nodeToCanvas[node];
+            try {
+
+                foreach (var child in can.Children) {
+                    if (child is TextBlock) {
+                        TextBlock tb = child as TextBlock;
+                        tb.Text = node.Attributes["type"].Value;
+                    }
+                }
+            } catch { }
+        }
+
+        /*
+ * Updates the title in the graphical representation of the pipe when the tpye is changed
+ */
+        public void UpdateSelectedPipeCanvas(XmlNode node) {
+            Canvas can = this.nodeToCanvas[node];
+            try {
+
+                foreach (var child in can.Children) {
+                    if (child is TextBlock) {
+                        TextBlock tb = child as TextBlock;
+                        tb.Text = node.Attributes["name"].Value;
+                    }
+                }
+            } catch { }
         }
     }
 }
