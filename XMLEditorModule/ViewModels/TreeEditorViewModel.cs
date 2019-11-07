@@ -81,7 +81,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        myGrid = new MSMQ(selectedItem, this.View);
+                        myGrid = new MSMQInput(selectedItem, this.View);
                         break;
                     case "MQ":
                         myGrid = new MQ(selectedItem, this.View);
@@ -251,6 +251,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             get { return saveAsDocumentCommand; }
         }
 
+        #endregion
 
 
 
@@ -868,8 +869,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             SelectedNodeXpath = string.Empty;
         }
 
-
-        #endregion
 
 
         #region Getting Xpath

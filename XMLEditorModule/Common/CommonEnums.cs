@@ -25,13 +25,4 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         AddAltQueue,
         AddDataFilter
     }
-
-    public enum ParamState {
-        InputRequired = 0b0001,
-        InputVis = 0b0010,
-        OutputRequired = 0b0100,
-        OutputVis = 0b1000,
-    }
-
-
 }

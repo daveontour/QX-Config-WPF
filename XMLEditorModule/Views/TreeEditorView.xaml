@@ -276,7 +276,7 @@
             <!-- Column 4: Properties and XML view -->
             <Grid Grid.Column="4">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="7*" />
+                    <RowDefinition Height="10*" />
                     <RowDefinition Height="5" />
                     <RowDefinition Height="5*" />
                 </Grid.RowDefinitions>

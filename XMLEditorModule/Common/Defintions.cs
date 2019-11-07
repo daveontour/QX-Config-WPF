@@ -8,15 +8,55 @@ using WXE.Internal.Tools.ConfigEditor.Common;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
+using System.Globalization;
+using System.Reflection;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
+
+
+public class GenericTypes {
+        public String Name { get; set; }
+        public String Value { get; set; }
+
+        public override string ToString() {
+            return Name;
+        }
+    }
+
+    public class NodeTypeList : IItemsSource {
+
+        
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "Microsoft MQ", "IBM MQ", "Kafka"
+            };
+            return types; ;
+        }
+    }
+
+    public class XSLTypeList : IItemsSource {
+
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "1.0", "2.0", "3.0"
+            };
+            return types; ;
+        }
+    }
+
+
     [CategoryOrder("Required", 1)]
     [CategoryOrder("Optional", 2)]
+    [CategoryOrder("Transformation", 3)]
     public class MyPropertyGrid {
-        public enum ETestEnum { MSMQ, IBMMQ, KAFKA }
+        public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("Kafka")] KAFKA };
+        public enum XSLVerEnum {[Description("1.0")] ONE, [Description("2.0")] TWO, [Description("3.0")] THREE }
         public int maxMsgPerMinute = -1;
         public int maxMsg = -1;
-        public ETestEnum type = ETestEnum.MSMQ;
+        public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
 
@@ -99,15 +139,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             view.UpdateParamBindings("XMLText");
         }
 
-        protected void SetType(ETestEnum value) {
+        protected void SetType(string value) {
             if (this.type != value) {
                 switch (value) {
-                    case ETestEnum.IBMMQ:
+                    case "IBM MQ":
                         SetAttribute("type", "MQ");
                         view.UpdateSelectedNodecanvas(_node);
                         view.MQSource(_node);
                         break;
-                    case ETestEnum.MSMQ:
+                    case "Microsoft MQ":
                         SetAttribute("type", "MSMQ");
                         view.UpdateSelectedNodecanvas(_node);
                         view.MSMQSource(_node);
@@ -181,11 +221,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public MQ(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
-            this.type = ETestEnum.IBMMQ;
+            this.type = "MQ";
         }
-        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node")]
-        public ETestEnum ComboData {
-            get { return this.type; }
+        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
+        public string TypeData {
+            get {return "IBM MQ"; }
             set { SetType(value); }
         }
 
@@ -226,24 +266,59 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 SetAttribute("name", value);
             }
         }
+        [CategoryAttribute("Optional"), DisplayName("Priority"), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
+        public int Priority {
+            get {
+                int val = GetIntAttribute("priority");
+                return Math.Max(val, 1);
+            }
+            set {
+                if (value < 1) {
+                    value = 1;
+                }
+                SetAttribute("priority", value);
+            }
+        }
+
+        [CategoryAttribute("Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
+        public string StyleSheet {
+            get { return GetAttribute("stylesheet"); }
+            set { SetAttribute("stylesheet", value); }
+        }
+
+        [CategoryAttribute("Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
+        public string XSLType {
+            get { return GetAttribute("xslVersion"); }
+            set { SetAttribute("xslVersion", value); ; }
+        }
+
+        [CategoryAttribute("Optional"), DisplayName("Get Interval"), PropertyOrder(4), DescriptionAttribute("Time in seconds of the wait time for each interval of reading a message")]
+        public int GetTimeout {
+            get { return Math.Max(1, GetIntAttribute("getTimeout") / 1000); }
+            set {
+                value = Math.Max(1, value);
+                SetAttribute("getTimeout", value * 1000);
+            }
+        }
     }
 
 
 
-    public class MSMQ : MyPropertyGrid {
+    public class MSMQInput : MyPropertyGrid {
 
 
-        public MSMQ(XmlNode dataModel, IView view) {
+        public MSMQInput(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
-            this.type = ETestEnum.MSMQ;
+            this.type = "MSMQ";
         }
 
-        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node")]
-        public ETestEnum ComboData {
-            get { return this.type; }
-            set { SetType(value); }
+        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
+        public string NodeType {
+            get {return "Microsoft MQ"; }
+            set {SetType(value);} 
         }
+        
 
         [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Descriptive name of the queue")]
         public string Name {
@@ -258,11 +333,45 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         [CategoryAttribute("Required"), DisplayName("Queue"), PropertyOrder(3), DescriptionAttribute("MS MQ Queue Name")]
         public string Queue {
             get {
-                return GetAttribute("name");
+                return GetAttribute("queue");
             }
             set {
-                SetAttribute("name", value);
+                SetAttribute("queue", value);
             }
+        }
+
+        [CategoryAttribute("Optional"), DisplayName("Priority"), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
+        public int Priority {
+            get {
+                int val =  GetIntAttribute("priority");
+                return Math.Max(val, 1);
+            }
+            set {
+                if (value < 1) {
+                    value = 1;
+                }
+                SetAttribute("priority", value);
+            }
+        }
+
+        [CategoryAttribute("Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
+        public string StyleSheet {
+            get { return GetAttribute("stylesheet"); }
+            set { SetAttribute("stylesheet", value); }
+        }
+
+        [CategoryAttribute("Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
+        public string XSLType {
+            get { return GetAttribute("xslVersion"); }
+            set { SetAttribute("xslVersion", value); ; }
+        }
+
+        [CategoryAttribute("Optional"), DisplayName("Get Interval"), PropertyOrder(4), DescriptionAttribute("Time in seconds of the wait time for each interval of reading a message")]
+        public int GetTimeout {
+            get { return Math.Max(1, GetIntAttribute("getTimeout")/1000);}
+            set {
+                value = Math.Max(1, value);
+                SetAttribute("getTimeout", value*1000); }
         }
     }
 

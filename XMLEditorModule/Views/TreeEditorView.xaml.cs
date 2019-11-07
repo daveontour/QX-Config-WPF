@@ -129,9 +129,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             can.Children.Add(monitorcanvas);
 
-            TextBlock txt = new TextBlock() {Text = "Monitor", FontSize = 8};
+            TextBlock txt = new TextBlock() { Text = "Monitor", FontSize = 8 };
             txt.SetValue(Canvas.LeftProperty, 0.0);
-            txt.SetValue(Canvas.TopProperty, (double)monitorcanvas.Height+2);
+            txt.SetValue(Canvas.TopProperty, (double)monitorcanvas.Height + 2);
 
             can.Children.Add(txt);
 
@@ -176,7 +176,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             this.canvasToNode.Clear();
             this.nodeToCanvas.Clear();
 
-           
+
 
             SolidColorBrush blackBrush = new SolidColorBrush();
             blackBrush.Color = Colors.Black;
@@ -208,7 +208,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 settingspanel.Children.Add(logCanvas);
             }
 
- 
+
             XmlNodeList nss = xmlDoc.SelectNodes("//namespace");
             foreach (XmlNode ns in nss) {
                 Canvas nsCanvas = GetNSCanvas();
@@ -287,7 +287,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 pipeCan.Children.Add(end);
                 pipeCan.Children.Add(end2);
                 pipeCan.Children.Add(tb);
-               
+
 
                 canTop.Children.Add(pipeCan);
 
@@ -748,9 +748,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             if (can == null || can == SelectedCanvas) {
                 return;
             }
-            SolidColorBrush bluishBrush = new SolidColorBrush();
-            bluishBrush.Color = Color.FromArgb(255, 255, 127, 200);
-            can.Background = bluishBrush;
+            SolidColorBrush brush = new SolidColorBrush();
+            brush.Color = Color.FromArgb(255, 255, 127, 200);
+            can.Background = brush;
             SelectedCanvas = can;
             HighlightNode(this.canvasToNode[can]);
         }
@@ -760,7 +760,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
 
         public void MSMQSource(XmlNode node) {
-            viewModel.myGrid = new MSMQ(node, this);
+            viewModel.myGrid = new MSMQInput(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
@@ -771,13 +771,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
 
         /*
-         * Updates the title in the graphical representation of the node when the tpye is changed
+         * Updates the title in the graphical representation of the node when the type is changed
          */
         public void UpdateSelectedNodecanvas(XmlNode node) {
 
             // Dont update logger, monitor or namespace
             string name = node.Name;
-            if (name == "logger" || name=="monitor" || name == "namespace") {
+            if (name == "logger" || name == "monitor" || name == "namespace") {
                 return;
             }
 
@@ -794,8 +794,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
 
         /*
- * Updates the title in the graphical representation of the pipe when the tpye is changed
- */
+         * Updates the title in the graphical representation of the pipe when the tpye is changed
+         */
         public void UpdateSelectedPipeCanvas(XmlNode node) {
             Canvas can = this.nodeToCanvas[node];
             try {
