@@ -601,6 +601,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Command = ViewModel.AddDataFilterCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].CommandParameter = XmlNodeType.Element;
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddXPathExists]);
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter]);
 
             this.xmlTreeView.ContextMenu.Items.Add(new Separator());
@@ -807,6 +809,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                     }
                 }
             } catch { }
+        }
+
+        public void ChangeElementType(string value) {
+            viewModel.ChangeElementType(value);
+        }
+        public bool CanChangeElementType(string value) {
+            return viewModel.CanChangeElementType(value);
         }
     }
 }

@@ -16,5 +16,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
         void UpdateSelectedNodecanvas(XmlNode node);
         void UpdateSelectedPipeCanvas(XmlNode node);
+        void ChangeElementType(string value);
+        bool CanChangeElementType(string value);
     }
 }

@@ -89,6 +89,9 @@
     <Compile Include="Views\CommandsBarView.xaml.cs">
       <DependentUpon>CommandsBarView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\FilterCustomEditor.xaml.cs">
+      <DependentUpon>FilterCustomEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TreeEditorsView.xaml.cs">
       <DependentUpon>TreeEditorsView.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\CommandsBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\FilterCustomEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

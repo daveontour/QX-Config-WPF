@@ -23,6 +23,7 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         AddFilter,
         AddExpression,
         AddAltQueue,
-        AddDataFilter
+        AddDataFilter,
+        AddXPathExists
     }
 }

@@ -10,11 +10,12 @@ using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using System.Globalization;
 using System.Reflection;
+using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
 
-public class GenericTypes {
+    public class GenericTypes {
         public String Name { get; set; }
         public String Value { get; set; }
 
@@ -25,7 +26,6 @@ public class GenericTypes {
 
     public class NodeTypeList : IItemsSource {
 
-        
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
@@ -37,7 +37,6 @@ public class GenericTypes {
 
     public class XSLTypeList : IItemsSource {
 
-
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
@@ -47,6 +46,27 @@ public class GenericTypes {
         }
     }
 
+    public class OutputTypeList : IItemsSource {
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "Distribute to All", "Round Robin", "Random"
+            };
+            return types; ;
+        }
+    }
+
+    public class BooleanTypeList : IItemsSource {
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "and", "or", "xor", "not"
+            };
+            return types; ;
+        }
+    }
 
     [CategoryOrder("Required", 1)]
     [CategoryOrder("Optional", 2)]
@@ -159,7 +179,6 @@ public class GenericTypes {
 
     public class PIPE : MyPropertyGrid {
 
-
         public PIPE(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
@@ -167,9 +186,7 @@ public class GenericTypes {
 
         [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Descriptive name of the pipe")]
         public string Name {
-            get {
-                return GetAttribute("name");
-            }
+            get { return GetAttribute("name"); }
             set {
                 SetAttribute("name", value);
                 view.UpdateSelectedPipeCanvas(_node);
@@ -194,18 +211,46 @@ public class GenericTypes {
             get { return GetBoolAttribute("enableLog"); }
             set { SetAttribute("enableLog", value); }
         }
+
+        [CategoryAttribute("Optional"), DisplayName("Output Isolation"), PropertyOrder(4), DescriptionAttribute("Isolate distribution of outputs from each other")]
+        public bool OoutputIsolation {
+            get { return GetBoolAttribute("outputIsolation"); }
+            set { SetAttribute("outputIsolation", value); }
+        }
+        [CategoryAttribute("Optional"), DisplayName("Distribution"), PropertyOrder(3), DescriptionAttribute("The type of ditribution to the output nodes"), ItemsSource(typeof(OutputTypeList))]
+        public string OutputDistribution {
+            get {
+                string dist = GetAttribute("distribution");
+                if (dist == "all" || dist == null || dist == "") {
+                    return "Distribute to All";
+                }
+                if (dist == "roundRobin") {
+                    return "Round Robin";
+                }
+                if (dist == "random") {
+                    return "Random";
+                }
+
+                return "Distribute to All";
+            }
+            set {
+                if (value == "Distribute to All") SetAttribute("distribution", null);
+                if (value == "Round Robin") SetAttribute("distribution", "roundRobin");
+                if (value == "Random") SetAttribute("distribution", "random");
+            }
+        }
     }
 
     public class NameSpaceGrid : MyPropertyGrid {
         public NameSpaceGrid(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
-         }
+        }
 
         [CategoryAttribute("Required"), DisplayName("Prefix"), PropertyOrder(1), DescriptionAttribute("Namespace Prefix")]
         public string Prefix {
-            get { return GetAttribute("prefix");}
-            set {SetAttribute("prefix", value);}
+            get { return GetAttribute("prefix"); }
+            set { SetAttribute("prefix", value); }
         }
 
         [CategoryAttribute("Required"), DisplayName("URI"), PropertyOrder(2), DescriptionAttribute("Namespace URI")]
@@ -225,7 +270,7 @@ public class GenericTypes {
         }
         [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
         public string TypeData {
-            get {return "IBM MQ"; }
+            get { return "IBM MQ"; }
             set { SetType(value); }
         }
 
@@ -300,6 +345,12 @@ public class GenericTypes {
                 SetAttribute("getTimeout", value * 1000);
             }
         }
+
+        //[Editor(typeof(FilterCustomEditor), typeof(FilterCustomEditor))]
+        //public int Filter {
+        //    get { return view.Se }; 
+        //    set;
+        //}
     }
 
 
@@ -315,10 +366,10 @@ public class GenericTypes {
 
         [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
         public string NodeType {
-            get {return "Microsoft MQ"; }
-            set {SetType(value);} 
+            get { return "Microsoft MQ"; }
+            set { SetType(value); }
         }
-        
+
 
         [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Descriptive name of the queue")]
         public string Name {
@@ -343,7 +394,7 @@ public class GenericTypes {
         [CategoryAttribute("Optional"), DisplayName("Priority"), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
         public int Priority {
             get {
-                int val =  GetIntAttribute("priority");
+                int val = GetIntAttribute("priority");
                 return Math.Max(val, 1);
             }
             set {
@@ -368,11 +419,32 @@ public class GenericTypes {
 
         [CategoryAttribute("Optional"), DisplayName("Get Interval"), PropertyOrder(4), DescriptionAttribute("Time in seconds of the wait time for each interval of reading a message")]
         public int GetTimeout {
-            get { return Math.Max(1, GetIntAttribute("getTimeout")/1000);}
+            get { return Math.Max(1, GetIntAttribute("getTimeout") / 1000); }
             set {
                 value = Math.Max(1, value);
-                SetAttribute("getTimeout", value*1000); }
+                SetAttribute("getTimeout", value * 1000);
+            }
         }
     }
 
-}
+    public class BooleanExpression : MyPropertyGrid {
+
+
+        public BooleanExpression(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Boolean Type"), PropertyOrder(1), DescriptionAttribute("Boolean Type"), ItemsSource(typeof(BooleanTypeList))]
+        public string Type {
+            get { return this._node.Name; }
+            set {
+                if (this.view.CanChangeElementType(value)) { 
+                    this.view.ChangeElementType(value);
+                }
+            }
+        }
+    }
+
+    }

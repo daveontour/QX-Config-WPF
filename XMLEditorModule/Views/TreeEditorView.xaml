@@ -79,6 +79,7 @@
         <HierarchicalDataTemplate x:Key="SettingsNodeTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Settings" FontWeight="DemiBold"></TextBlock>
+                <TextBlock Text=" (Right Click to Add)"  FontWeight="Light" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -105,7 +106,8 @@
 
         <HierarchicalDataTemplate x:Key="NamespaceNodeTemplate">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="PaleVioletRed" Text="Namespace"></TextBlock>
+                <TextBlock Foreground="PaleVioletRed" Text="Namespace: "></TextBlock>
+                <TextBlock Foreground="Red" Text="{Binding XPath=@prefix}" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -135,6 +137,7 @@
         <HierarchicalDataTemplate x:Key="PipesNodeTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Pipes"  FontWeight="DemiBold"></TextBlock>
+                <TextBlock Text=" (Right Click to Add)"  FontWeight="Light" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -203,8 +206,6 @@
                 <ColumnDefinition Width="270"></ColumnDefinition>
                 <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="5"></ColumnDefinition>
-                <ColumnDefinition Width="450"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
             <!-- Column 0: Tree View of Config file -->
@@ -235,69 +236,75 @@
                 VerticalAlignment="Stretch"
                 Cursor="SizeWE"/>
 
-            <!-- Column 2: Visual View of Config file -->
             <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="450"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="80" />
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="7*" />
+                    <RowDefinition Height="5" />
+                    <RowDefinition Height="3*" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Logger, Monitor and Namespaces" Grid.Row="0" Margin="10,0,0,0" FontWeight="Bold"/>
-                <Border Padding="5,5,0,0" Grid.Row="1">
-                    <StackPanel VerticalAlignment="Top"  x:Name="settingspanel" Orientation="Horizontal" Height="50" MaxWidth="600">
-                        <StackPanel.Resources>
-                            <Style TargetType="{x:Type Canvas}">
-                                <Setter Property="Margin" Value="0,0,50,0"/>
-                            </Style>
-                        </StackPanel.Resources>
-                    </StackPanel>
-                </Border>
-                <TextBlock Text="Pipes" Grid.Row="2" Margin="10,0,0,0"  FontWeight="Bold"/>
-                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="3">
-                    <ScrollViewer >
+
+                <!-- Visual View of Config file -->
+                <Grid Grid.Column="0" Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="80" />
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Logger, Monitor and Namespaces" Grid.Row="0" Margin="10,0,0,0" FontWeight="Bold"/>
+                    <Border Padding="5,5,0,0" Grid.Row="1">
+                        <StackPanel VerticalAlignment="Top"  x:Name="settingspanel" Orientation="Horizontal" Height="50" MaxWidth="600">
+                            <StackPanel.Resources>
+                                <Style TargetType="{x:Type Canvas}">
+                                    <Setter Property="Margin" Value="0,0,50,0"/>
+                                </Style>
+                            </StackPanel.Resources>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="Pipes" Grid.Row="2" Margin="10,0,0,0"  FontWeight="Bold"/>
+                    <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="3">
+                        <ScrollViewer >
                             <Viewbox VerticalAlignment="Top" Stretch="Uniform">
                                 <Grid HorizontalAlignment="Center" >
                                     <StackPanel VerticalAlignment="Top" Panel.ZIndex="50" Grid.Column="0" Grid.ColumnSpan="2" x:Name="panel" Width="600" />
                                 </Grid>
                             </Viewbox>
-                    </ScrollViewer>
-                </Border>
-            </Grid>
-
-            <GridSplitter 
-                Background="Gray" 
-                Grid.Column="3" 
-                Height="Auto" Width="Auto" 
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Cursor="SizeWE"/>
-
-            <!-- Column 4: Properties and XML view -->
-            <Grid Grid.Column="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="10*" />
-                    <RowDefinition Height="5" />
-                    <RowDefinition Height="5*" />
-                </Grid.RowDefinitions>
-
-                <!-- Row 0: Properties of the selected Item -->
-                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="450" SelectedObject="{Binding myGrid}" AutoGenerateProperties="true" />
-
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
 
                 <GridSplitter 
                 Background="Gray" 
+                Grid.Column="0"
                 Grid.Row="1"
+                Grid.ColumnSpan="3"
                 Height="Auto" Width="Auto" 
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Cursor="SizeNS"/>
 
-                <!-- Row 2: Raw XML -->
-                <ScrollViewer Grid.Row="2"  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" >
+                <GridSplitter 
+                Background="Gray" 
+                Grid.Column="1"
+                Height="Auto" Width="Auto" 
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Cursor="SizeWE"/>
+
+                <!-- Raw XML -->
+                <ScrollViewer Grid.Row="2"  Grid.ColumnSpan ="3" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" >
                     <TextBlock TextWrapping="NoWrap" Text="{Binding Path=XMLText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="White"  HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" />
                 </ScrollViewer>
+
+                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="445" SelectedObject="{Binding myGrid}" HorizontalAlignment="Stretch" AutoGenerateProperties="true" />
+
             </Grid>
+
         </Grid>
 
         <Grid Grid.Row="2">
@@ -308,8 +315,5 @@
             </StatusBar>
         </Grid>
     </Grid>
-
-    <!--Visibility="{Binding Path=SelectedElement.DataModel, Converter={StaticResource AddChildVisibilityConverter}}"-->
-
-
+    
 </UserControl>

@@ -8,6 +8,7 @@ using WXE.Internal.Tools.ConfigEditor.Common;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
+using Xceed.Wpf.Toolkit;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
@@ -77,8 +78,16 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         private void UpdatePropertiesPanel(XmlNode selectedItem) {
 
 
-            if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
-
+            if (selectedItem.Name == "input") {
+                switch (selectedItem.Attributes["type"].Value) {
+                    case "MSMQ":
+                        myGrid = new MSMQInput(selectedItem, this.View);
+                        break;
+                    case "MQ":
+                        myGrid = new MQ(selectedItem, this.View);
+                        break;
+                }
+            } else if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
                         myGrid = new MSMQInput(selectedItem, this.View);
@@ -91,6 +100,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new PIPE(selectedItem, this.View);
             } else if (selectedItem.Name == "namespace") {
                 myGrid = new NameSpaceGrid(selectedItem, this.View);
+            } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not"  ) {
+                myGrid = new BooleanExpression(selectedItem, this.View);
             } else {
                 myGrid = null;
             }
@@ -421,8 +432,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         private void AddInput(XmlNodeType newNodeType) {
 
-
-
             XmlNode newNode = this.DataModel.CreateElement("input");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
@@ -578,13 +587,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             newNode.Attributes.Append(newAttribute2);
             newNode.Attributes.Append(newAttribute3);
 
-            if (newNode == null)
-                return;
-            if (newNode.NodeType == XmlNodeType.Attribute) {
-                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
-            } else {
+            //if (newNode == null)
+            //    return;
+            //if (newNode.NodeType == XmlNodeType.Attribute) {
+            //    SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
+            //    ViewAttributes(SelectedElement.DataModel);
+            //} else {
+            //    SelectedElement.DataModel.AppendChild(newNode);
+            //}
+
+            if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
+            } else {
+                SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
             }
 
             OnPropertyChanged("XMLText");
@@ -759,15 +774,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         private void AddExpression(XmlNodeType newNodeType) {
-            XmlNode newNode = AddXmlNode(newNodeType);
 
-            if (newNode == null)
-                return;
-            if (newNode.NodeType == XmlNodeType.Attribute) {
-                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
-            } else {
+            XmlNode newNode = this.DataModel.CreateElement("and");
+            
+
+            //Allow adding to any other expression and 
+            if (SelectedElement.DataModel.ChildNodes.Count == 0 || SelectedElement.DataModel.Name == "and" || SelectedElement.DataModel.Name == "or" || SelectedElement.DataModel.Name == "xor" || SelectedElement.DataModel.Name == "not") {
                 SelectedElement.DataModel.AppendChild(newNode);
+            } else {
+                
             }
 
             OnPropertyChanged("XMLText");
@@ -785,7 +800,22 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             if (SelectedElement.DataModel.Name == "filter") {
+                if (!SelectedElement.DataModel.HasChildNodes) {
+                    return true;
+                }
+                if (SelectedElement.DataModel.ChildNodes.Count == 1 && SelectedElement.DataModel.ChildNodes.Item(0).Name=="altqueue") {
+                    return true;
+                }
+
+                return false;
+            }
+            if (SelectedElement.DataModel.Name == "and" || SelectedElement.DataModel.Name == "or" || SelectedElement.DataModel.Name == "xor") {
                 return true;
+            }
+            if ( SelectedElement.DataModel.Name == "not") {
+                if (!SelectedElement.DataModel.HasChildNodes) {
+                    return true;
+                }
             }
             if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
                 return false;
@@ -850,6 +880,40 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return true;
             }
             return false;
+        }
+
+        internal bool CanChangeElementType(string value) {
+            if (value == "not" && SelectedElement.DataModel.ChildNodes.Count > 1) {
+                MessageBox.Show("Cannot change to 'not' beacause a 'not' can only have one direct child", "QueueExchange Configuration");
+                myGrid = new BooleanExpression(SelectedElement.DataModel, this.View);
+                OnPropertyChanged("myGrid");
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        internal void ChangeElementType(string value) {
+
+            if (value == "not" && SelectedElement.DataModel.ChildNodes.Count > 1) {
+                MessageBox.Show("Cannot change to 'not' beacause a 'not' can only have one direct child", "QueueExchange Configuration");
+                OnPropertyChanged("XMLText");
+                View.DrawQXConfig();
+                return;
+            }
+          
+            XmlNode newNode = this.DataModel.CreateElement(value);
+            SelectedElement.DataModel.ParentNode.InsertAfter(newNode, SelectedElement.DataModel);
+
+            foreach (XmlNode child in SelectedElement.DataModel.ChildNodes ) {
+                XmlNode move = child.CloneNode(true);
+                newNode.AppendChild(move);
+            }
+
+            SelectedElement.DataModel.ParentNode.RemoveChild(SelectedElement.DataModel);
+
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
         }
 
         private void Save() {
