@@ -23,14 +23,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.viewAttributesCommand = new RelayCommand<XmlNode>(ViewAttributes);
             this.copyElementCommand = new RelayCommand<XmlNode>(p => { Copy(SelectedElement.DataModel); }, p => { return CanCopy(SelectedElement.DataModel); });
             this.pasteElementCommand = new RelayCommand((p) => { Paste(SelectedElement.DataModel); }, (p) => { return CanPaste(SelectedElement.DataModel); });
-            this.addElementCommand = new RelayCommand<XmlNodeType>(AddElement, CanAddElement);
             this.addPipeCommand = new RelayCommand<XmlNodeType>(AddPipe, CanAddPipe);
             this.addInputCommand = new RelayCommand<XmlNodeType>(AddInput, CanAddInput);
             this.addOutputCommand = new RelayCommand<XmlNodeType>(AddOutput, CanAddOutput);
             this.addFilterCommand = new RelayCommand<XmlNodeType>(AddFilter, CanAddFilter);
             this.addExpressionCommand = new RelayCommand<XmlNodeType>(AddExpression, CanAddExpression);
+            this.addDataFilterCommand = new RelayCommand<XmlNodeType>(AddDataFilter, CanAddExpression);
             this.addAltQueueCommand = new RelayCommand<XmlNodeType>(AddAltQueue, CanAddAltQueue);
-            this.addDataFilterCommand = new RelayCommand<XmlNodeType>(AddExpression, CanAddExpression);
             this.addMonitorCommand = new RelayCommand<XmlNodeType>(AddMonitor, CanAddMonitor);
             this.addLoggerCommand = new RelayCommand<XmlNodeType>(AddLogger, CanAddLogger);
             this.addNamespaceCommand = new RelayCommand<XmlNodeType>(AddNamespace, CanAddNamespace);
@@ -102,6 +101,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new NameSpaceGrid(selectedItem, this.View);
             } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not"  ) {
                 myGrid = new BooleanExpression(selectedItem, this.View);
+            } else if (selectedItem.Name == "contains") {
+                myGrid = new ContainsFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "xpexists") {
+                myGrid = new XPExistsFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "xpmatches") {
+                myGrid = new XPMatchesFilter(selectedItem, this.View);
             } else {
                 myGrid = null;
             }
@@ -773,17 +778,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
         }
 
+        private void AddDataFilter(XmlNodeType newNodeType) {
+
+            XmlNode newNode = this.DataModel.CreateElement("contains");
+            SelectedElement.DataModel.AppendChild(newNode);
+
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
+
+        }
         private void AddExpression(XmlNodeType newNodeType) {
 
             XmlNode newNode = this.DataModel.CreateElement("and");
-            
-
-            //Allow adding to any other expression and 
-            if (SelectedElement.DataModel.ChildNodes.Count == 0 || SelectedElement.DataModel.Name == "and" || SelectedElement.DataModel.Name == "or" || SelectedElement.DataModel.Name == "xor" || SelectedElement.DataModel.Name == "not") {
-                SelectedElement.DataModel.AppendChild(newNode);
-            } else {
-                
-            }
+            SelectedElement.DataModel.AppendChild(newNode);
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
@@ -840,30 +847,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         }
 
-        private bool CanAddElement(XmlNodeType newNodeType) {
-            if (SelectedElement == null || SelectedElement.DataModel == null) {
-                return false;
-            }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
 
         private void DeleteElement(XmlNode currentNode) {
-            //TODO:
-
-            currentNode.ParentNode.RemoveChild(currentNode);
+             currentNode.ParentNode.RemoveChild(currentNode);
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
-
         }
 
         private bool CanDeleteElement(XmlNode currentNode) {
@@ -880,6 +868,30 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return true;
             }
             return false;
+        }
+
+        internal void ChangeFilterType(string value) {
+
+            //"Data Contains Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals", "Xpath Date Within Offset"
+
+            string name = "contains";
+            if (value == "Data Contains Value") name = "contains";
+            if (value == "Data Matches Regex.") name = "matche";
+            if (value == "Data Minimum Length") name = "length";
+            if (value == "XPath Exists") name = "xpexists";
+            if (value == "XPath Equals") name = "xpequals";
+            if (value == "XPath Matches") name = "xpmatches";
+            if (value == "Xpath Date Within Offset") name = "dateRange";
+
+            XmlNode newNode = this.DataModel.CreateElement(name);
+            SelectedElement.DataModel.ParentNode.InsertAfter(newNode, SelectedElement.DataModel);
+
+            SelectedElement.DataModel.ParentNode.RemoveChild(SelectedElement.DataModel);
+
+            ViewAttributesCommand.Execute(newNode);
+
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
         }
 
         internal bool CanChangeElementType(string value) {
@@ -911,6 +923,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
 
             SelectedElement.DataModel.ParentNode.RemoveChild(SelectedElement.DataModel);
+            ViewAttributesCommand.Execute(newNode);
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();

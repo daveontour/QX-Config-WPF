@@ -29,6 +29,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             InitializeComponent();
             this.MenuBar.Items.Clear();
             MenuItem fileMenuItem = new MenuItem { Header = "_File" };
+            MenuItem newMenuItem = new MenuItem { Header = "_New" };
+            newMenuItem.Click += new RoutedEventHandler(newMenuItem_Click);
+
             MenuItem openMenuItem = new MenuItem { Header = "_Open" };
             openMenuItem.Click += new RoutedEventHandler(openMenuItem_Click);
             MenuItem saveMenuItem = new MenuItem { Header = "_Save" };
@@ -37,6 +40,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             MenuItem saveAsMenuItem = new MenuItem { Header = "Save _As" };
             saveAsMenuItem.Click += new RoutedEventHandler(saveAsMenuItem_Click);
 
+            fileMenuItem.Items.Add(newMenuItem);
             fileMenuItem.Items.Add(openMenuItem);
             fileMenuItem.Items.Add(new Separator());
             fileMenuItem.Items.Add(saveMenuItem);          
@@ -61,7 +65,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
         
 
         public event EventHandler<DocumentLoadedEventArgs> DocumentLoaded;
-        public event EventHandler<SearchRequestedEventArgs> SearchRequested;
         public event EventHandler SaveRequested;
         public event EventHandler<SaveAsEventArgs> SaveAsRequested;
 
@@ -106,6 +109,24 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
                 }
 
             }
+        }
+
+        void newMenuItem_Click(object sender, RoutedEventArgs e) {
+
+            XmlDocument document = new XmlDocument();
+            document.LoadXml("<?xml version=\"1.0\" encoding=\"utf - 8\"?><config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">  <settings> </settings><pipes></pipes></config>"); ;
+
+
+
+            try {
+
+                DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = ".", Document = document, FileName = "new.xml" };
+                    OnDocumentLoaded(this, args);
+
+                } catch (Exception ex) {
+                    Debug.WriteLine(ex.Message);
+                }
+
         }
 
         void saveAsMenuItem_Click(object sender, RoutedEventArgs e)

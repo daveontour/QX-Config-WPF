@@ -589,20 +589,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             contextMenuProvider.ContextMenus[ContextMenuType.AddFilter].CommandParameter = XmlNodeType.Element;
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddFilter]);
 
-            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].Command = ViewModel.AddExpressionCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddExpression]);
-
             this.xmlTreeView.ContextMenu.Items.Add(new Separator());
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].Command = ViewModel.AddAltQueueCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].CommandParameter = XmlNodeType.Element;
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue]);
+            
+            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].Command = ViewModel.AddExpressionCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddExpression]);
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Command = ViewModel.AddDataFilterCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].CommandParameter = XmlNodeType.Element;
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddXPathExists]);
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter]);
 
             this.xmlTreeView.ContextMenu.Items.Add(new Separator());
@@ -610,7 +608,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             contextMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.Delete]);
 
-            ViewModel.AddXmlNode = AddNewNodeFromUI;
             ViewModel.HighlightNodeInUI = HighlightNode;
         }
         public void HighlightNode(XmlNode xmlNode) {
@@ -637,11 +634,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             //SelectedNode.InsertAfter(childNode, SelectedNode.FirstChild);
 
         }
-        XmlNode AddNewNodeFromUI(XmlNodeType xmlNodeType) {
-            AddChildView popup = new AddChildView(this.ViewModel.DataModel, xmlNodeType);
-            popup.ShowDialog();
-            return popup.NewNode;
-        }
+
 
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e) {
@@ -816,6 +809,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
         public bool CanChangeElementType(string value) {
             return viewModel.CanChangeElementType(value);
+        }
+        public void ChangeFilterType(string value) {
+            viewModel.ChangeFilterType(value);
         }
     }
 }

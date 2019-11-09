@@ -57,6 +57,17 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         }
     }
 
+    public class FilterTypeList : IItemsSource {
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "Data Contains Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals","XPath Matches", "Xpath Date Within Offset"
+            };
+            return types; ;
+        }
+    }
+
     public class BooleanTypeList : IItemsSource {
 
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
@@ -353,8 +364,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         //}
     }
 
-
-
     public class MSMQInput : MyPropertyGrid {
 
 
@@ -440,11 +449,73 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public string Type {
             get { return this._node.Name; }
             set {
-                if (this.view.CanChangeElementType(value)) { 
+                if (this.view.CanChangeElementType(value)) {
                     this.view.ChangeElementType(value);
                 }
             }
         }
     }
 
+    public class ContainsFilter : MyPropertyGrid {
+
+        public ContainsFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "Data Contains Value"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The string the data must contain for the filter to pass")]
+        public string Value {
+            get { return GetAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
     }
+
+    public class XPExistsFilter : MyPropertyGrid {
+
+        public XPExistsFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "XPath Exists"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The XPath that must exist for the filter to pass")]
+        public string Value {
+            get { return GetAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
+    }
+    public class XPMatchesFilter : MyPropertyGrid {
+
+        public XPMatchesFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "XPath Matches"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The XPath that must exist for the filter to pass")]
+        public string Value {
+            get { return GetAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
+    }
+
+}

@@ -28,7 +28,7 @@ namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
         {
             InitializeComponent();     
             this.commandBarView.DocumentLoaded += new EventHandler<DocumentLoadedEventArgs>(commandBarView_DocumentLoaded);
-            this.commandBarView.SearchRequested += new EventHandler<SearchRequestedEventArgs>(commandBarView_SearchRequested);
+           
             this.commandBarView.SaveRequested += new EventHandler(commandBarView_SaveRequested);
             this.commandBarView.SaveAsRequested += new EventHandler<SaveAsEventArgs>(commandBarView_SaveAsRequested);
             editorsVM = new TreeEditorsViewModel();
