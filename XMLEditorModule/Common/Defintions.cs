@@ -81,7 +81,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
     [CategoryOrder("Required", 1)]
     [CategoryOrder("Optional", 2)]
-    [CategoryOrder("Transformation", 3)]
+    [CategoryOrder("Optional - Transformation", 3)]
+    [CategoryOrder("Optional - Context Aware", 4)]
     public class MyPropertyGrid {
         public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("Kafka")] KAFKA };
         public enum XSLVerEnum {[Description("1.0")] ONE, [Description("2.0")] TWO, [Description("3.0")] THREE }
@@ -175,12 +176,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 switch (value) {
                     case "IBM MQ":
                         SetAttribute("type", "MQ");
-                        view.UpdateSelectedNodecanvas(_node);
+                        view.UpdateSelectedNodeCanvas(_node);
                         view.MQSource(_node);
                         break;
                     case "Microsoft MQ":
                         SetAttribute("type", "MSMQ");
-                        view.UpdateSelectedNodecanvas(_node);
+                        view.UpdateSelectedNodeCanvas(_node);
                         view.MSMQSource(_node);
                         break;
                 }
@@ -224,7 +225,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         }
 
         [CategoryAttribute("Optional"), DisplayName("Output Isolation"), PropertyOrder(4), DescriptionAttribute("Isolate distribution of outputs from each other")]
-        public bool OoutputIsolation {
+        public bool OutputIsolation {
             get { return GetBoolAttribute("outputIsolation"); }
             set { SetAttribute("outputIsolation", value); }
         }
@@ -249,6 +250,35 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 if (value == "Round Robin") SetAttribute("distribution", "roundRobin");
                 if (value == "Random") SetAttribute("distribution", "random");
             }
+        }
+
+        [CategoryAttribute("Optional - Context Aware"), DisplayName("Context Key"), PropertyOrder(1), DescriptionAttribute("XPath for the Context Key")]
+        public string ContextKey {
+            get { return GetAttribute("contextCacheKeyXPath"); }
+            set {
+                SetAttribute("maxMsgPerMinute", -1);
+                SetAttribute("contextCacheKeyXPath", value);
+                if (ContextExpiry <= 0) {
+                    ContextExpiry = 10;
+                }
+            }
+        }
+
+        [CategoryAttribute("Optional - Context Aware"), DisplayName("Context Cache Expiry"), PropertyOrder(2), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
+        public int ContextExpiry {
+            get { return GetIntAttribute("contextCacheExpiry"); }
+            set {
+                if (value <= 0) {
+                    value = 1;
+                }
+                SetAttribute("contextCacheExpiry", value);
+            }
+        }
+
+        [CategoryAttribute("Optional - Context Aware"), DisplayName("Discard Messages"), PropertyOrder(3), DescriptionAttribute("Discard Messages if they already exist in the  Context Cache")]
+        public bool DiscardCacheItems {
+            get { return GetBoolAttribute("discardInCache"); }
+            set { SetAttribute("discardInCache", value); }
         }
     }
 
@@ -414,19 +444,21 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
-        [CategoryAttribute("Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
         public string StyleSheet {
             get { return GetAttribute("stylesheet"); }
-            set { SetAttribute("stylesheet", value); }
+            set { SetAttribute("stylesheet", value);
+                view.DrawQXConfig();
+            }
         }
 
-        [CategoryAttribute("Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
         public string XSLType {
             get { return GetAttribute("xslVersion"); }
             set { SetAttribute("xslVersion", value); ; }
         }
 
-        [CategoryAttribute("Optional"), DisplayName("Get Interval"), PropertyOrder(4), DescriptionAttribute("Time in seconds of the wait time for each interval of reading a message")]
+        [CategoryAttribute("Optional - Transformation"), DisplayName("Get Interval"), PropertyOrder(4), DescriptionAttribute("Time in seconds of the wait time for each interval of reading a message")]
         public int GetTimeout {
             get { return Math.Max(1, GetIntAttribute("getTimeout") / 1000); }
             set {
@@ -455,7 +487,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
     }
-
     public class ContainsFilter : MyPropertyGrid {
 
         public ContainsFilter(XmlNode dataModel, IView view) {
@@ -476,7 +507,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             set { SetAttribute("value", value); }
         }
     }
-
     public class XPExistsFilter : MyPropertyGrid {
 
         public XPExistsFilter(XmlNode dataModel, IView view) {

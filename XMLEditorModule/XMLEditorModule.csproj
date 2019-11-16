@@ -61,20 +61,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\BoolToVisibilityConverter.cs" />
     <Compile Include="Common\Defintions.cs" />
-    <Compile Include="Common\Interface1.cs" />
     <Compile Include="Common\OutModeConverter.cs" />
-    <Compile Include="Common\NodeToVisibilityConverter.cs" />
     <Compile Include="Common\CommonEnums.cs" />
     <Compile Include="Common\ContextMenuProvider.cs" />
     <Compile Include="Common\Converters.cs" />
     <Compile Include="Common\DocumentLoadedEventArgs.cs" />
-    <Compile Include="Common\ParamConfig.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\TaskListDataTemplateSelector.cs" />
-    <Compile Include="Common\TextStringToBoolConverter.cs" />
-    <Compile Include="Common\TextToBoolConverter.cs" />
     <Compile Include="ViewModels\ChildViewModel.cs" />
     <Compile Include="ViewModels\SelectedElementViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />

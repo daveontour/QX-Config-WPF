@@ -38,8 +38,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             {
                 ViewModel.Remove((sender as CloseableTabItem).Content as TreeEditorViewModel);
             }
-            catch
-            {
+            catch (Exception ex)  {
+                Console.WriteLine(ex.Message);
             }
         }
 

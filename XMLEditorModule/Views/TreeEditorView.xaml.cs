@@ -124,7 +124,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public Canvas GetMonitorCanvas() {
 
-            Canvas can = new Canvas();
+            Canvas can = new Canvas() {
+                Height = 44,
+                Width = 30
+            };
             Canvas monitorcanvas = GetResourceCopy<Canvas>("monitor");
 
             can.Children.Add(monitorcanvas);
@@ -140,7 +143,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public Canvas GetLoggerCanvas() {
 
-            Canvas can = new Canvas();
+            Canvas can = new Canvas() {
+                Height = 44,
+                Width = 30
+            };
             Canvas monitorcanvas = GetResourceCopy<Canvas>("logger");
 
             can.Children.Add(monitorcanvas);
@@ -155,8 +161,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
 
         public Canvas GetNSCanvas() {
-
-            Canvas can = new Canvas();
+            Canvas can = new Canvas() {
+                Height = 44,
+                Width = 44
+            };
             Canvas nscanvas = GetResourceCopy<Canvas>("namespace");
 
             can.Children.Add(nscanvas);
@@ -217,6 +225,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 this.canvasToNode.Add(nsCanvas, ns);
                 settingspanel.Children.Add(nsCanvas);
             }
+
 
             int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
@@ -288,6 +297,24 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 pipeCan.Children.Add(end2);
                 pipeCan.Children.Add(tb);
 
+                pipeCan.ContextMenu = new ContextMenu();
+
+                ContextMenuProvider pipeMenuProvider = new ContextMenuProvider();
+                pipeMenuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
+                pipeMenuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
+                pipeCan.ContextMenu.Items.Add(pipeMenuProvider.ContextMenus[ContextMenuType.AddInput]);
+
+                pipeMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
+                pipeMenuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
+                pipeCan.ContextMenu.Items.Add(pipeMenuProvider.ContextMenus[ContextMenuType.AddOutput]);
+
+                pipeCan.ContextMenu.Items.Add(new Separator());
+
+                pipeMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                pipeCan.ContextMenu.Items.Add(pipeMenuProvider.ContextMenus[ContextMenuType.Delete]);
+
+
+
 
                 canTop.Children.Add(pipeCan);
 
@@ -307,14 +334,62 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                         can.SetValue(Canvas.LeftProperty, (double)10);
                         can.SetValue(Canvas.TopProperty, (space / 2 + (space + imHeight) * inNum));
 
+                        
+
                         canvasToNode.Add(can, inNode);
                         nodeToCanvas.Add(inNode, can);
                         can.PreviewMouseDown += Can_MouseDown;
                         can.Background = transBrush;
 
+
+                        if (inNode.HasChildNodes) {
+
+                            Canvas filterCanvas = new Canvas() {
+                                Height = can.Height / 2,
+                                Width = can.ActualWidth / 2,
+                                Background = blackBrush
+                            };
+
+                            filterCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0);
+                            filterCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
+                            filterCanvas.Children.Add(GetResourceCopy<Path>("filter"));
+                            canTop.Children.Add(filterCanvas);
+
+                        }
+
+                        if (inNode.Attributes["stylesheet"] != null) {
+                            Canvas transformCanvas = new Canvas() {
+                                Height = can.Height / 2,
+                                Width = can.ActualWidth / 2,
+                                Background = blackBrush
+                            };
+
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0);
+                            if (inNode.HasChildNodes) {
+                                transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6*can.Width + 4.0);
+                            }
+                            transformCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
+                            Path transformpath = GetResourceCopy<Path>("transform");
+
+                            transformCanvas.Children.Add(transformpath);
+                            canTop.Children.Add(transformCanvas);
+                        }
+
+                        can.ContextMenu = new ContextMenu();
+                        ContextMenuProvider inMenuProvider = new ContextMenuProvider();
+                        inMenuProvider.ContextMenus[ContextMenuType.AddFilter].Command = ViewModel.AddDataFilterCommand;
+                        inMenuProvider.ContextMenus[ContextMenuType.AddFilter].CommandParameter = XmlNodeType.Element;
+                        can.ContextMenu.Items.Add(inMenuProvider.ContextMenus[ContextMenuType.AddFilter]);
+
+                        can.ContextMenu.Items.Add(new Separator());
+
+                        inMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                        can.ContextMenu.Items.Add(inMenuProvider.ContextMenus[ContextMenuType.Delete]);
+
                         canTop.Children.Add(can);
 
                         Path arrowpath = GetResourceCopy<Path>("arrow");
+                     
                         double startArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                         double startArrrowX = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4;
 
@@ -322,6 +397,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
                         canTop.Children.Add(p.Item1);
                         canTop.Children.Add(p.Item2);
+                       
+
 
                         inNum++;
                     }
@@ -345,15 +422,61 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
                         canvasToNode.Add(can, outNode);
                         nodeToCanvas.Add(outNode, can);
+                       
+
 
                         //can.MouseDown += Can_MouseDown;
                         can.PreviewMouseDown += Can_MouseDown;
                         can.Background = transBrush;
 
+                        if (outNode.HasChildNodes) {
 
+                            Canvas filterCanvas = new Canvas() {
+                                Height = can.Height / 2,
+                                Width = can.ActualWidth / 2,
+                                Background = blackBrush
+                            };
+
+                            filterCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width/2- 4.0);
+                            filterCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
+                            
+                            filterCanvas.Children.Add(GetResourceCopy<Path>("filter"));
+                            canTop.Children.Add(filterCanvas);
+
+                        }
+
+                        if (outNode.Attributes["stylesheet"] != null) {
+                            Canvas transformCanvas = new Canvas() {
+                                Height = can.Height / 2,
+                                Width = can.ActualWidth / 2,
+                                Background = blackBrush
+                            };
+
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width/2 - 4.0);
+                            if (outNode.HasChildNodes) {
+                                transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - 2 * can.Width/2 - 8.0);
+                            }
+                            transformCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
+                            Path transformpath = GetResourceCopy<Path>("transform");
+
+                            transformCanvas.Children.Add(transformpath);
+                            canTop.Children.Add(transformCanvas);
+                        }
+
+                        can.ContextMenu = new ContextMenu();
+                        ContextMenuProvider inMenuProvider = new ContextMenuProvider();
+                        inMenuProvider.ContextMenus[ContextMenuType.AddFilter].Command = ViewModel.AddDataFilterCommand;
+                        inMenuProvider.ContextMenus[ContextMenuType.AddFilter].CommandParameter = XmlNodeType.Element;
+                        can.ContextMenu.Items.Add(inMenuProvider.ContextMenus[ContextMenuType.AddFilter]);
+
+                        can.ContextMenu.Items.Add(new Separator());
+
+                        inMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                        can.ContextMenu.Items.Add(inMenuProvider.ContextMenus[ContextMenuType.Delete]);
                         canTop.Children.Add(can);
 
                         Path arrowpath = GetResourceCopy<Path>("arrow");
+                        
 
                         double stopArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                         double stopArrrowX = (double)can.GetValue(Canvas.LeftProperty) - 4;
@@ -510,7 +633,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         void TreeEditorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
             ViewModel = e.NewValue as TreeEditorViewModel;
-            DrawConfig(viewModel.DataModel);
+            if (ViewModel != null) {
+                DrawConfig(viewModel.DataModel);
+            }
         }
 
         public TreeEditorViewModel ViewModel {
@@ -541,9 +666,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
 
         private void BindUIElementToViewModel() {
-            this.DataContext = viewModel;
-            viewModel.View = this as IView;
-            if (viewModel == null) {
+            //         this.DataContext = viewModel;
+            try {
+                viewModel.View = this as IView;
+                if (viewModel == null) {
+                    return;
+                }
+            } catch {
                 return;
             }
 
@@ -754,6 +883,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             viewModel.OnPropertyChanged(param);
         }
 
+        #region updatePropertyGrid
+
         public void MSMQSource(XmlNode node) {
             viewModel.myGrid = new MSMQInput(node, this);
             viewModel.OnPropertyChanged("myGrid");
@@ -765,10 +896,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
 
+        #endregion
+
+
         /*
          * Updates the title in the graphical representation of the node when the type is changed
          */
-        public void UpdateSelectedNodecanvas(XmlNode node) {
+        public void UpdateSelectedNodeCanvas(XmlNode node) {
 
             // Dont update logger, monitor or namespace
             string name = node.Name;

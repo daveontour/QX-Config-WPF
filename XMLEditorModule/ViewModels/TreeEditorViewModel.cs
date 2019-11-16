@@ -9,13 +9,14 @@ using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using Xceed.Wpf.Toolkit;
+using System.IO;
+using Microsoft.Win32;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
 
     public class TreeEditorViewModel : BaseViewModel {
         public TreeEditorViewModel(XmlDocument dataModel, string filePath, string fileName) {
-          //  this.myGrid = new MQ();
             this.DataModel = dataModel;
             this.path = filePath;
             this.fileName = fileName;
@@ -37,6 +38,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.saveAsDocumentCommand = new RelayCommand<string>(SaveAs);
             this.deleteElementCommand = new RelayCommand<XmlNode>(p => { DeleteElement(SelectedElement.DataModel); }, p => { return CanDeleteElement(SelectedElement.DataModel); });
             this.unloadDocumentCommand = new RelayCommand(UnloadDocument);
+
         }
 
         public MyPropertyGrid myGrid { get; set; }
@@ -50,7 +52,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         public string Path {
             get { return path; }
-
         }
 
         private string fileName;
@@ -99,7 +100,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new PIPE(selectedItem, this.View);
             } else if (selectedItem.Name == "namespace") {
                 myGrid = new NameSpaceGrid(selectedItem, this.View);
-            } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not"  ) {
+            } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not") {
                 myGrid = new BooleanExpression(selectedItem, this.View);
             } else if (selectedItem.Name == "contains") {
                 myGrid = new ContainsFilter(selectedItem, this.View);
@@ -137,9 +138,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
 
 
-        /// <summary>
-        /// To get the value from UI
-        /// </summary>
         public Func<XmlNodeType, XmlNode> AddXmlNode { get; set; }
 
 
@@ -159,14 +157,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         public ICommand ViewAttributesCommand {
             get { return viewAttributesCommand; }
-        }
-
-
-
-        private ICommand addElementCommand;
-
-        public ICommand AddElementCommand {
-            get { return addElementCommand; }
         }
 
         private ICommand addPipeCommand;
@@ -287,7 +277,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         IEnumerator<XmlNode> enumerator;
         public void HighlightElement(string xPath) {
 
-            
+
             //
             if (xPath != prevXPath) {
                 try {
@@ -541,7 +531,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             XmlNode newNode = this.DataModel.CreateElement("filter");
 
-
             if (newNode == null)
                 return;
             if (newNode.NodeType == XmlNodeType.Attribute) {
@@ -591,15 +580,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
             newNode.Attributes.Append(newAttribute3);
-
-            //if (newNode == null)
-            //    return;
-            //if (newNode.NodeType == XmlNodeType.Attribute) {
-            //    SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-            //    ViewAttributes(SelectedElement.DataModel);
-            //} else {
-            //    SelectedElement.DataModel.AppendChild(newNode);
-            //}
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
@@ -652,7 +632,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
                 ViewAttributes(SelectedElement.DataModel);
             } else {
-                SelectedElement.DataModel.AppendChild(newNode);
+                SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
             }
 
             OnPropertyChanged("XMLText");
@@ -700,7 +680,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
                 ViewAttributes(SelectedElement.DataModel);
             } else {
-                SelectedElement.DataModel.AppendChild(newNode);
+                try {
+                    if (SelectedElement.DataModel.FirstChild.Name == "monitor") {
+                        SelectedElement.DataModel.InsertAfter(newNode, SelectedElement.DataModel.FirstChild);
+                    } else {
+                        SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
+                    }
+                } catch {
+                    SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
+                }
             }
 
             OnPropertyChanged("XMLText");
@@ -810,7 +798,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 if (!SelectedElement.DataModel.HasChildNodes) {
                     return true;
                 }
-                if (SelectedElement.DataModel.ChildNodes.Count == 1 && SelectedElement.DataModel.ChildNodes.Item(0).Name=="altqueue") {
+                if (SelectedElement.DataModel.ChildNodes.Count == 1 && SelectedElement.DataModel.ChildNodes.Item(0).Name == "altqueue") {
                     return true;
                 }
 
@@ -819,7 +807,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement.DataModel.Name == "and" || SelectedElement.DataModel.Name == "or" || SelectedElement.DataModel.Name == "xor") {
                 return true;
             }
-            if ( SelectedElement.DataModel.Name == "not") {
+            if (SelectedElement.DataModel.Name == "not") {
                 if (!SelectedElement.DataModel.HasChildNodes) {
                     return true;
                 }
@@ -833,23 +821,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return false;
             }
         }
-        private void AddElement(XmlNodeType newNodeType) {
-            XmlNode newNode = AddXmlNode(newNodeType);
-
-            if (newNode == null)
-                return;
-            if (newNode.NodeType == XmlNodeType.Attribute) {
-                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
-            } else {
-                SelectedElement.DataModel.AppendChild(newNode);
-            }
-
-        }
-
 
         private void DeleteElement(XmlNode currentNode) {
-             currentNode.ParentNode.RemoveChild(currentNode);
+            currentNode.ParentNode.RemoveChild(currentNode);
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
         }
@@ -913,11 +887,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 View.DrawQXConfig();
                 return;
             }
-          
+
             XmlNode newNode = this.DataModel.CreateElement(value);
             SelectedElement.DataModel.ParentNode.InsertAfter(newNode, SelectedElement.DataModel);
 
-            foreach (XmlNode child in SelectedElement.DataModel.ChildNodes ) {
+            foreach (XmlNode child in SelectedElement.DataModel.ChildNodes) {
                 XmlNode move = child.CloneNode(true);
                 newNode.AppendChild(move);
             }
@@ -930,23 +904,46 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         private void Save() {
-            this.DataModel.Save(Path);
+
+
+            if (Path == null) {
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.Filter = "XML Files (*.xml)|*.xml";
+                if (dialog.ShowDialog() == true) {
+                    using (TextWriter sw = new StreamWriter(dialog.FileName, false, Encoding.UTF8)) {
+                        this.DataModel.Save(sw);         
+                    }
+                    UnloadEditor();
+                    return;
+                } else {
+                    return;
+                }
+            }
+
+            using (TextWriter sw = new StreamWriter(Path, false, Encoding.UTF8)) {
+                this.DataModel.Save(sw);
+            }
+
         }
 
         private void SaveAs(string path) {
             XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
-            newDoc.Save(path);
+            using (TextWriter sw = new StreamWriter(path, false, Encoding.UTF8)) {
+                newDoc.Save(sw);
+            }
         }
         private void UnloadDocument(object param) {
-            this.DataModel.Save(Path);
+
+            using (TextWriter sw = new StreamWriter(path, false, Encoding.UTF8)) {
+                this.DataModel.Save(sw);
+            }
+            //         this.DataModel.Save(Path);
         }
 
         public void UnloadEditor() {
-            UnloadDocument(null);
+        //    UnloadDocument(null);
             SelectedNodeXpath = string.Empty;
         }
-
-
 
         #region Getting Xpath
 

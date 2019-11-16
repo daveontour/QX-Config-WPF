@@ -58,8 +58,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
         }
         public void Remove(TreeEditorViewModel treeEditor)
         {
-            treeEditor.UnloadEditor();
-            this.TreeEditors.Remove(treeEditor);
+            try {
+                treeEditor.UnloadEditor();
+                this.TreeEditors.Remove(treeEditor);
+            } catch (Exception ex) {
+                Console.WriteLine(ex);
+                
+            }
             ActiveEditorIndex = this.TreeEditors.Count - 1;
         }
 

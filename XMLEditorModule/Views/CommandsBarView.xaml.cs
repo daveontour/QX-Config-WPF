@@ -116,11 +116,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             XmlDocument document = new XmlDocument();
             document.LoadXml("<?xml version=\"1.0\" encoding=\"utf - 8\"?><config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">  <settings> </settings><pipes></pipes></config>"); ;
 
-
-
             try {
 
-                DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = ".", Document = document, FileName = "new.xml" };
+                DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = null, Document = document, FileName = "new.xml" };
                     OnDocumentLoaded(this, args);
 
                 } catch (Exception ex) {
@@ -144,7 +142,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
         }
 
         void saveMenuItem_Click(object sender, RoutedEventArgs e)
-        {           
+        {    
 
             if (SaveRequested != null)
             {
