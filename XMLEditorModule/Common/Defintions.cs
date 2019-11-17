@@ -447,7 +447,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
         public string StyleSheet {
             get { return GetAttribute("stylesheet"); }
-            set { SetAttribute("stylesheet", value);
+            set {
+                SetAttribute("stylesheet", value);
                 view.DrawQXConfig();
             }
         }
@@ -467,7 +468,42 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
     }
+    public class Filter : MyPropertyGrid {
 
+
+        public Filter(XmlNode dataModel, IView view) {
+            _node = dataModel;
+            this.view = view;
+            type = dataModel.Name;
+        }
+
+        [DisplayName("Alt Queue"), PropertyOrder(1), DescriptionAttribute("The queue the message is sent to if it fails to pass the filter")]
+        public string AltQueue {
+            get {
+          
+                if (_node.InnerXml.Contains("altqueue")) {
+                    return "Alt Queue is Set (Select in Tree to Edit)";
+                } else {
+                    return "Alt Queue is Not Set (Right Click on Filter to Add)";
+                }
+            }
+        }
+
+        [DisplayName("Filter Type"), PropertyOrder(1), DescriptionAttribute("Filters can either be a single data filter or a compound boolean expression made up of several data filters")]
+        public string Type {
+            get {
+                if (_node.InnerXml.Contains("<and>") || _node.InnerXml.Contains("<or>") || _node.InnerXml.Contains("<xor>") || _node.InnerXml.Contains("<not>")  ) {
+                    return "Compound Boolean Expression (Select in Tree to Edit)";
+                } else {
+                    if ((_node.InnerXml.Contains("altqueue") && _node.ChildNodes.Count == 1) || !_node.HasChildNodes ) {
+                        return "No Filter Has Been set Yet. (Right Click on Filter to Add)";
+                    } else {
+                        return "Simple Data Filter. (Select in Tree to Edit)";
+                    }
+                }
+            }
+        }
+    }
     public class BooleanExpression : MyPropertyGrid {
 
 
@@ -477,7 +513,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Boolean Type"), PropertyOrder(1), DescriptionAttribute("Boolean Type"), ItemsSource(typeof(BooleanTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Boolean Type"), PropertyOrder(1), DescriptionAttribute("The selected boolean operator is applied to all the child nodes to produce a result"), ItemsSource(typeof(BooleanTypeList))]
         public string Type {
             get { return this._node.Name; }
             set {

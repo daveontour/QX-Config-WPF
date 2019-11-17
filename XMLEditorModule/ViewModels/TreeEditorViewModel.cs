@@ -67,11 +67,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             get { return selectedElement; }
             private set {
                 selectedElement = value;
-                OnPropertyChanged("SelectedElement");
+      //          OnPropertyChanged("SelectedElement");
                 SelectedNodeXpath = GetXPathToNode(SelectedElement.DataModel);
                 UpdatePropertiesPanel(selectedElement.DataModel);
                 View.HightLightCanvas(selectedElement.DataModel);
-
             }
         }
 
@@ -96,6 +95,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                         myGrid = new MQ(selectedItem, this.View);
                         break;
                 }
+            } else if (selectedItem.Name == "filter") {
+                myGrid = new Filter(selectedItem, this.View);
             } else if (selectedItem.Name == "pipe") {
                 myGrid = new PIPE(selectedItem, this.View);
             } else if (selectedItem.Name == "namespace") {
@@ -526,7 +527,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return false;
             }
         }
-
         private void AddFilter(XmlNodeType newNodeType) {
 
             XmlNode newNode = this.DataModel.CreateElement("filter");
@@ -545,8 +545,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
 
         }
-
         private bool CanAddFilter(XmlNodeType newNodeType) {
+
+            
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
@@ -554,6 +555,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
                 return false;
             }
+
+            if (SelectedElement.DataModel.HasChildNodes) {
+                return false;
+            } 
 
             if (SelectedElement.DataModel.Name == "input" || SelectedElement.DataModel.Name == "output") {
                 return true;
@@ -567,7 +572,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return false;
             }
         }
-
         private void AddAltQueue(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("altqueue");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
@@ -591,7 +595,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             View.DrawQXConfig();
 
         }
-
         private bool CanAddAltQueue(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
@@ -639,7 +642,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             View.DrawQXConfig();
 
         }
-
         private bool CanAddMonitor(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
@@ -695,7 +697,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             View.DrawQXConfig();
 
         }
-
         private bool CanAddLogger(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
@@ -718,7 +719,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             return true;
 
         }
-
         private void AddNamespace(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("namespace");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("prefix");
@@ -743,7 +743,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             View.DrawQXConfig();
 
         }
-
         private bool CanAddNamespace(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
@@ -765,7 +764,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return false;
             }
         }
-
         private void AddDataFilter(XmlNodeType newNodeType) {
 
             XmlNode newNode = this.DataModel.CreateElement("contains");
@@ -784,7 +782,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             View.DrawQXConfig();
 
         }
-
         private bool CanAddExpression(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
