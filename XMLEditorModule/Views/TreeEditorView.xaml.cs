@@ -218,6 +218,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 this.nodeToCanvas.Add(monitor, monitorCanvas);
                 this.canvasToNode.Add(monitorCanvas, monitor);
                 settingspanel.Children.Add(monitorCanvas);
+
+                monitorCanvas.ContextMenu = new ContextMenu();
+                ContextMenuProvider monMenuProvider = new ContextMenuProvider();
+                monMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                monitorCanvas.ContextMenu.Items.Add(monMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
 
             XmlNodeList loggers = xmlDoc.SelectNodes("//logger");
@@ -227,6 +232,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 this.nodeToCanvas.Add(logger, logCanvas);
                 this.canvasToNode.Add(logCanvas, logger);
                 settingspanel.Children.Add(logCanvas);
+
+                logCanvas.ContextMenu = new ContextMenu();
+                ContextMenuProvider logMenuProvider = new ContextMenuProvider();
+                logMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                logCanvas.ContextMenu.Items.Add(logMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
 
 
@@ -237,9 +247,31 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 this.nodeToCanvas.Add(ns, nsCanvas);
                 this.canvasToNode.Add(nsCanvas, ns);
                 settingspanel.Children.Add(nsCanvas);
+
+                nsCanvas.ContextMenu = new ContextMenu();
+                ContextMenuProvider nsMenuProvider = new ContextMenuProvider();
+                nsMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                nsCanvas.ContextMenu.Items.Add(nsMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
 
-            int i = 0;
+            // Context Menu for the Settings Panel 
+            this.settingspanel.ContextMenu = new ContextMenu();
+            ContextMenuProvider setMenuProvider = new ContextMenuProvider();
+
+            setMenuProvider.ContextMenus[ContextMenuType.AddMonitor].Command = ViewModel.AddMonitorCommand;
+            setMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
+            this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddMonitor]);
+
+            setMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
+            setMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
+            this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
+
+            setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
+            setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;
+            this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddNamespace]);
+            this.settingspanel.PreviewMouseDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//settings")); };
+
+           int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
             foreach (XmlNode pipeNode in pipes) {
 
@@ -907,10 +939,23 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             viewModel.OnPropertyChanged("myGrid");
         }
 
-        public void MQSource(XmlNode node) {
-            viewModel.myGrid = new MQ(node, this);
+        public void MQInSource(XmlNode node) {
+            viewModel.myGrid = new MQIN(node, this);
             viewModel.OnPropertyChanged("myGrid");
+        }
 
+        public void MQOutSource(XmlNode node) {
+            viewModel.myGrid = new MQOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void FileInSource(XmlNode node) {
+            viewModel.myGrid = new FILEIN(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+        public void FileOutSource(XmlNode node) {
+            viewModel.myGrid = new FILEOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
         }
 
         #endregion

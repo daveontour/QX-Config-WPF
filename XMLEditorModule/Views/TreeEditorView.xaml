@@ -261,7 +261,7 @@
                     </Grid.RowDefinitions>
                     <TextBlock Text="Logger, Monitor and Namespaces" Grid.Row="0" Margin="10,0,0,0" FontWeight="Bold"/>
                     <Border  Padding="10,5,5,5" Grid.Row="1">
-                        <StackPanel VerticalAlignment="Center"  x:Name="settingspanel" Orientation="Horizontal" Height="48" MaxWidth="600">
+                        <StackPanel VerticalAlignment="Center" Background="BlanchedAlmond"  x:Name="settingspanel" Orientation="Horizontal" Height="48">
                             <StackPanel.Resources>
                                 <Style TargetType="{x:Type Canvas}">
                                     <Setter Property="Margin" Value="0,0,10,0"/>

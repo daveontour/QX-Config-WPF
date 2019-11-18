@@ -33,7 +33,10 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         void HightLightCanvas(XmlNode node);
         void UpdateParamBindings(string param);
         void MSMQSource(XmlNode node);
-        void MQSource(XmlNode node);
+        void FileInSource(XmlNode node);
+        void FileOutSource(XmlNode node);
+        void MQInSource(XmlNode node);
+        void MQOutSource(XmlNode node);
         void UpdateSelectedNodeCanvas(XmlNode node);
         void UpdateSelectedPipeCanvas(XmlNode node);
         void ChangeElementType(string value);

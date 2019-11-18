@@ -29,7 +29,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "Kafka"
+                "Microsoft MQ", "IBM MQ", "File","HTTP","RESTful","Kafka", "Rabbit MQ"
             };
             return types; ;
         }
@@ -80,11 +80,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
     }
 
     [CategoryOrder("Required", 1)]
-    [CategoryOrder("Optional", 2)]
-    [CategoryOrder("Optional - Transformation", 3)]
-    [CategoryOrder("Optional - Context Aware", 4)]
+    [CategoryOrder("Required - Connection", 2)]
+    [CategoryOrder("Optional - Connection", 3)]
+    [CategoryOrder("Optional", 4)]
+    [CategoryOrder("Optional - Transformation", 5)]
+    [CategoryOrder("Optional - Context Aware", 6)]
     public class MyPropertyGrid {
-        public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("Kafka")] KAFKA };
+        public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("File")] FILE, [Description("HTTP")] HTTP, [Description("HTTP Rest")] REST, [Description("Kafka")] KAFKA, [Description("Rabbit MQ")] RABBIT, [Description("SINK")] SINK, };
         public enum XSLVerEnum {[Description("1.0")] ONE, [Description("2.0")] TWO, [Description("3.0")] THREE }
         public int maxMsgPerMinute = -1;
         public int maxMsg = -1;
@@ -177,18 +179,26 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                     case "IBM MQ":
                         SetAttribute("type", "MQ");
                         view.UpdateSelectedNodeCanvas(_node);
-                        view.MQSource(_node);
+                        if (_node.Name == "input")view.MQInSource(_node);
+                        if (_node.Name == "output") view.MQOutSource(_node);
                         break;
                     case "Microsoft MQ":
                         SetAttribute("type", "MSMQ");
                         view.UpdateSelectedNodeCanvas(_node);
                         view.MSMQSource(_node);
                         break;
+                    case "File":
+                        SetAttribute("type", "File");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "input") view.FileInSource(_node);
+                        if (_node.Name == "output") view.FileOutSource(_node);
+                        break;
                 }
             };
         }
     }
 
+    [DisplayName("Pipe Connecting Input and Output")]
     public class PIPE : MyPropertyGrid {
 
         public PIPE(XmlNode dataModel, IView view) {
@@ -204,7 +214,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 view.UpdateSelectedPipeCanvas(_node);
             }
         }
-        [CategoryAttribute("Optional"), DisplayName("Maximum Messages/Minute"), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
+
+        [CategoryAttribute("Required"), DisplayName("Enable Logging"), PropertyOrder(3), DescriptionAttribute("Log envent on this pipe")]
+        public bool EnableLogging {
+            get { return GetBoolAttribute("enableLog"); }
+            set { SetAttribute("enableLog", value); }
+        }
+
+        [CategoryAttribute("Optional"), DisplayName("Maximum Messages/Min"), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
         public int MessPerMinute {
             get { return GetIntAttribute("maxMsgPerMinute"); }
             set {
@@ -217,18 +234,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 }
             }
         }
-
-        [CategoryAttribute("Required"), DisplayName("Enable Logging"), PropertyOrder(3), DescriptionAttribute("Log envent on this pipe")]
-        public bool EnableLogging {
-            get { return GetBoolAttribute("enableLog"); }
-            set { SetAttribute("enableLog", value); }
-        }
-
         [CategoryAttribute("Optional"), DisplayName("Output Isolation"), PropertyOrder(4), DescriptionAttribute("Isolate distribution of outputs from each other")]
         public bool OutputIsolation {
             get { return GetBoolAttribute("outputIsolation"); }
             set { SetAttribute("outputIsolation", value); }
         }
+
         [CategoryAttribute("Optional"), DisplayName("Distribution"), PropertyOrder(3), DescriptionAttribute("The type of ditribution to the output nodes"), ItemsSource(typeof(OutputTypeList))]
         public string OutputDistribution {
             get {
@@ -264,7 +275,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
-        [CategoryAttribute("Optional - Context Aware"), DisplayName("Context Cache Expiry"), PropertyOrder(2), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
+        [CategoryAttribute("Optional - Context Aware"), DisplayName("Context Cache Expiry"), PropertyOrder(3), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
         public int ContextExpiry {
             get { return GetIntAttribute("contextCacheExpiry"); }
             set {
@@ -275,10 +286,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
-        [CategoryAttribute("Optional - Context Aware"), DisplayName("Discard Messages"), PropertyOrder(3), DescriptionAttribute("Discard Messages if they already exist in the  Context Cache")]
+        [CategoryAttribute("Optional - Context Aware"), DisplayName("Discard Messages"), PropertyOrder(4), DescriptionAttribute("Discard Messages if they already exist in the  Context Cache")]
         public bool DiscardCacheItems {
             get { return GetBoolAttribute("discardInCache"); }
             set { SetAttribute("discardInCache", value); }
+        }
+        [CategoryAttribute("Optional - Context Aware"), DisplayName("Use Message As Key"), PropertyOrder(2), DescriptionAttribute("Use a SHA256 hash of the entire message Isolate for the Context Cache Key (Duplicate Messages)")]
+        public bool UseMessageAsKey {
+            get { return GetBoolAttribute("useMessageAsKey"); }
+            set { SetAttribute("useMessageAsKey", value); }
         }
     }
 
@@ -301,13 +317,20 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         }
     }
 
-    public class MQ : MyPropertyGrid {
+    [DisplayName("IBM MQ Input Node")]
+    public class MQIN : MyPropertyGrid {
 
 
-        public MQ(XmlNode dataModel, IView view) {
+        public MQIN(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = "MQ";
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Name of the Output")]
+        public string Name {
+            get { return GetAttribute("name"); }
+            set { SetAttribute("name", value); }
         }
         [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
         public string TypeData {
@@ -315,83 +338,235 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             set { SetType(value); }
         }
 
-        [CategoryAttribute("Required"),
+        [CategoryAttribute("Required - Connection"),
         DisplayName("Queue Manager"),
         PropertyOrder(1),
         DescriptionAttribute("IBM MQ Queue Manager Name")]
         public string QManager {
-            get;
-            set;
-        }
-
-        [CategoryAttribute("Required"),
-        DisplayName("Host"),
-        PropertyOrder(2),
-        DescriptionAttribute("Host name")]
-        public string HostName {
-            get;
-            set;
-        }
-
-        [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Descriptive name of the queue")]
-        public string Name {
             get {
-                return GetAttribute("name");
+                return GetAttribute("queueMgr");
             }
             set {
-                SetAttribute("name", value);
+                SetAttribute("queueMgr", value);
             }
         }
-
-        [CategoryAttribute("Required"), DisplayName("Queue"), PropertyOrder(1), DescriptionAttribute("MQ Queue Name")]
+        [CategoryAttribute("Required - Connection"), DisplayName("Queue"), PropertyOrder(2), DescriptionAttribute("MQ Queue Name")]
         public string Queue {
             get {
-                return GetAttribute("name");
+                return GetAttribute("queue");
             }
             set {
-                SetAttribute("name", value);
-            }
-        }
-        [CategoryAttribute("Optional"), DisplayName("Priority"), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
-        public int Priority {
-            get {
-                int val = GetIntAttribute("priority");
-                return Math.Max(val, 1);
-            }
-            set {
-                if (value < 1) {
-                    value = 1;
-                }
-                SetAttribute("priority", value);
+                SetAttribute("queue", value);
             }
         }
 
-        [CategoryAttribute("Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
+        [CategoryAttribute("Required - Connection"), DisplayName("Channel"), PropertyOrder(3), DescriptionAttribute("Descriptive name of the queue")]
+        public string Channel {
+            get {
+                return GetAttribute("channel");
+            }
+            set {
+                SetAttribute("channel", value);
+            }
+        }
+        [CategoryAttribute("Required - Connection"),
+        DisplayName("Host"),
+        PropertyOrder(4),
+        DescriptionAttribute("Host name")]
+        public string HostName {
+            get {
+                return GetAttribute("host");
+            }
+            set {
+                SetAttribute("host", value);
+            }
+        }
+
+        [CategoryAttribute("Required - Connection"), DisplayName("Port"), PropertyOrder(5), DescriptionAttribute("TCP Port Number of Queue Manager")]
+        public string Port {
+            get {
+                return GetAttribute("port");
+            }
+            set {
+                SetAttribute("port", value);
+            }
+        }
+
+ 
+        [CategoryAttribute("Optional - Connection"), DisplayName("User Name"), PropertyOrder(1), DescriptionAttribute("MQ User Name")]
+        public string UserName {
+            get {
+                return GetAttribute("username");
+            }
+            set {
+                SetAttribute("username", value);
+            }
+        }
+        [CategoryAttribute("Optional - Connection"), DisplayName("User Password"), PropertyOrder(2), DescriptionAttribute("Connection password for this user")]
+        public string UserPass {
+            get {
+                return GetAttribute("password");
+            }
+            set {
+                SetAttribute("password", value);
+            }
+        }
+
+
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
         public string StyleSheet {
             get { return GetAttribute("stylesheet"); }
             set { SetAttribute("stylesheet", value); }
         }
 
-        [CategoryAttribute("Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
+        public string XSLType {
+            get { return GetAttribute("xslVersion"); }
+            set { SetAttribute("xslVersion", value); ; }
+        }
+    }
+
+
+    [DisplayName("IBM MQ Output Node")]
+    public class MQOUT : MQIN {
+
+
+        public MQOUT(XmlNode dataModel, IView view) :base(dataModel, view){
+        }
+
+        [CategoryAttribute("Optional"), DisplayName("Maximum Messages"), PropertyOrder(3), DescriptionAttribute("Maximum Number of Messages Allowed in the Queue. (Older messages will be replaced)")]
+        public int MaxMessages {
+            get { return GetIntAttribute("maxMessages"); }
+            set {
+                if (value <= -1) {
+                    value = -1;
+                }
+                SetAttribute("maxMessages", value);
+            }
+        }
+    }
+
+        [DisplayName("File Input")]
+    public class FILEIN : MyPropertyGrid {
+
+
+        public FILEIN(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = "File";
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Name of the Output")]
+        public string Name {
+            get { return GetAttribute("name"); }
+            set { SetAttribute("name", value); }
+        }
+        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(2), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
+        public string TypeData {
+            get { return "File"; }
+            set { SetType(value); }
+        }
+
+        [CategoryAttribute("Required"),
+        DisplayName("Directory Path"),
+        PropertyOrder(3),
+        DescriptionAttribute("Path to the directory to watch")]
+        public string Path {
+            get {
+                return GetAttribute("path");
+            }
+            set {
+                SetAttribute("path", value);
+            }
+        }
+        [CategoryAttribute("Required"), DisplayName("File Filter"), PropertyOrder(4), DescriptionAttribute("File Pattern to Match. (e.g. *.xml)")]
+        public string FileFilter {
+            get {
+                return GetAttribute("fileFilter");
+            }
+            set {
+                SetAttribute("fileFilter", value);
+            }
+        }
+        [CategoryAttribute("Required"), DisplayName("Delete After Send"), PropertyOrder(5), DescriptionAttribute("Delete the source file after the pipeline picks it up")]
+        public bool Delete {
+            get {
+                return GetBoolAttribute("deleteAfterSend");
+            }
+            set {
+                SetAttribute("deleteAfterSend", value);
+            }
+        }
+        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(6), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
+        public string Buffer {
+            get {
+                return GetAttribute("bufferQueueName");
+            }
+            set {
+                SetAttribute("bufferQueueName", value);
+            }
+        }
+
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(1), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
+        public string StyleSheet {
+            get { return GetAttribute("stylesheet"); }
+            set { SetAttribute("stylesheet", value); }
+        }
+
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Version"), PropertyOrder(2), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
         public string XSLType {
             get { return GetAttribute("xslVersion"); }
             set { SetAttribute("xslVersion", value); ; }
         }
 
-        [CategoryAttribute("Optional"), DisplayName("Get Interval"), PropertyOrder(4), DescriptionAttribute("Time in seconds of the wait time for each interval of reading a message")]
-        public int GetTimeout {
-            get { return Math.Max(1, GetIntAttribute("getTimeout") / 1000); }
+    }
+
+    public class FILEOUT : MyPropertyGrid {
+
+
+        public FILEOUT(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = "File";
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Name"), PropertyOrder(1), DescriptionAttribute("Name of the Output")]
+        public string Name {
+            get { return GetAttribute("name"); }
+            set { SetAttribute("name", value); }
+        }
+        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(2), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
+        public string TypeData {
+            get { return "File"; }
+            set { SetType(value); }
+        }
+
+        [CategoryAttribute("Required"),
+        DisplayName("Output File"),
+        PropertyOrder(3),
+        DescriptionAttribute("THe path including filename of the file to output to. Successive files have a numeric suffix.")]
+        public string Path {
+            get {
+                return GetAttribute("path");
+            }
             set {
-                value = Math.Max(1, value);
-                SetAttribute("getTimeout", value * 1000);
+                SetAttribute("path", value);
             }
         }
 
-        //[Editor(typeof(FilterCustomEditor), typeof(FilterCustomEditor))]
-        //public int Filter {
-        //    get { return view.Se }; 
-        //    set;
-        //}
+
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
+        public string StyleSheet {
+            get { return GetAttribute("stylesheet"); }
+            set { SetAttribute("stylesheet", value); }
+        }
+
+        [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Version"), PropertyOrder(3), DescriptionAttribute("XSLT Version"), ItemsSource(typeof(XSLTypeList))]
+        public string XSLType {
+            get { return GetAttribute("xslVersion"); }
+            set { SetAttribute("xslVersion", value); ; }
+        }
+
     }
 
     public class MSMQInput : MyPropertyGrid {

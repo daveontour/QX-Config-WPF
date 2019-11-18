@@ -83,16 +83,22 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                         myGrid = new MSMQInput(selectedItem, this.View);
                         break;
                     case "MQ":
-                        myGrid = new MQ(selectedItem, this.View);
+                        myGrid = new MQIN(selectedItem, this.View);
+                        break;
+                    case "File":
+                        myGrid = new FILEIN(selectedItem, this.View);
                         break;
                 }
-            } else if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
+            } else if (selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
                         myGrid = new MSMQInput(selectedItem, this.View);
                         break;
                     case "MQ":
-                        myGrid = new MQ(selectedItem, this.View);
+                        myGrid = new MQOUT(selectedItem, this.View);
+                        break;
+                    case "File":
+                        myGrid = new FILEOUT(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "filter") {
