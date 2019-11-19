@@ -62,7 +62,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Data Contains Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals","XPath Matches", "Xpath Date Within Offset"
+                "Data Contains Value", "Data Equals Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals","XPath Matches", "XPath Date Within Offset"
             };
             return types; ;
         }
@@ -371,6 +371,71 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             set { SetAttribute("value", value); }
         }
     }
+
+    public class EqualsFilter : MyPropertyGrid {
+
+        public EqualsFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "Data Equals Value"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The string the data must equal for the filter to pass")]
+        public string Value {
+            get { return GetAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
+    }
+
+
+
+    public class MatchesFilter : MyPropertyGrid {
+
+        public MatchesFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "Data Equals Value"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The Regex that the data must match")]
+        public string Value {
+            get { return GetAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
+    }
+
+    public class LengthFilter : MyPropertyGrid {
+
+        public LengthFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "Data Minimum Length"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Minimum Length"), PropertyOrder(1), DescriptionAttribute("The Minimum Length of the Data")]
+        public int Value {
+            get { return GetIntAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
+    }
     public class XPExistsFilter : MyPropertyGrid {
 
         public XPExistsFilter(XmlNode dataModel, IView view) {
@@ -385,10 +450,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The XPath that must exist for the filter to pass")]
+        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath that must exist for the filter to pass")]
         public string Value {
-            get { return GetAttribute("value"); }
-            set { SetAttribute("value", value); }
+            get { return GetAttribute("xpath"); }
+            set { SetAttribute("xpath", value); }
         }
     }
     public class XPMatchesFilter : MyPropertyGrid {
@@ -419,4 +484,65 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         }
     }
 
+    public class XPEqualsFilter : MyPropertyGrid {
+
+        public XPEqualsFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "XPath Equals"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath of the data element")]
+        public string XPath {
+            get { return GetAttribute("xpath"); }
+            set { SetAttribute("xpath", value); }
+        }
+
+
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The value at the specified XPath must equal")]
+        public string Value {
+            get { return GetAttribute("value"); }
+            set { SetAttribute("value", value); }
+        }
+    }
+
+    public class DateRangeFilter : MyPropertyGrid {
+
+        public DateRangeFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "XPath Date Within Offset"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath Date Element to test")]
+        public string Value {
+            get { return GetAttribute("xpath"); }
+            set { SetAttribute("xpath", value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("From Offset"), PropertyOrder(1), DescriptionAttribute("From Date Offset in Days from Now")]
+        public int From {
+            get { return GetIntAttribute("fromOffset"); }
+            set { SetAttribute("fromOffset", value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("To Offset"), PropertyOrder(1), DescriptionAttribute("To Date Offset in Days from Now")]
+        public int To {
+            get { return GetIntAttribute("toOffset"); }
+            set { SetAttribute("toOffset", value); }
+        }
+    }
 }
+

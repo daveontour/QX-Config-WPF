@@ -119,10 +119,20 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new BooleanExpression(selectedItem, this.View);
             } else if (selectedItem.Name == "contains") {
                 myGrid = new ContainsFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "equals") {
+                myGrid = new EqualsFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "matches") {
+                myGrid = new MatchesFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "length") {
+                myGrid = new LengthFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpexists") {
                 myGrid = new XPExistsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpmatches") {
                 myGrid = new XPMatchesFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "xpequals") {
+                myGrid = new XPEqualsFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "dateRange") {
+                myGrid = new DateRangeFilter(selectedItem, this.View);
             } else {
                 myGrid = null;
             }
@@ -861,12 +871,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             string name = "contains";
             if (value == "Data Contains Value") name = "contains";
-            if (value == "Data Matches Regex.") name = "matche";
+            if (value == "Data Equals Value") name = "equals";
+            if (value == "Data Matches Regex.") name = "matches";
             if (value == "Data Minimum Length") name = "length";
             if (value == "XPath Exists") name = "xpexists";
             if (value == "XPath Equals") name = "xpequals";
             if (value == "XPath Matches") name = "xpmatches";
-            if (value == "Xpath Date Within Offset") name = "dateRange";
+            if (value == "XPath Date Within Offset") name = "dateRange";
 
             XmlNode newNode = this.DataModel.CreateElement(name);
             SelectedElement.DataModel.ParentNode.InsertAfter(newNode, SelectedElement.DataModel);
