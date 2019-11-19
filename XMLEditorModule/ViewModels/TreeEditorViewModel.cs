@@ -11,6 +11,7 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using Xceed.Wpf.Toolkit;
 using System.IO;
 using Microsoft.Win32;
+using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
@@ -80,7 +81,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (selectedItem.Name == "input") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        myGrid = new MSMQInput(selectedItem, this.View);
+                        myGrid = new MSMQIN(selectedItem, this.View);
                         break;
                     case "MQ":
                         myGrid = new MQIN(selectedItem, this.View);
@@ -88,17 +89,24 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                     case "File":
                         myGrid = new FILEIN(selectedItem, this.View);
                         break;
+                    case "Kafka":
+                        myGrid = new KAFKAIN(selectedItem, this.View);
+                        break;
+
                 }
             } else if (selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        myGrid = new MSMQInput(selectedItem, this.View);
+                        myGrid = new MSMQOUT(selectedItem, this.View);
                         break;
                     case "MQ":
                         myGrid = new MQOUT(selectedItem, this.View);
                         break;
                     case "File":
                         myGrid = new FILEOUT(selectedItem, this.View);
+                        break;
+                    case "Kafka":
+                        myGrid = new KAFKAOUT(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "filter") {

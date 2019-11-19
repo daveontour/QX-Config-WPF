@@ -69,6 +69,15 @@
     <Compile Include="Common\DocumentLoadedEventArgs.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\TaskListDataTemplateSelector.cs" />
+    <Compile Include="GridDefinitions\FILEIN.cs" />
+    <Compile Include="GridDefinitions\FILEOUT.cs" />
+    <Compile Include="GridDefinitions\KAFKAIN.cs" />
+    <Compile Include="GridDefinitions\KAFKAOUT.cs" />
+    <Compile Include="GridDefinitions\MQIN.cs" />
+    <Compile Include="GridDefinitions\MQOUT.cs" />
+    <Compile Include="GridDefinitions\MSMQIN.cs" />
+    <Compile Include="GridDefinitions\MSMQOUT.cs" />
+    <Compile Include="GridDefinitions\PIPE.cs" />
     <Compile Include="ViewModels\ChildViewModel.cs" />
     <Compile Include="ViewModels\SelectedElementViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />

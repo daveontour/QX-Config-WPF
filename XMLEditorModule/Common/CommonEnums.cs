@@ -32,7 +32,8 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         void DrawQXConfig();
         void HightLightCanvas(XmlNode node);
         void UpdateParamBindings(string param);
-        void MSMQSource(XmlNode node);
+        void MSMQIn(XmlNode node);
+        void MSMQOut(XmlNode node);
         void FileInSource(XmlNode node);
         void FileOutSource(XmlNode node);
         void MQInSource(XmlNode node);
@@ -42,5 +43,7 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         void ChangeElementType(string value);
         bool CanChangeElementType(string value);
         void ChangeFilterType(string value);
+        void KafkaIn(XmlNode node);
+        void KafkaOut(XmlNode node);
     }
 }

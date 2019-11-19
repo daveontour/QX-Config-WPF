@@ -16,6 +16,7 @@ using System.IO;
 using Path = System.Windows.Shapes.Path;
 using System.Windows.Markup;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
+using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
@@ -934,8 +935,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         #region updatePropertyGrid
 
-        public void MSMQSource(XmlNode node) {
-            viewModel.myGrid = new MSMQInput(node, this);
+        public void MSMQIn(XmlNode node) {
+            viewModel.myGrid = new MSMQIN(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void MSMQOut(XmlNode node) {
+            viewModel.myGrid = new MSMQOUT(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
@@ -955,6 +961,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
         public void FileOutSource(XmlNode node) {
             viewModel.myGrid = new FILEOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+        public void KafkaIn(XmlNode node) {
+            viewModel.myGrid = new KAFKAIN(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+        public void KafkaOut(XmlNode node) {
+            viewModel.myGrid = new KAFKAOUT(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
