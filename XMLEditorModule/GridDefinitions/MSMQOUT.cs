@@ -39,7 +39,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
         [CategoryAttribute("Optional"), DisplayName("Create Queue"), PropertyOrder(1), Browsable(true), DescriptionAttribute("Create the Queue if it doesn't exist")]
         public bool CreatQueue {
             get { return GetBoolAttribute("createQueue"); }
-            set { SetAttribute("queue", value); }
+            set { SetAttribute("createQueue", value); }
         }
 
         [CategoryAttribute("Optional"), DisplayName("Maximum Messages"), PropertyOrder(2), Browsable(true), DescriptionAttribute("Maximum Number of Messages Allowed in the Queue. (Older messages will be replaced)")]

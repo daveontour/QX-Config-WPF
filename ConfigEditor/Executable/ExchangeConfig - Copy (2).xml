@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+  <!--  <namespace prefix="ams" uri="http://www.sita.aero/ams6-xml-api-messages" />
+    <namespace prefix="amsdata" uri="http://www.sita.aero/ams6-xml-api-datatypes" />
+    <namespace prefix="aip" uri="http://www.sita.aero/aip/XMLSchema" />
+    -->
+  </settings>
+
+  <pipes>
+
+    <pipe name="FileBridge" outputIsolation="false" useMessageAsKey="true" contextCacheKeyXPath="//*[local-name() ='KEY']" discardInCache="true" contextCacheExpiry="5">
+      <input type="TESTSOURCE" name ="source1" path="c:/Users/dave_/Desktop/input.xml" fixedInterval="1000" maxMessages ="10"/>
+      <input type="TESTSOURCE" name ="source2" path="c:/Users/dave_/Desktop/input.xml" fixedInterval="20000" maxMessages ="10"/> 
+      <input type="FILE" path="c:/Users/dave_/Desktop/Test" fileFilter="input*.xml" bufferQueueName=".\private$\AAfileBuff" deleteAfterSend="true"/>
+          <!--<filter>
+        <altqueue  type="MQ" queue="AATESTDELAY"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"/>  
+          <contextContains>
+            <contextCacheKeyXPath>/message/flightPlan/KEY</contextCacheKeyXPath>
+            <contextCacheExpiry>5</contextCacheExpiry>
+          </contextContains>
+        </filter>
+        -->
+
+      <output type="FILE" name="File Destination" path="c:/Users/dave_/Desktop/Test/output.xml"  />
+    </pipe>
+
+  <!--   <pipe name="Context Test - Pipe 2 -(Delayed Channel" maxMsgPerMinute="20" perWait="true">
+      <input  type="MQ" queue="AATESTDELAY"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"/>
+      <output type="FILE" name="File Destination" path="c:/Users/dave_/Desktop/Test/outputDelayed.xml"  />
+    </pipe>
+    -->
+    <!--
+    <pipe name="Context Test - Pipe 1">
+      <input type="MQ" queue="AATEST"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415">
+        <filter>
+          <altqueue  type="MQ" queue="AATESTDELAY"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"/>
+          <contextContains>
+            <contextCacheKeyXPath>/message/flightPlan/KEY</contextCacheKeyXPath>
+            <contextCacheExpiry>5</contextCacheExpiry>
+          </contextContains>
+        </filter>
+      </input>
+      <output type="MQ" queue="AATEST2"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"  />
+    </pipe>
+
+    <pipe name="Context Test - Pipe 2 -(Delayed Channel" maxMsgPerMinute="12" perWait="true">
+      <input  type="MQ" queue="AATESTDELAY"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"/>
+      <output type="MQ" queue="AATEST2"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"  />
+    </pipe>
+
+-->
+
+
+      <!-- <pipe name="Bridge" outputIsolation="false">
+      <input type="MSMQ" name="FROMAMS" queue=".\private$\wkb_api_notification_queue"/>
+      <output type="MSMQ" name="FROMAMS" queue=".\private$\towalert" createQueue="true"/>
+      <output type="FILE" name="File Destination" path="c:/Users/dave_/Desktop/Test/output.xml"  />
+    </pipe> -->
+    <!--
+  <pipe name="Test Blocking" outputIsolation="true">
+    <input name="source" type="TESTSOURCE" maxWait="1" maxMessages="500"/>
+    <output type="MSMQ" queue=".\private$\davetestOK" createQueue ="true" maxMessages="14"/>
+    <output type="MSMQ" queue=".\private$\davetestNOTOK" createQueue ="false"/>
+  </pipe>
+  
+  -->
+  
+  <!--
+
+    <pipe name ="Rabbit Pipe">
+      <input name="source" type="TESTSOURCE" maxWait="1" maxMessages="10"/>
+      <output type="KAFKA" xpathDestination="/dave/*[1]" connection="localhost:9092" />
+      <output type="KAFKA" xpathContentDestination="/dave/burton" connection="localhost:9092" />
+      <output type="HTTPGET" requestURL="http://localhost:8084/output/" bufferQueueName=".\private$\httpBufferQueue2" />
+    </pipe>
+-->
+    <!--
+    <pipe>
+      <input type="KAFKA" topic="DAVETEST" connection="localhost:9092" bufferQueueName=".\private$\kafkaBufferQueue"/>
+      <output type="MSMQ" queue=".\private$\kafkaOutput2" createQueue="true" maxMessages="5" />
+    </pipe>
+
+ 
+    <pipe name ="MQ Pipe" outputIsolation="true" enableLog ="false" randomDistribution="true">
+      <input name="source" type="TESTSOURCE" maxWait="1" maxMessages="100"/>
+      <output type="MSMQ" queue=".\private$\davetest2" createQueue ="true" maxMessages ="10"/>
+      <output type="MSMQ" queue=".\private$\davetest2slow" createQueue ="true" maxMessages ="10"/>
+      <output type="MSMQ" queue=".\private$\davetest3"  createQueue ="true"  maxMessages ="10" />
+      <output type="MQ" queue="AATEST"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" maxMessages ="10"  />
+
+    </pipe>
+ -->
+    <!-- 
+    <pipe name ="FileTransfer Pipe">
+      <input type="HTTP" requestURL="http://localhost:8084/input/" bufferQueueName=".\private$\httpBufferQueue" />
+    <input type="FILE" path="c:/Users/dave_/Desktop" fileFilter="*.xml" bufferQueueName=".\private$\AAfileBuff" deleteAfterSend="true"/> 
+    <input name="source" type="TESTSOURCE" maxWait="10" maxMessages="10" path="XMLFile1.xml"/> 
+      <output type="FILE" name="File Destination" path="c:/Users/dave_/Desktop/Test/output.test"  >
+
+      </output>
+    </pipe>
+-->
+    <!--
+    <pipe>
+    <input type="MQ" queue="AATEST3"  priority="0" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="10"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+    <input type="MQ" queue="AATEST4"  priority="1" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="10"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+    <input type="MQ" queue="AATEST5"  priority="2" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="10"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+    <output type="MQ" queue="AATEST"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="1000"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+     <output type="MSMQ" queue=".\private$\testin">
+      <filters>
+        <and>
+          <length>
+            <value>5</value>
+          </length>
+          <expr not="true">
+            <contains>
+              <value>DAVE</value>
+            </contains>
+          </expr>
+        </and>
+      </filters>
+    </output>
+    </pipe>
+    
+    -->
+    <!--
+    <pipe name ="Test Transfer PipeLine">
+      <input type="MQ" queue="AATEST3"  priority="0" connection="AIEQMGR, AMS.SVRCONN, DESKTOP-G1QS0ID, 1415" getTimeout="10000"  retryInterval="5000" maxRetry ="10" />
+      <output type="MSMQ" queue="FormatName:Direct=OS:DXBDJB\private$\QX" />
+    </pipe>
+-->
+    <!--   <pipe name ="$$$$$$$$$$$$$ FileTransfer Pipe">
+      <input type="TESTSOURCE" maxWait="10000"/> 
+      <output type="FILE" path="c:/Users/dave_/Desktop/message.dav" />
+    </pipe>
+
+    <pipe name ="$$$$$$$$$$$$$ FileTransfer Pipe">
+      <input type="FILE" path="c:/Users/dave_/Desktop" fileFilter="*.xml" bufferQueueName=".\private$\AAfileBuff" deleteAfterSend="true"/> 
+      <output type="FILE" path="c:/Users/dave_/Desktop/message.txt" />
+    </pipe>
+
+    <pipe name ="============ FileTransfer Pipe ">
+      <input type="FILE" path="c:/Users/dave_/Desktop" fileFilter="*.txt" bufferQueueName=".\private$\AAfileBuff2" deleteAfterSend="true"/>
+      <output type="FILE" path="c:/Users/dave_/Desktop/Test/message.txt" />
+    </pipe> -->
+
+    <!--  <pipe roundRobinDistribution="true">
+      <input type="MQ" queue="AATEST3"  priority="0" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="10"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+      <input type="MQ" queue="AATEST4"  priority="1" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="10"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+      <input type="MQ" queue="AATEST5"  priority="2" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="10"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+      <output type="MQ" queue="AATEST"  connection="AIEQMGR, AMS.SVRCONN, localhost, 1415" getTimeout="1000"  retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+      <output type="KAFKA" topic="TESTQX" connection="localhost:9092"  />
+      <output type="MSMQ" queue=".\private$\testin">
+        <filters>
+          <and>
+            <length>
+              <value>5</value>
+            </length>
+            <expr not="true">
+              <contains>
+                <value>DAVE</value>
+              </contains>
+            </expr> 
+          </and>
+        </filters>
+      </output>
+    </pipe> -->
+    <!--   <pipe>
+      <input type="KAFKA" topic="TESTQX" connection="localhost:9092" bufferQueueName=".\private$\KAFKA_CONSUMER_BUFF" />
+      <output type="MQ" queue="AATEST5" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+      <output type="MQ" queue="AATEST4" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+    </pipe>
+   -->
+    <!--    <pipe>
+      <input type="MQ" queue="AATEST5" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+      <output type="MQ" queue="AATEST3" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror" />
+    </pipe>
+-->
+    <!--        <pipe>
+      <input type="MQ" queue="AATEST2" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror">
+      <filters>
+          <filter>
+            <dateRange>
+              <xpath>/ams:Envelope/ams:Content/ams:FlightUpdatedNotification/ams:Flight/amsdata:FlightId/amsdata:ScheduledDate</xpath>
+              <fromOffset>-100</fromOffset>
+              <toOffset>30</toOffset>
+              <pass>true</pass>
+            </dateRange>
+          </filter>
+        </filters>
+  
+      </input>
+       <output type="MQ" queue="AATEST4" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror">
+         <filters>
+           <expr type="or">
+              <filter type ="bool">
+                <value>false</value>
+               </filter>
+             <filter type ="bool">
+               <value>false</value>
+             </filter>
+             <expr type="and" not="true">
+               <filter type ="bool">
+                 <value>true</value>
+               </filter>
+               <filter type ="bool">
+                 <value>false</value>
+               </filter>              
+             </expr>
+           </expr>
+                 -->
+    <!-- If the message does not pass the defined filter, then the message will be sent to the Alt Queue -->
+    <!--          <altqueue type="MQ" queue="AATEST5" connection="AIEQMGR, AMS.SVRCONN, localhost, 1415"   retryInterval="5000" maxRetry ="10" undeliverableQueue=".\private$\daveerror"/>
+
+                     <expr type="and">
+             <expr not="true">
+               <filter type = "exists">
+                 <xpath>/ams:Envelope/ams:Content</xpath>
+               </filter>              
+             </expr>
+             <filter type ="bool">
+               <value>false</value>
+             </filter>
+             <expr type="or">
+               <filter type="bool">
+                 <value>true</value>
+               </filter>
+               <filter type = "exists">
+                 <xpath>/ams:Envelope/ams:Content</xpath>
+               </filter>
+               <filter type="equals">
+                 <xpath>/ams:Envelope/ams:Content/ams:FlightUpdatedNotification/ams:Flight/amsdata:FlightId/amsdata:AirlineDesignator[@codeContext="ICAO"]</xpath>
+                 <value>QFB</value>
+               </filter>
+             </expr>
+           </expr>
+           
+             
+     
+        </filters>
+      </output>
+    </pipe> -->
+    
+    <!--
+    <pipe>
+      <input type="MSMQ" queue=".\private$\three" />
+      <output type="MQ" queue="DAVE"  persist="true" connection="XXXQMGR, GLASSFISH.SVRCONN, Localhost, 1414"  />
+    </pipe>
+-->
+  </pipes>
+</config>

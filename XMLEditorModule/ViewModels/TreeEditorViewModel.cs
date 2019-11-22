@@ -12,6 +12,8 @@ using Xceed.Wpf.Toolkit;
 using System.IO;
 using Microsoft.Win32;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
+using System.Diagnostics;
+using System.IO.Compression;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
@@ -37,6 +39,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.addNamespaceCommand = new RelayCommand<XmlNodeType>(AddNamespace, CanAddNamespace);
             this.saveDocumentCommand = new RelayCommand(p => { Save(); });
             this.saveAsDocumentCommand = new RelayCommand<string>(SaveAs);
+            this.saveAsAndExecuteDocumentCommand = new RelayCommand(p => { SaveAsAndExecute(); });
+            this.packageCommand = new RelayCommand(p => { PackageAndSave(); });
             this.deleteElementCommand = new RelayCommand<XmlNode>(p => { DeleteElement(SelectedElement.DataModel); }, p => { return CanDeleteElement(SelectedElement.DataModel); });
             this.unloadDocumentCommand = new RelayCommand(UnloadDocument);
 
@@ -300,6 +304,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         public ICommand SaveAsDocumentCommand {
             get { return saveAsDocumentCommand; }
+        }
+
+        private ICommand saveAsAndExecuteDocumentCommand;
+
+        public ICommand SaveAsAndExecuteCommand {
+            get { return saveAsAndExecuteDocumentCommand; }
+        }
+
+        private ICommand packageCommand;
+
+        public ICommand PackageCommand {
+            get { return packageCommand; }
         }
 
         #endregion
@@ -973,6 +989,36 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             using (TextWriter sw = new StreamWriter(path, false, Encoding.UTF8)) {
                 newDoc.Save(sw);
             }
+        }
+        private void SaveAsAndExecute() {
+            XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
+            using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
+                newDoc.Save(sw);
+            }
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = false;
+            startInfo.UseShellExecute = false;
+            startInfo.FileName = @"./Executable/QX.exe";
+
+            System.Diagnostics.Process.Start(startInfo);
+        }
+
+        private void PackageAndSave() {
+            XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
+            using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
+                newDoc.Save(sw);
+            }
+
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "Zip Files (*.zip)|*.zip";
+            if (dialog.ShowDialog() == true) {
+
+                string startPath = @"./Executable/";
+                ZipFile.CreateFromDirectory(startPath, dialog.FileName);
+
+            }
+
         }
         private void UnloadDocument(object param) {
 

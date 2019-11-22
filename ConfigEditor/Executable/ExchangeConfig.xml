@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <namespace prefix="aip" uri="http://www.sita.aero/aip/XMLSchema" />
+    <namespace prefix="soap" uri="http://www.w3.org/2001/12/soap-envelope" />
+  </settings>
+
+  <pipes>
+
+    <pipe name="Flight Plan Buffer Pipe" outputIsolation="false" contextCacheKeyXPath="/soap:Envelope/soap:Body/aip:PublishFlightDataInput/aip:FlightData/aip:CustomFields/aip:AODBFields/aip:KeyValue[@Key ='S--G_SourceUniqueID_Source28']/aip:String" discardInCache="false" contextCacheExpiry="20">
+      <input type="MQ" name ="ReceiveFlightPlanFromDMU" queue="AATEST" queueMgr="AIEQMGR" channel="AMS.SVRCONN" host="localhost" port="1415" getTimeout="5000"/>
+      <output type="MQ" name="SendFlightPlanToAMS" queue="AATEST2" queueMgr="AIEQMGR" channel="AMS.SVRCONN" host="localhost" port="1415"/>
+    </pipe>
+    
+    
+    <!--<pipe name="TestFeed">
+      <input type="TESTSOURCE" name ="source1" path="c:/Users/dave_/Desktop/AIP1.xml" fixedInterval="500" maxMessages ="3"/>
+      <output type="MQ" name ="Test Input 1" queue="AATEST" queueMgr="AIEQMGR" channel="AMS.SVRCONN" host="localhost" port="1415"/>
+    </pipe>
+    <pipe name="TestFeed2">
+      <input type="TESTSOURCE" name ="source1" path="c:/Users/dave_/Desktop/AIP2.xml" fixedInterval="500" maxMessages ="5"/>
+      <output type="MQ" name ="Test Input 2" queue="AATEST" queueMgr="AIEQMGR" channel="AMS.SVRCONN" host="localhost" port="1415"/>
+    </pipe>-->
+
+</pipes>
+</config>

@@ -16,16 +16,13 @@ using System.Xml;
 using System.Diagnostics;
 using Microsoft.Win32;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
-{
+namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
     /// <summary>
     /// Interaction logic for CommandsBarView.xaml
     /// </summary>
-    public partial class CommandsBarView : UserControl
-    {
-    
-        public CommandsBarView()
-        {
+    public partial class CommandsBarView : UserControl {
+
+        public CommandsBarView() {
             InitializeComponent();
             this.MenuBar.Items.Clear();
             MenuItem fileMenuItem = new MenuItem { Header = "_File" };
@@ -43,68 +40,45 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             fileMenuItem.Items.Add(newMenuItem);
             fileMenuItem.Items.Add(openMenuItem);
             fileMenuItem.Items.Add(new Separator());
-            fileMenuItem.Items.Add(saveMenuItem);          
+            fileMenuItem.Items.Add(saveMenuItem);
             fileMenuItem.Items.Add(saveAsMenuItem);
             this.MenuBar.Items.Add(fileMenuItem);
+
+            MenuItem packageMenuItem = new MenuItem { Header = "_Package" };
+            MenuItem executeMenuItem = new MenuItem { Header = "_Execute" };
+            executeMenuItem.Click += new RoutedEventHandler(executeMenuItem_Click);
+            MenuItem exportMenuItem = new MenuItem { Header = "Package and Export" };
+            exportMenuItem.Click += new RoutedEventHandler(exportMenuItem_Click);
+            packageMenuItem.Items.Add(executeMenuItem);
+            packageMenuItem.Items.Add(exportMenuItem);
+            this.MenuBar.Items.Add(packageMenuItem);
         }
-
-      
-
-        
-        
-        //public string xPath
-        //{
-        //    get { return (string)GetValue(xPathProperty); }
-        //    set { SetValue(xPathProperty, value); }
-        //}
-
-        //// Using a DependencyProperty as the backing store for xPath.  This enables animation, styling, binding, etc...
-        //public static readonly DependencyProperty xPathProperty =
-        //    DependencyProperty.Register("xPath", typeof(string), typeof(CommandsBarView), new UIPropertyMetadata(string.Empty));
-
-        
 
         public event EventHandler<DocumentLoadedEventArgs> DocumentLoaded;
         public event EventHandler SaveRequested;
+        public event EventHandler SaveAsAndExecuteRequested;
+        public event EventHandler PackageRequested;
         public event EventHandler<SaveAsEventArgs> SaveAsRequested;
 
-        private void OnDocumentLoaded(object sender, DocumentLoadedEventArgs e)
-        {
-            if (DocumentLoaded != null)
-            {
+        private void OnDocumentLoaded(object sender, DocumentLoadedEventArgs e) {
+            if (DocumentLoaded != null) {
                 DocumentLoaded(sender, e);
             }
         }
-      
-
-        private void searchButton_Click(object sender, RoutedEventArgs e)
-        {
-            //if (SearchRequested != null)
-            //{
-            //    SearchRequested(this, new SearchRequestedEventArgs { XPath = searchTextBox.Text });
-            //}
-        }
-
-     
 
         #region Menu Click Handlers
 
-        void openMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        void openMenuItem_Click(object sender, RoutedEventArgs e) {
             OpenFileDialog open = new OpenFileDialog();
             open.Filter = "XML Files (*.xml)|*.xml";
-            if (open.ShowDialog() == true)
-            {
+            if (open.ShowDialog() == true) {
                 XmlDocument document = new XmlDocument();
-                try
-                {
+                try {
                     document.Load(open.FileName);
                     DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = open.FileName, Document = document, FileName = open.SafeFileName };
                     OnDocumentLoaded(this, args);
 
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     Debug.WriteLine(ex.Message);
                 }
 
@@ -119,39 +93,46 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
             try {
 
                 DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = null, Document = document, FileName = "new.xml" };
-                    OnDocumentLoaded(this, args);
+                OnDocumentLoaded(this, args);
 
-                } catch (Exception ex) {
-                    Debug.WriteLine(ex.Message);
-                }
+            } catch (Exception ex) {
+                Debug.WriteLine(ex.Message);
+            }
 
         }
 
-        void saveAsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        void saveAsMenuItem_Click(object sender, RoutedEventArgs e) {
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "XML Files (*.xml)|*.xml";
-            if (dialog.ShowDialog() == true)
-            {
+            if (dialog.ShowDialog() == true) {
                 SaveAsEventArgs args = new SaveAsEventArgs { FileName = dialog.SafeFileName, Path = dialog.FileName };
-                if (SaveAsRequested != null)
-                {
+                if (SaveAsRequested != null) {
                     SaveAsRequested(this, args);
                 }
-            } 
+            }
         }
 
-        void saveMenuItem_Click(object sender, RoutedEventArgs e)
-        {    
+        void saveMenuItem_Click(object sender, RoutedEventArgs e) {
 
-            if (SaveRequested != null)
-            {
+            if (SaveRequested != null) {
                 SaveRequested(this, e);
+            }
+        }
+
+        void exportMenuItem_Click(object sender, RoutedEventArgs e) {
+            if (PackageRequested != null) {
+                PackageRequested(this, e);
+            }
+        }
+
+        void executeMenuItem_Click(object sender, RoutedEventArgs e) {
+            if (SaveAsAndExecuteRequested != null) {
+                SaveAsAndExecuteRequested(this, e);
             }
         }
         #endregion
 
 
-       
+
     }
 }

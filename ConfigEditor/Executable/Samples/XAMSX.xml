@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" apiVersion="2.12" user="Allocation of fixed resources" timestamp="2019-09-09T15:11:58" xmlns="http://www.sita.aero/ams6-xml-api-messages">
+  <Content>
+    <FlightUpdatedNotification>
+      <Flight>
+        <DataVersion xmlns="http://www.sita.aero/ams6-xml-api-datatypes">36</DataVersion>
+        <FlightId xmlns="http://www.sita.aero/ams6-xml-api-datatypes">
+          <FlightKind>Departure</FlightKind>
+          <AirlineDesignator codeContext="IATA">QR</AirlineDesignator>
+          <AirlineDesignator codeContext="ICAO">QTR</AirlineDesignator>
+          <FlightNumber>522</FlightNumber>
+          <ScheduledDate>2019-09-09</ScheduledDate>
+          <AirportCode codeContext="IATA">DOH</AirportCode>
+          <AirportCode codeContext="ICAO">OTHH</AirportCode>
+        </FlightId>
+        <FlightState xmlns="http://www.sita.aero/ams6-xml-api-datatypes">
+          <ScheduledTime>2019-09-09T20:10:00</ScheduledTime>
+          <AircraftType>
+            <AircraftTypeId>
+              <AircraftTypeCode codeContext="IATA">321</AircraftTypeCode>
+              <AircraftTypeCode codeContext="ICAO">A321</AircraftTypeCode>
+            </AircraftTypeId>
+            <Value propertyName="Name">Airbus A321</Value>
+          </AircraftType>
+          <Aircraft>
+            <AircraftId>
+              <Registration>A7AIA</Registration>
+            </AircraftId>
+            <Value propertyName="IsRetired">false</Value>
+          </Aircraft>
+          <Route customsType="International">
+            <ViaPoints>
+              <RouteViaPoint sequenceNumber="0">
+                <AirportCode codeContext="IATA">GOI</AirportCode>
+                <AirportCode codeContext="ICAO">VOGO</AirportCode>
+              </RouteViaPoint>
+            </ViaPoints>
+          </Route>
+          <Value propertyName="CheckInGroupIsManuallySet">false</Value>
+          <Value propertyName="FlightUniqueID">DEP_341908</Value>
+          <Value propertyName="de-G_MostConfidentDepartureTime">2019-09-09T20:10:00</Value>
+          <Value propertyName="S--G_Terminal">1</Value>
+          <Value propertyName="Il--_TotalAdultPax">95</Value>
+          <Value propertyName="Dl--_TotalBaggageLoad">3022</Value>
+          <Value propertyName="Il--_TotalBusinessPax">5</Value>
+          <Value propertyName="Il--_TotalChildrenPax">4</Value>
+          <Value propertyName="Dl--_TotalDeadLoad">3330</Value>
+          <Value propertyName="Il--_TotalEconomyPax">94</Value>
+          <Value propertyName="Il--_TotalFemalePax">23</Value>
+          <Value propertyName="Il--_TotalMalePax">72</Value>
+          <Value propertyName="Il--_TotalOnBoardPax">99</Value>
+          <Value propertyName="S--G_Qualifier">J</Value>
+          <Value propertyName="S--G_QualifierCategory">PAX</Value>
+          <Value propertyName="S---_SISGate">D19</Value>
+          <Value propertyName="B---_ShowOnFIDS">true</Value>
+          <Value propertyName="B---_SITATEXReceived">true</Value>
+          <Value propertyName="B---_ShowOnStaffFIDS">true</Value>
+          <Value propertyName="S--G_FlightStatusText">SH - Scheduled</Value>
+          <Value propertyName="B---_Violate_Rule">false</Value>
+          <Value propertyName="B---_Dogsniffing">false</Value>
+          <Value propertyName="B--G_PublishResourceToFIDS">true</Value>
+          <Value propertyName="I---_ChuteCapacity">1</Value>
+          <Value propertyName="B---_FIDSHidden">true</Value>
+          <Value propertyName="Il--_CockpitCrew">2</Value>
+          <Value propertyName="Il--_TotalCabinCrew">8</Value>
+          <Value propertyName="I--G_Seats_Business_Source01">12</Value>
+          <Value propertyName="I--G_Seats_Economy_Source01">170</Value>
+          <Value propertyName="B--G_IsGeneralAviation">false</Value>
+          <Value propertyName="S---_RemoteStandSide">West</Value>
+          <Value propertyName="B---_BHSChutesOpentimeplanned">2019-09-09T20:10:00</Value>
+          <Value propertyName="B---_BHSChutesNewOpentime">2019-09-09T17:10:00</Value>
+          <Value propertyName="S---_Registration_MC">A7AIA</Value>
+          <Value propertyName="B---_JustUnlinked">false</Value>
+          <Value propertyName="S--G_LastReceivedReg">A7AIA</Value>
+          <Value propertyName="S---_Qualifier">J</Value>
+          <Value propertyName="S---_Standnojump">501</Value>
+          <Value propertyName="DataLocked">false</Value>
+          <Value propertyName="Stand">501</Value>
+          <TableValue propertyName="Ts--_Services" />
+          <TableValue propertyName="Td--_DelayCodesOLD" />
+          <TableValue propertyName="Te--_TowEventData" />
+          <TableValue propertyName="Tl--_TransferLoads" />
+          <TableValue propertyName="test" />
+          <TableValue propertyName="Te--_CounterUsageData" />
+          <TableValue propertyName="Te--_ChuteUsageData" />
+          <TableValue propertyName="Te--_GateUsageData" />
+          <TableValue propertyName="Td--_DelayCodes" />
+          <StandSlots>
+            <StandSlot>
+              <Value propertyName="StartTime">2019-09-09T19:10:00</Value>
+              <Value propertyName="EndTime">2019-09-09T20:10:00</Value>
+              <Stand>
+                <Value propertyName="Name">501</Value>
+                <Value propertyName="ExternalName">501</Value>
+                <Area>
+                  <Value propertyName="Name">Apron 500</Value>
+                </Area>
+              </Stand>
+            </StandSlot>
+          </StandSlots>
+          <GateSlots>
+            <GateSlot>
+              <Value propertyName="StartTime">2019-09-09T19:20:00</Value>
+              <Value propertyName="EndTime">2019-09-09T20:00:00</Value>
+              <Value propertyName="Category" />
+              <Gate>
+                <Value propertyName="Name">D19</Value>
+                <Value propertyName="ExternalName">D19</Value>
+                <Area>
+                  <Value propertyName="Name">Concourse D Bus Gates</Value>
+                </Area>
+              </Gate>
+            </GateSlot>
+          </GateSlots>
+          <ChuteSlots>
+            <ChuteSlot>
+              <Value propertyName="StartTime">2019-09-09T17:10:00</Value>
+              <Value propertyName="EndTime">2019-09-09T20:10:00</Value>
+              <Value propertyName="Category" />
+            </ChuteSlot>
+          </ChuteSlots>
+        </FlightState>
+        <FlightChanges xmlns="http://www.sita.aero/ams6-xml-api-datatypes">
+          <Change propertyName="S---_SISGate">
+            <OldValue />
+            <NewValue>D19</NewValue>
+          </Change>
+          <Change propertyName="Gates">
+            <OldValue />
+            <NewValue>D19</NewValue>
+          </Change>
+          <GateSlotsChange>
+            <OldValue>
+              <GateSlot>
+                <Value propertyName="StartTime">2019-09-09T19:20:00</Value>
+                <Value propertyName="EndTime">2019-09-09T20:00:00</Value>
+                <Value propertyName="Category" />
+              </GateSlot>
+            </OldValue>
+            <NewValue>
+              <GateSlot>
+                <Value propertyName="StartTime">2019-09-09T19:20:00</Value>
+                <Value propertyName="EndTime">2019-09-09T20:00:00</Value>
+                <Value propertyName="Category" />
+                <Gate>
+                  <Value propertyName="Name">D19</Value>
+                  <Value propertyName="ExternalName">D19</Value>
+                  <Area>
+                    <Value propertyName="Name">Concourse D Bus Gates</Value>
+                  </Area>
+                </Gate>
+              </GateSlot>
+            </NewValue>
+          </GateSlotsChange>
+        </FlightChanges>
+      </Flight>
+    </FlightUpdatedNotification>
+  </Content>
+</Envelope>
