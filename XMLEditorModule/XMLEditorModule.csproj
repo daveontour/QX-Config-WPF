@@ -71,6 +71,8 @@
     <Compile Include="Common\TaskListDataTemplateSelector.cs" />
     <Compile Include="GridDefinitions\FILEIN.cs" />
     <Compile Include="GridDefinitions\FILEOUT.cs" />
+    <Compile Include="GridDefinitions\HTTPIN.cs" />
+    <Compile Include="GridDefinitions\HTTPOUT.cs" />
     <Compile Include="GridDefinitions\KAFKAIN.cs" />
     <Compile Include="GridDefinitions\KAFKAOUT.cs" />
     <Compile Include="GridDefinitions\MQIN.cs" />
@@ -78,6 +80,11 @@
     <Compile Include="GridDefinitions\MSMQIN.cs" />
     <Compile Include="GridDefinitions\MSMQOUT.cs" />
     <Compile Include="GridDefinitions\PIPE.cs" />
+    <Compile Include="GridDefinitions\RABBITIN.cs" />
+    <Compile Include="GridDefinitions\RABBITOUT.cs" />
+    <Compile Include="GridDefinitions\RESTOUT.cs" />
+    <Compile Include="GridDefinitions\SINK.cs" />
+    <Compile Include="GridDefinitions\TESTSOURCE.cs" />
     <Compile Include="ViewModels\ChildViewModel.cs" />
     <Compile Include="ViewModels\SelectedElementViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
@@ -120,6 +127,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Runtime\XMLFile1.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

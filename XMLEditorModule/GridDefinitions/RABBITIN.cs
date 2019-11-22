@@ -15,18 +15,18 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
 
-    [DisplayName("Kafka Input Node")]
-    public class KAFKAIN : MyNodeInPropertyGrid {
+    [DisplayName("Rabbit MQ Input Node")]
+    public class RABBITIN : MyNodeInPropertyGrid {
 
-        public KAFKAIN(XmlNode dataModel, IView view) {
+        public RABBITIN(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
-            this.type = "KAFKA";
+            this.type = "RABBITDEFEX";
         }
 
         [CategoryAttribute("Required"), DisplayName("Node Type"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
         public string NodeType {
-            get { return "Kafka"; }
+            get { return "Rabbit MQ"; }
             set { SetType(value); }
         }
 

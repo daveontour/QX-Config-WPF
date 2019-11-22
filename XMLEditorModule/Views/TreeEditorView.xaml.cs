@@ -212,10 +212,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             SolidColorBrush aliceBrush = new SolidColorBrush();
             aliceBrush.Color = Colors.AliceBlue;
 
+
             XmlNodeList monitors = xmlDoc.SelectNodes("//monitor");
             foreach (XmlNode monitor in monitors) {
                 Canvas monitorCanvas = GetMonitorCanvas();
-                monitorCanvas.PreviewMouseDown += Can_MouseDown;
+                monitorCanvas.MouseDown += Can_MouseDown;
                 this.nodeToCanvas.Add(monitor, monitorCanvas);
                 this.canvasToNode.Add(monitorCanvas, monitor);
                 settingspanel.Children.Add(monitorCanvas);
@@ -239,8 +240,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 logMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
                 logCanvas.ContextMenu.Items.Add(logMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
-
-
             XmlNodeList nss = xmlDoc.SelectNodes("//namespace");
             foreach (XmlNode ns in nss) {
                 Canvas nsCanvas = GetNSCanvas();
@@ -279,7 +278,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 Canvas canTop = new Canvas();
                 canTop.Height = 200;
                 canTop.Width = this.panel.Width;
-                canTop.Background = aliceBrush;
+                canTop.Background = transBrush;
                 canTop.SetValue(Canvas.LeftProperty, (double)0);
 
                 canTop.ContextMenu = new ContextMenu();
@@ -400,11 +399,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 }
 
                 this.panel.Children.Add(canTop);
-                Separator sep = new Separator() {
-                    Opacity = 127,
-                    Height = 15
-                };
-                this.panel.Children.Add(sep);
+                //Separator sep = new Separator() {
+                //    Opacity = 127,
+                //    Height = 15
+                //};
+                //this.panel.Children.Add(sep);
 
                 i++;
             }
@@ -547,6 +546,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
         private void Can_MouseDown(object sender, MouseButtonEventArgs e) {
+
+            Console.WriteLine("Mouse Down");
+
             if (sender == null) {
                 return;
             }
@@ -969,6 +971,39 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
         public void KafkaOut(XmlNode node) {
             viewModel.myGrid = new KAFKAOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void RestOut(XmlNode node) {
+            viewModel.myGrid = new RESTOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void HTTPOut(XmlNode node) {
+            viewModel.myGrid = new HTTPOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+        public void HTTPIn(XmlNode node) {
+            viewModel.myGrid = new HTTPIN(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+        public void RabbitOut(XmlNode node) {
+            viewModel.myGrid = new RABBITOUT(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void RabbitIn(XmlNode node) {
+            viewModel.myGrid = new RABBITIN(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void SinkOut(XmlNode node) {
+            viewModel.myGrid = new SINK(node, this);
+            viewModel.OnPropertyChanged("myGrid");
+        }
+
+        public void TestSource(XmlNode node) {
+            viewModel.myGrid = new TESTSOURCE(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 

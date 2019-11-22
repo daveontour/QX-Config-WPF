@@ -86,13 +86,21 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                     case "MQ":
                         myGrid = new MQIN(selectedItem, this.View);
                         break;
-                    case "File":
+                    case "FILE":
                         myGrid = new FILEIN(selectedItem, this.View);
                         break;
-                    case "Kafka":
+                    case "KAFKA":
                         myGrid = new KAFKAIN(selectedItem, this.View);
                         break;
-
+                    case "HTTP":
+                        myGrid = new HTTPIN(selectedItem, this.View);
+                        break;
+                    case "RABBITDEFEX":
+                        myGrid = new RABBITIN(selectedItem, this.View);
+                        break;
+                    case "TESTSOURCE":
+                        myGrid = new TESTSOURCE(selectedItem, this.View);
+                        break;
                 }
             } else if (selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
@@ -102,11 +110,23 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                     case "MQ":
                         myGrid = new MQOUT(selectedItem, this.View);
                         break;
-                    case "File":
+                    case "FILE":
                         myGrid = new FILEOUT(selectedItem, this.View);
                         break;
-                    case "Kafka":
+                    case "KAFKA":
                         myGrid = new KAFKAOUT(selectedItem, this.View);
+                        break;
+                    case "REST":
+                        myGrid = new RESTOUT(selectedItem, this.View);
+                        break;
+                    case "HTTP":
+                        myGrid = new HTTPOUT(selectedItem, this.View);
+                        break;
+                    case "RABBITDEFEX":
+                        myGrid = new RABBITOUT(selectedItem, this.View);
+                        break;
+                    case "SINK":
+                        myGrid = new SINK(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "filter") {
@@ -456,13 +476,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
-            newAttribute2.Value = "descriptive queue name";
-            XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            newAttribute3.Value = @".\private$\QUEUENAME";
+            newAttribute2.Value = "Description of the Node";
+         //   XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
+         //   newAttribute3.Value = @".\private$\QUEUENAME";
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
-            newNode.Attributes.Append(newAttribute3);
+       //     newNode.Attributes.Append(newAttribute3);
 
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
@@ -515,13 +535,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
-            newAttribute2.Value = "descriptive queue name";
-            XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            newAttribute3.Value = @".\private$\QUEUENAME";
+            newAttribute2.Value = "Description of the Node";
+            //         XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
+            //       newAttribute3.Value = @".\private$\QUEUENAME";
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
-            newNode.Attributes.Append(newAttribute3);
+       //     newNode.Attributes.Append(newAttribute3);
 
             SelectedElement.DataModel.AppendChild(newNode);
 

@@ -11,6 +11,7 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using System.Globalization;
 using System.Reflection;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
+using Xceed.Wpf.Toolkit;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
@@ -29,7 +30,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP","RESTful","Kafka", "Rabbit MQ"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "SINK", "Test Source"
             };
             return types; ;
         }
@@ -86,16 +87,16 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
     [CategoryOrder("Optional - Transformation", 5)]
     [CategoryOrder("Optional - Temporal Context Awareness", 6)]
     [RefreshProperties(RefreshProperties.All)]
-    public class MyPropertyGrid : INotifyPropertyChanged {
-        public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("File")] FILE, [Description("HTTP")] HTTP, [Description("HTTP Rest")] REST, [Description("Kafka")] KAFKA, [Description("Rabbit MQ")] RABBIT, [Description("SINK")] SINK, };
-        public enum XSLVerEnum {[Description("1.0")] ONE, [Description("2.0")] TWO, [Description("3.0")] THREE }
+    public class MyPropertyGrid  {
+  //      public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("File")] FILE, [Description("HTTP")] HTTP, [Description("HTTP Rest")] REST, [Description("Kafka")] KAFKA, [Description("Rabbit MQ")] RABBIT, [Description("SINK")] SINK, };
+ //       public enum XSLVerEnum {[Description("1.0")] ONE, [Description("2.0")] TWO, [Description("3.0")] THREE }
         public int maxMsgPerMinute = -1;
         public int maxMsg = -1;
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+//        public event PropertyChangedEventHandler PropertyChanged;
 
         protected string GetAttribute(string attribName) {
 
@@ -125,8 +126,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         }
 
         protected void SetAttribute(string attribName, string value) {
-            if ((value == null || value == "") && _node.Attributes[attribName] != null) {
-                _node.Attributes.Remove(_node.Attributes[attribName]);
+            if (value == null || value == "") {
+                try {
+                    _node.Attributes.Remove(_node.Attributes[attribName]);
+                } catch { }
             } else {
 
                 if (_node.Attributes[attribName] == null) {
@@ -192,17 +195,58 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         if (_node.Name == "output") view.MSMQOut(_node);
                         break;
                     case "File":
-                        SetAttribute("type", "File");
+                        SetAttribute("type", "FILE");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.FileInSource(_node);
                         if (_node.Name == "output") view.FileOutSource(_node);
                         break;
                     case "Kafka":
-                        SetAttribute("type", "Kafka");
+                        SetAttribute("type", "KAFKA");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.KafkaIn(_node);
                         if (_node.Name == "output") view.KafkaOut(_node);
                         break;
+                    case "HTTP Post":
+                        SetAttribute("type", "HTTP");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "input") view.HTTPIn(_node);
+                        if (_node.Name == "output") view.HTTPOut(_node);
+                        break;
+                    case "Rabbit MQ":
+                        SetAttribute("type", "RABBITDEFEX");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "input") view.RabbitIn(_node);
+                        if (_node.Name == "output") view.RabbitOut(_node);
+                        break;
+                    case "SINK":
+                        if (_node.Name == "input") {
+                            MessageBox.Show("The Sink Type Cannot Be Used as an Input Type", "Invalid Input Node Type");
+                            break;
+                        }
+                        SetAttribute("type", "SINK");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "output") view.SinkOut(_node);
+                        break;
+                    case "Test Source":
+                        if (_node.Name == "output") {
+                            MessageBox.Show("The Test Source Type Cannot Be Used as an Output Type", "Invalid Output Node Type");
+                            break;
+                        }
+                        SetAttribute("type", "TESTSOURCE");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "input") view.TestSource(_node);
+                        break;
+
+                    case "RESTful":
+                        if (_node.Name == "input") {
+                            MessageBox.Show("The RESTful Type Cannot Be Used as an Input Type", "Invalid Input Node Type");
+                            break;
+                        }
+                        SetAttribute("type", "REST");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "output") view.RestOut(_node);
+                        break;
+
                 }
             };
         }
@@ -218,6 +262,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             set { SetAttribute("name", value); }
         }
 
+       
         [RefreshProperties(RefreshProperties.All)]
         [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), ReadOnly(false), Browsable(true), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
         public string StyleSheet {

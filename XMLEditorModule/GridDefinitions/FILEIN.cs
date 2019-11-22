@@ -13,7 +13,7 @@ using System.Reflection;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
-    [DisplayName("File Input")]
+    [DisplayName("File Input Node")]
     public class FILEIN : MyNodeInPropertyGrid {
 
         public FILEIN(XmlNode dataModel, IView view) {

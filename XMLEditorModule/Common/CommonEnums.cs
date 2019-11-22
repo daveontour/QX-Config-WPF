@@ -45,5 +45,12 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         void ChangeFilterType(string value);
         void KafkaIn(XmlNode node);
         void KafkaOut(XmlNode node);
+        void RestOut(XmlNode node);
+        void HTTPOut(XmlNode node);
+        void HTTPIn(XmlNode node);
+        void RabbitOut(XmlNode node);
+        void RabbitIn(XmlNode node);
+        void SinkOut(XmlNode node);
+        void TestSource(XmlNode node);
     }
 }

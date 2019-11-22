@@ -13,7 +13,7 @@
             <ColumnDefinition Width="5*"/>
 
         </Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Content="Add Filter" />
+        <Button Grid.Column="0" Content="Enable " />
         <Button Grid.Column="2" Content="Add Boolean" />
 
     </Grid>

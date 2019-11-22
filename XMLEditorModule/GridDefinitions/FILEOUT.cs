@@ -13,6 +13,7 @@ using System.Reflection;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
+    [DisplayName("File Output Node")]
     public class FILEOUT : MyNodePropertyGrid {
 
 
