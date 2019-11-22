@@ -63,7 +63,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Data Contains Value", "Data Equals Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals","XPath Matches", "XPath Date Within Offset"
+                "Data Contains Value", "Data Equals Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals","XPath Matches", "XPath Date Within Offset", "Context Contains"
             };
             return types; ;
         }
@@ -587,6 +587,60 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         public int To {
             get { return GetIntAttribute("toOffset"); }
             set { SetAttribute("toOffset", value); }
+        }
+    }
+
+    [DisplayName("Temporal Context Cache")]
+    public class ContextFilter : MyPropertyGrid {
+
+        public ContextFilter(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        public string Type {
+            get { return "Context Contains"; }
+            set { this.view.ChangeFilterType(value); }
+        }
+
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Use Message Hash As Key"), PropertyOrder(1), DescriptionAttribute("Use a SHA256 hash of the entire message for the Context Cache Key (Duplicate Messages)")]
+        public bool UseMessageAsKey {
+            get {
+                bool value = GetBoolAttribute("useMessageAsKey");
+                return value;
+            }
+            set {
+                SetAttribute("useMessageAsKey", value);
+
+                if (ContextExpiry <= 0) {
+                    ContextExpiry = 10;
+                }
+            }
+        }
+
+        [RefreshProperties(RefreshProperties.All)]
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Key"), PropertyOrder(2), DescriptionAttribute("XPath for the Context Key")]
+        public string ContextKey {
+            get { return GetAttribute("contextCacheKeyXPath"); }
+            set {
+                SetAttribute("contextCacheKeyXPath", value);
+                if (ContextExpiry <= 0) {
+                    ContextExpiry = 10;
+                }
+            }
+        }
+
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Cache Expiry"), PropertyOrder(3), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
+        public int ContextExpiry {
+            get { return GetIntAttribute("contextCacheExpiry"); }
+            set {
+                if (value <= 0) {
+                    value = 1;
+                }
+                SetAttribute("contextCacheExpiry", value);
+            }
         }
     }
 }

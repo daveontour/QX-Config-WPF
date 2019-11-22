@@ -157,6 +157,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new XPEqualsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "dateRange") {
                 myGrid = new DateRangeFilter(selectedItem, this.View);
+            } else if (selectedItem.Name == "contextContains") {
+                myGrid = new ContextFilter(selectedItem, this.View);
             } else {
                 myGrid = null;
             }
@@ -913,7 +915,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (value == "XPath Exists") name = "xpexists";
             if (value == "XPath Equals") name = "xpequals";
             if (value == "XPath Matches") name = "xpmatches";
-            if (value == "XPath Date Within Offset") name = "dateRange";
+            if (value == "XPath Date Within Offset") name = "dateRange"; 
+            if (value == "Context Contains") name = "contextContains";
 
             XmlNode newNode = this.DataModel.CreateElement(name);
             SelectedElement.DataModel.ParentNode.InsertAfter(newNode, SelectedElement.DataModel);
