@@ -15,12 +15,21 @@ using WXE.Internal.Tools.ConfigEditor.Common;
 using System.Xml;
 using System.Diagnostics;
 using Microsoft.Win32;
+using System.IO;
+using System.Windows.Markup;
+
+using Path = System.Windows.Shapes.Path;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
     /// <summary>
     /// Interaction logic for CommandsBarView.xaml
     /// </summary>
     public partial class CommandsBarView : UserControl {
+
+        public static MenuItem executeMenuItem;
+        public static MenuItem exportMenuItem;
+        public static MenuItem saveMenuItem;
+        public static MenuItem saveAsMenuItem;
 
         public CommandsBarView() {
             InitializeComponent();
@@ -31,27 +40,37 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             MenuItem openMenuItem = new MenuItem { Header = "_Open" };
             openMenuItem.Click += new RoutedEventHandler(openMenuItem_Click);
-            MenuItem saveMenuItem = new MenuItem { Header = "_Save" };
+            
+            saveMenuItem = new MenuItem { Header = "_Save" };
             saveMenuItem.Click += new RoutedEventHandler(saveMenuItem_Click);
+            saveMenuItem.IsEnabled = false;
 
-            MenuItem saveAsMenuItem = new MenuItem { Header = "Save _As" };
+            saveAsMenuItem = new MenuItem { Header = "Save _As" };
             saveAsMenuItem.Click += new RoutedEventHandler(saveAsMenuItem_Click);
+            saveAsMenuItem.IsEnabled = false;
+
+            exportMenuItem = new MenuItem { Header = "Package and Export" };
+            exportMenuItem.Click += new RoutedEventHandler(exportMenuItem_Click);
+            exportMenuItem.IsEnabled = false;
+
 
             fileMenuItem.Items.Add(newMenuItem);
             fileMenuItem.Items.Add(openMenuItem);
             fileMenuItem.Items.Add(new Separator());
             fileMenuItem.Items.Add(saveMenuItem);
             fileMenuItem.Items.Add(saveAsMenuItem);
+            fileMenuItem.Items.Add(new Separator());
+            fileMenuItem.Items.Add(exportMenuItem);
             this.MenuBar.Items.Add(fileMenuItem);
 
-            MenuItem packageMenuItem = new MenuItem { Header = "_Package" };
-            MenuItem executeMenuItem = new MenuItem { Header = "_Execute" };
+            executeMenuItem = new MenuItem { Header = "_Execute" };
+            executeMenuItem.IsEnabled = false;
+
+            Path go = GetResourceCopy<Path>("go");
+            executeMenuItem.Icon = go;
             executeMenuItem.Click += new RoutedEventHandler(executeMenuItem_Click);
-            MenuItem exportMenuItem = new MenuItem { Header = "Package and Export" };
-            exportMenuItem.Click += new RoutedEventHandler(exportMenuItem_Click);
-            packageMenuItem.Items.Add(executeMenuItem);
-            packageMenuItem.Items.Add(exportMenuItem);
-            this.MenuBar.Items.Add(packageMenuItem);
+
+            this.MenuBar.Items.Add(executeMenuItem);
         }
 
         public event EventHandler<DocumentLoadedEventArgs> DocumentLoaded;
@@ -77,7 +96,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                     document.Load(open.FileName);
                     DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = open.FileName, Document = document, FileName = open.SafeFileName };
                     OnDocumentLoaded(this, args);
-
                 } catch (Exception ex) {
                     Debug.WriteLine(ex.Message);
                 }
@@ -114,9 +132,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         void saveMenuItem_Click(object sender, RoutedEventArgs e) {
 
-            if (SaveRequested != null) {
-                SaveRequested(this, e);
-            }
+            SaveRequested?.Invoke(this, e);
         }
 
         void exportMenuItem_Click(object sender, RoutedEventArgs e) {
@@ -133,6 +149,43 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         #endregion
 
 
+        private T GetResourceCopy<T>(string key) {
+            T model = (T)FindResource(key);
+            return ElementClone<T>(model);
+        }
+        /// <summary>
+        /// Clones an element.
+        /// </summary>
+        public static T ElementClone<T>(T element) {
+            T clone = default(T);
+            MemoryStream memStream = ElementToStream(element);
+            clone = ElementFromStream<T>(memStream);
+            return clone;
+        }
+
+        /// <summary>
+        /// Saves an element as MemoryStream.
+        /// </summary>
+        public static MemoryStream ElementToStream(object element) {
+            MemoryStream memStream = new MemoryStream();
+            XamlWriter.Save(element, memStream);
+            return memStream;
+        }
+
+        /// <summary>
+        /// Rebuilds an element from a MemoryStream.
+        /// </summary>
+        public static T ElementFromStream<T>(MemoryStream elementAsStream) {
+            object reconstructedElement = null;
+
+            if (elementAsStream.CanRead) {
+                elementAsStream.Seek(0, SeekOrigin.Begin);
+                reconstructedElement = XamlReader.Load(elementAsStream);
+                elementAsStream.Close();
+            }
+
+            return (T)reconstructedElement;
+        }
 
     }
 }

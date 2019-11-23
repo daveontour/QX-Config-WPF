@@ -38,29 +38,21 @@ namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
             this.editorsView.ViewModel = editorsVM;
         }
 
-          
-
-        void commandBarView_SearchRequested(object sender, SearchRequestedEventArgs e)
-        {          
-           
+        void commandBarView_SearchRequested(object sender, SearchRequestedEventArgs e)  {          
            this.editorsVM.ActiveEditor.FindElementCommand.Execute(e.XPath);
         }
 
       
-        void commandBarView_DocumentLoaded(object sender, DocumentLoadedEventArgs e)
-        {
+        void commandBarView_DocumentLoaded(object sender, DocumentLoadedEventArgs e){
             var xmlTreeViewModel = new TreeEditorViewModel(e.Document, e.Path, e.FileName);            
-    
             editorsVM.Add(xmlTreeViewModel);            
         }
 
-        void commandBarView_SaveAsRequested(object sender, SaveAsEventArgs e)
-        {
+        void commandBarView_SaveAsRequested(object sender, SaveAsEventArgs e) {
             editorsVM.ActiveEditor.SaveAsDocumentCommand.Execute(e.Path);
         }
 
-        void commandBarView_SaveRequested(object sender, EventArgs e)
-        {
+        void commandBarView_SaveRequested(object sender, EventArgs e) {
             editorsVM.ActiveEditor.SaveDocumentCommand.Execute(null);
         }
 
