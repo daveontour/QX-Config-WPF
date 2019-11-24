@@ -28,7 +28,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             set { SetType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Rest URL"), PropertyOrder(2), Browsable(true), DescriptionAttribute("The URL on the local machine that the output messages will be made available on.")]
+        [CategoryAttribute("Required"), DisplayName("Rest URL"), PropertyOrder(2), Browsable(true), DescriptionAttribute("The URL on the local machine that the output messages will be made available on. The form of the URL is 'http://localhost:8080/endpoint/'. Important! - it must include the '/' at the end")]
         public string URL {
             get {return GetAttribute("requestURL"); }
             set {SetAttribute("requestURL", value); }
@@ -39,5 +39,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             get { return GetAttribute("bufferQueueName"); }
             set { SetAttribute("bufferQueueName", value); }
         }
+
+        [CategoryAttribute("Optional"), DisplayName("Buffer Queue Max Size"), PropertyOrder(4), Browsable(true), DescriptionAttribute("The maximum number of messages to hold in the buffer. Oldest messages are deleted")]
+        public int BufferSize {
+            get { return GetIntAttribute("maxMessages"); }
+            set { SetAttribute("maxMessages", value); }
+        }
+
     }
 }

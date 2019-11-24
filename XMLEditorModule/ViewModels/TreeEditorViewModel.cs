@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
 using System.Diagnostics;
 using System.IO.Compression;
+using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
@@ -72,7 +73,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             get { return selectedElement; }
             private set {
                 selectedElement = value;
-      //          OnPropertyChanged("SelectedElement");
+                //          OnPropertyChanged("SelectedElement");
                 SelectedNodeXpath = GetXPathToNode(SelectedElement.DataModel);
                 UpdatePropertiesPanel(selectedElement.DataModel);
                 View.HightLightCanvas(selectedElement.DataModel);
@@ -495,12 +496,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
             newAttribute2.Value = "Description of the Node";
-         //   XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-         //   newAttribute3.Value = @".\private$\QUEUENAME";
+            //   XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
+            //   newAttribute3.Value = @".\private$\QUEUENAME";
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
-       //     newNode.Attributes.Append(newAttribute3);
+            //     newNode.Attributes.Append(newAttribute3);
 
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
@@ -559,7 +560,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
-       //     newNode.Attributes.Append(newAttribute3);
+            //     newNode.Attributes.Append(newAttribute3);
 
             SelectedElement.DataModel.AppendChild(newNode);
 
@@ -609,7 +610,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
         private bool CanAddFilter(XmlNodeType newNodeType) {
 
-            
+
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
@@ -620,7 +621,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             if (SelectedElement.DataModel.HasChildNodes) {
                 return false;
-            } 
+            }
 
             if (SelectedElement.DataModel.Name == "input" || SelectedElement.DataModel.Name == "output") {
                 return true;
@@ -915,7 +916,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (value == "XPath Exists") name = "xpexists";
             if (value == "XPath Equals") name = "xpequals";
             if (value == "XPath Matches") name = "xpmatches";
-            if (value == "XPath Date Within Offset") name = "dateRange"; 
+            if (value == "XPath Date Within Offset") name = "dateRange";
             if (value == "Context Contains") name = "contextContains";
 
             XmlNode newNode = this.DataModel.CreateElement(name);
@@ -972,7 +973,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 dialog.Filter = "XML Files (*.xml)|*.xml";
                 if (dialog.ShowDialog() == true) {
                     using (TextWriter sw = new StreamWriter(dialog.FileName, false, Encoding.UTF8)) {
-                        this.DataModel.Save(sw);         
+                        this.DataModel.Save(sw);
+
+                        this.path = dialog.FileName;
+                        string[] f = dialog.FileName.Split('\\');
+                        this.fileName = f[f.Length - 1];
+
+                        OnPropertyChanged("FileName");
+                        OnPropertyChanged("Path");
                     }
                     UnloadEditor();
                     return;
@@ -992,6 +1000,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             using (TextWriter sw = new StreamWriter(path, false, Encoding.UTF8)) {
                 newDoc.Save(sw);
             }
+
+            this.path = path;
+            string[] f = path.Split('\\');
+            this.fileName = f[f.Length - 1];
+
+            OnPropertyChanged("FileName");
+            OnPropertyChanged("Path");
         }
         private void SaveAsAndExecute() {
             XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
@@ -1008,20 +1023,32 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         private void PackageAndSave() {
-            XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
-            using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
-                newDoc.Save(sw);
-            }
 
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "Zip Files (*.zip)|*.zip";
             if (dialog.ShowDialog() == true) {
+                ServiceConfig dlg = new ServiceConfig();
 
-                string startPath = @"./Executable/";
-                ZipFile.CreateFromDirectory(startPath, dialog.FileName);
+                if (dlg.ShowDialog() == true) {
 
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load("./Executable/QX.exe.config");
+
+                    doc.SelectSingleNode("//add[@key='ServiceName']").Attributes["value"].Value = dlg.ServiceShortName;
+                    doc.SelectSingleNode("//add[@key='ServiceDisplayName']").Attributes["value"].Value = dlg.ServiceName;
+                    doc.SelectSingleNode("//add[@key='ServiceDescription']").Attributes["value"].Value = dlg.ServiceDesc;
+
+                    using (TextWriter sw = new StreamWriter(@"./Executable/QX.exe.config", false, Encoding.UTF8)) {
+                       doc.Save(sw);
+                    }
+
+                    XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
+                    using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
+                        newDoc.Save(sw);
+                    }
+                    ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
+                }
             }
-
         }
         private void UnloadDocument(object param) {
 
@@ -1032,7 +1059,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         public void UnloadEditor() {
-        //    UnloadDocument(null);
+            //    UnloadDocument(null);
             SelectedNodeXpath = string.Empty;
         }
 

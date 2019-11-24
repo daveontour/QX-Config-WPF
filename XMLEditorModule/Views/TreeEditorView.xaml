@@ -206,7 +206,7 @@
         <Grid Grid.Row="0" Margin="0,0,0,0">
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="270"></ColumnDefinition>
+                <ColumnDefinition Width="340"></ColumnDefinition>
                 <ColumnDefinition Width="5"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
@@ -304,7 +304,7 @@
                     <TextBlock TextWrapping="NoWrap" Text="{Binding Path=XMLText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="White"  HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" />
                 </ScrollViewer>
 
-                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="445" SelectedObject="{Binding myGrid}" HorizontalAlignment="Stretch" AutoGenerateProperties="true" />
+                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="440" SelectedObject="{Binding myGrid}" HorizontalAlignment="Stretch" AutoGenerateProperties="true" />
 
             </Grid>
 

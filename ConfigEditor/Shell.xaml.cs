@@ -15,6 +15,7 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 using ConfigEditor;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels;
 using WXE.Internal.Tools.ConfigEditor.Common;
+using System.Xml;
 
 namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
 {
@@ -36,6 +37,15 @@ namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
             editorsVM = new TreeEditorsViewModel();
            
             this.editorsView.ViewModel = editorsVM;
+
+            this.startUp();
+        }
+
+        void startUp() {
+            XmlDocument document = new XmlDocument();
+            document.LoadXml("<?xml version=\"1.0\" encoding=\"utf - 8\"?><config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">  <settings> </settings><pipes></pipes></config>"); ;
+            var xmlTreeViewModel = new TreeEditorViewModel(document, null, "new.xml*");
+            editorsVM.Add(xmlTreeViewModel);
         }
 
         void commandBarView_SearchRequested(object sender, SearchRequestedEventArgs e)  {          

@@ -37,21 +37,31 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             MenuItem fileMenuItem = new MenuItem { Header = "_File" };
             MenuItem newMenuItem = new MenuItem { Header = "_New" };
             newMenuItem.Click += new RoutedEventHandler(newMenuItem_Click);
+            Path newI = GetResourceCopy<Path>("new");
+            newMenuItem.Icon = newI;
 
             MenuItem openMenuItem = new MenuItem { Header = "_Open" };
             openMenuItem.Click += new RoutedEventHandler(openMenuItem_Click);
-            
+            Path open = GetResourceCopy<Path>("open");
+            openMenuItem.Icon = open;
+
             saveMenuItem = new MenuItem { Header = "_Save" };
             saveMenuItem.Click += new RoutedEventHandler(saveMenuItem_Click);
             saveMenuItem.IsEnabled = false;
+            Path save = GetResourceCopy<Path>("save");
+            saveMenuItem.Icon = save;
 
             saveAsMenuItem = new MenuItem { Header = "Save _As" };
             saveAsMenuItem.Click += new RoutedEventHandler(saveAsMenuItem_Click);
             saveAsMenuItem.IsEnabled = false;
+            Path saveas = GetResourceCopy<Path>("save");
+            saveAsMenuItem.Icon = saveas;
 
             exportMenuItem = new MenuItem { Header = "Package and Export" };
             exportMenuItem.Click += new RoutedEventHandler(exportMenuItem_Click);
             exportMenuItem.IsEnabled = false;
+            Path export = GetResourceCopy<Path>("export");
+            exportMenuItem.Icon = export;
 
 
             fileMenuItem.Items.Add(newMenuItem);
@@ -110,7 +120,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             try {
 
-                DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = null, Document = document, FileName = "new.xml" };
+                DocumentLoadedEventArgs args = new DocumentLoadedEventArgs() { Path = null, Document = document, FileName = "new.xml*" };
                 OnDocumentLoaded(this, args);
 
             } catch (Exception ex) {
