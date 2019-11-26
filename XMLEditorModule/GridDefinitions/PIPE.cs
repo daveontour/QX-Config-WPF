@@ -11,6 +11,7 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using System.Globalization;
 using System.Reflection;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
+using Xceed.Wpf.Toolkit;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
     [DisplayName("Pipe Connecting Input and Output")]
@@ -33,6 +34,17 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             set {
                 SetAttribute("name", value);
                 view.UpdateSelectedPipeCanvas(_node);
+            }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Number of Intances"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Number of intances of this Pipeline to run")]
+        public int Instances {
+            get { return GetIntAttribute("numInstances"); }
+            set {
+                if (value > 1) {
+                    MessageBox.Show("Make sure you know what you're doing!", "Multi Thread Warning");
+                }
+                SetAttribute("numInstances", value);
             }
         }
 

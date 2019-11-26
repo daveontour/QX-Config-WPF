@@ -15,22 +15,47 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
 using System.Diagnostics;
 using System.IO.Compression;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
+using System.Windows.Media;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
 
     public class TreeEditorViewModel : BaseViewModel {
+
+    //    private ICommand findElementCommand;
+        private ICommand viewAttributesCommand;
+        private ICommand addPipeCommand;
+        private ICommand addMonitorCommand;
+        private ICommand addLoggerCommand;
+        private ICommand addNamespaceCommand;
+        private ICommand addServiceSettingsCommand;
+        private ICommand addInputCommand;
+        private ICommand addTypeInputCommand;
+        private ICommand addTypeOutputCommand;
+        private ICommand addOutputCommand;
+        private ICommand addFilterCommand;
+        private ICommand addExpressionCommand;
+        private ICommand addAltQueueCommand;
+        private ICommand addDataFilterCommand;
+        private ICommand deleteElementCommand;
+        private ICommand saveDocumentCommand;
+        private ICommand saveAsDocumentCommand;
+        private ICommand saveAsAndExecuteDocumentCommand;
+        private ICommand packageCommand;
+
+        private string prevXPath;
+
         public TreeEditorViewModel(XmlDocument dataModel, string filePath, string fileName) {
             this.DataModel = dataModel;
             this.path = filePath;
             this.fileName = fileName;
-            this.findElementCommand = new RelayCommand<string>(HighlightElement, CanHighlightElement);
+  //          this.findElementCommand = new RelayCommand<string>(HighlightElement, CanHighlightElement);
             this.viewAttributesCommand = new RelayCommand<XmlNode>(ViewAttributes);
-            this.copyElementCommand = new RelayCommand<XmlNode>(p => { Copy(SelectedElement.DataModel); }, p => { return CanCopy(SelectedElement.DataModel); });
-            this.pasteElementCommand = new RelayCommand((p) => { Paste(SelectedElement.DataModel); }, (p) => { return CanPaste(SelectedElement.DataModel); });
             this.addPipeCommand = new RelayCommand<XmlNodeType>(AddPipe, CanAddPipe);
             this.addInputCommand = new RelayCommand<XmlNodeType>(AddInput, CanAddInput);
+            this.addTypeInputCommand = new RelayCommand<String>(AddTypeInput, CanAddTypeInput);
             this.addOutputCommand = new RelayCommand<XmlNodeType>(AddOutput, CanAddOutput);
+            this.addTypeOutputCommand = new RelayCommand<String>(AddTypeOutput, CanAddTypeOutput);
             this.addFilterCommand = new RelayCommand<XmlNodeType>(AddFilter, CanAddFilter);
             this.addExpressionCommand = new RelayCommand<XmlNodeType>(AddExpression, CanAddExpression);
             this.addDataFilterCommand = new RelayCommand<XmlNodeType>(AddDataFilter, CanAddExpression);
@@ -44,7 +69,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.saveAsAndExecuteDocumentCommand = new RelayCommand(p => { SaveAsAndExecute(); });
             this.packageCommand = new RelayCommand(p => { PackageAndSave(); });
             this.deleteElementCommand = new RelayCommand<XmlNode>(p => { DeleteElement(SelectedElement.DataModel); }, p => { return CanDeleteElement(SelectedElement.DataModel); });
-            this.unloadDocumentCommand = new RelayCommand(UnloadDocument);
 
         }
 
@@ -74,7 +98,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             get { return selectedElement; }
             private set {
                 selectedElement = value;
-                //          OnPropertyChanged("SelectedElement");
                 SelectedNodeXpath = GetXPathToNode(SelectedElement.DataModel);
                 UpdatePropertiesPanel(selectedElement.DataModel);
                 View.HightLightCanvas(selectedElement.DataModel);
@@ -165,6 +188,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new ContextFilter(selectedItem, this.View);
             } else {
                 myGrid = null;
+                //if (View.selectedCanvas != null) {
+                //    SolidColorBrush brush = new SolidColorBrush();
+                //    brush.Color = Colors.Transparent;
+                //    View.selectedCanvas.Background = brush;
+                //}
             }
             OnPropertyChanged("myGrid");
         }
@@ -196,139 +224,30 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         public Func<XmlNodeType, XmlNode> AddXmlNode { get; set; }
 
 
-        private string prevXPath;
-
-        public Action<XmlNode> HighlightNodeInUI { get; set; }
+         public Action<XmlNode> HighlightNodeInUI { get; set; }
 
         #region Commands
 
-        private ICommand findElementCommand;
-
-        public ICommand FindElementCommand {
-            get { return findElementCommand; }
-        }
-
-        private ICommand viewAttributesCommand;
-
-        public ICommand ViewAttributesCommand {
-            get { return viewAttributesCommand; }
-        }
-
-        private ICommand addPipeCommand;
-
-        public ICommand AddPipeCommand {
-            get { return addPipeCommand; }
-        }
-
-        private ICommand addMonitorCommand;
-
-        public ICommand AddMonitorCommand {
-            get { return addMonitorCommand; }
-        }
-
-        private ICommand addLoggerCommand;
-
-        public ICommand AddLoggerCommand {
-            get { return addLoggerCommand; }
-        }
-
-        private ICommand addNamespaceCommand;
-
-        public ICommand AddNamespaceCommand {
-            get { return addNamespaceCommand; }
-        }
-
-        private ICommand addServiceSettingsCommand;
-
-        public ICommand AddServiceSettingsCommand {
-            get { return addServiceSettingsCommand; }
-        }
-
-        private ICommand addInputCommand;
-
-        public ICommand AddInputCommand {
-            get { return addInputCommand; }
-        }
-
-        private ICommand addOutputCommand;
-
-        public ICommand AddOutputCommand {
-            get { return addOutputCommand; }
-        }
-
-        private ICommand addFilterCommand;
-
-        public ICommand AddFilterCommand {
-            get { return addFilterCommand; }
-        }
-
-        private ICommand addExpressionCommand;
-
-        public ICommand AddExpressionCommand {
-            get { return addExpressionCommand; }
-        }
-
-
-        private ICommand addAltQueueCommand;
-
-        public ICommand AddAltQueueCommand {
-            get { return addAltQueueCommand; }
-        }
-
-        private ICommand addDataFilterCommand;
-
-        public ICommand AddDataFilterCommand {
-            get { return addDataFilterCommand; }
-        }
-        private ICommand copyElementCommand;
-
-        public ICommand CopyElementCommand {
-            get { return copyElementCommand; }
-        }
-
-        private ICommand pasteElementCommand;
-
-        public ICommand PasteElementCommand {
-            get { return pasteElementCommand; }
-        }
-
-
-        private ICommand deleteElementCommand;
-
-        public ICommand DeleteElementCommand {
-            get { return deleteElementCommand; }
-        }
-
-
-        private ICommand unloadDocumentCommand;
-
-        public ICommand UnloadDocumentCommand {
-            get { return unloadDocumentCommand; }
-        }
-
-        private ICommand saveDocumentCommand;
-
-        public ICommand SaveDocumentCommand {
-            get { return saveDocumentCommand; }
-        }
-
-        private ICommand saveAsDocumentCommand;
-
-        public ICommand SaveAsDocumentCommand {
-            get { return saveAsDocumentCommand; }
-        }
-
-        private ICommand saveAsAndExecuteDocumentCommand;
-
-        public ICommand SaveAsAndExecuteCommand {
-            get { return saveAsAndExecuteDocumentCommand; }
-        }
-
-        private ICommand packageCommand;
-
-        public ICommand PackageCommand {
-            get { return packageCommand; }
-        }
+ //       public ICommand FindElementCommand { get { return findElementCommand; } }
+        public ICommand ViewAttributesCommand { get { return viewAttributesCommand; } }
+        public ICommand AddPipeCommand { get { return addPipeCommand; } }
+        public ICommand AddMonitorCommand { get { return addMonitorCommand; } }
+        public ICommand AddLoggerCommand { get { return addLoggerCommand; } }
+        public ICommand AddNamespaceCommand { get { return addNamespaceCommand; }}
+        public ICommand AddServiceSettingsCommand {  get { return addServiceSettingsCommand; }}
+        public ICommand AddInputCommand { get { return addInputCommand; } }
+        public ICommand AddTypeInputCommand { get { return addTypeInputCommand; }}
+        public ICommand AddTypeOutputCommand { get { return addTypeOutputCommand; }}
+        public ICommand AddOutputCommand { get { return addOutputCommand; }}
+        public ICommand AddFilterCommand {get { return addFilterCommand; }}
+        public ICommand AddExpressionCommand { get { return addExpressionCommand; }}
+        public ICommand AddAltQueueCommand { get { return addAltQueueCommand; }}
+        public ICommand AddDataFilterCommand { get { return addDataFilterCommand; }}
+        public ICommand DeleteElementCommand { get { return deleteElementCommand; } }
+        public ICommand SaveDocumentCommand { get { return saveDocumentCommand; }}
+        public ICommand SaveAsDocumentCommand {get { return saveAsDocumentCommand; }}
+        public ICommand SaveAsAndExecuteCommand { get { return saveAsAndExecuteDocumentCommand; }}
+        public ICommand PackageCommand { get { return packageCommand; }}
 
         #endregion
 
@@ -348,57 +267,57 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
         IEnumerator<XmlNode> enumerator;
-        public void HighlightElement(string xPath) {
+        //public void HighlightElement(string xPath) {
 
 
-            //
-            if (xPath != prevXPath) {
-                try {
-                    XmlNodeList nodeList = null;
+        //    //
+        //    if (xPath != prevXPath) {
+        //        try {
+        //            XmlNodeList nodeList = null;
 
-                    if (DataModel.DocumentElement.Attributes["xmlns:xsi"] != null) {
+        //            if (DataModel.DocumentElement.Attributes["xmlns:xsi"] != null) {
 
-                        string xmlns = DataModel.DocumentElement.Attributes["xmlns:xsi"].Value;
-                        xPath = DataModel.DocumentElement.Name + xPath + "/*";
-                        XmlNamespaceManager nsmgr = new XmlNamespaceManager(DataModel.NameTable);
+        //                string xmlns = DataModel.DocumentElement.Attributes["xmlns:xsi"].Value;
+        //                xPath = DataModel.DocumentElement.Name + xPath + "/*";
+        //                XmlNamespaceManager nsmgr = new XmlNamespaceManager(DataModel.NameTable);
 
-                        nsmgr.AddNamespace(DataModel.DocumentElement.Name, xmlns);
-                        xmlns = DataModel.DocumentElement.Attributes["xmlns:xsd"].Value;
-                        nsmgr.AddNamespace(DataModel.DocumentElement.Name, xmlns);
-                        nodeList = DataModel.SelectNodes(xPath, nsmgr);
-                    } else {
-                        nodeList = DataModel.SelectNodes(xPath);
-                    }
-
-
-                    if (nodeList.Count > 0) {
-                        CanMoveNext = true;
-                        prevXPath = xPath;
-                    } else {
-                        CanMoveNext = false;
-
-                    }
-                    enumerator = GetNextNode(nodeList);
-                    CanMoveNext = enumerator.MoveNext();
-                } catch {
-                    CanMoveNext = false;
-                }
-            }
-            if (enumerator != null) {
-                XmlNode xmlNode = enumerator.Current;
-                CanMoveNext = enumerator.MoveNext();
-                if (xmlNode == null) {
-                    CanMoveNext = false;
-                }
-                if (HighlightNodeInUI != null) {
-                    HighlightNodeInUI(xmlNode);
-                }
-            } else {
-                CanMoveNext = false;
-            }
+        //                nsmgr.AddNamespace(DataModel.DocumentElement.Name, xmlns);
+        //                xmlns = DataModel.DocumentElement.Attributes["xmlns:xsd"].Value;
+        //                nsmgr.AddNamespace(DataModel.DocumentElement.Name, xmlns);
+        //                nodeList = DataModel.SelectNodes(xPath, nsmgr);
+        //            } else {
+        //                nodeList = DataModel.SelectNodes(xPath);
+        //            }
 
 
-        }
+        //            if (nodeList.Count > 0) {
+        //                CanMoveNext = true;
+        //                prevXPath = xPath;
+        //            } else {
+        //                CanMoveNext = false;
+
+        //            }
+        //            enumerator = GetNextNode(nodeList);
+        //            CanMoveNext = enumerator.MoveNext();
+        //        } catch {
+        //            CanMoveNext = false;
+        //        }
+        //    }
+        //    if (enumerator != null) {
+        //        XmlNode xmlNode = enumerator.Current;
+        //        CanMoveNext = enumerator.MoveNext();
+        //        if (xmlNode == null) {
+        //            CanMoveNext = false;
+        //        }
+        //        if (HighlightNodeInUI != null) {
+        //            HighlightNodeInUI(xmlNode);
+        //        }
+        //    } else {
+        //        CanMoveNext = false;
+        //    }
+
+
+        //}
 
         IEnumerator<XmlNode> GetNextNode(XmlNodeList nodeList) {
             if (nodeList == null) {
@@ -427,48 +346,52 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
 
-        private void Copy(XmlNode node) {
-            TreeEditorViewModel.CopiedElement = node.CloneNode(true);
+        //private void Copy(XmlNode node) {
+        //    TreeEditorViewModel.CopiedElement = node.CloneNode(true);
 
-        }
+        //}
 
-        private bool CanCopy(XmlNode node) {
-            return node != null;
-        }
+        //private bool CanCopy(XmlNode node) {
+        //    return node != null;
+        //}
 
-        private void Paste(XmlNode parentNode) {
-            if (parentNode.NodeType == XmlNodeType.Element) {
-                XmlNode xmlNode = null;
-                if (parentNode.OwnerDocument != TreeEditorViewModel.CopiedElement.OwnerDocument) {
-                    xmlNode = parentNode.OwnerDocument.ImportNode(TreeEditorViewModel.CopiedElement, true);
-                } else {
-                    xmlNode = TreeEditorViewModel.CopiedElement;
-                }
-                parentNode.InsertAfter(xmlNode, parentNode.LastChild);
-                Copy(TreeEditorViewModel.CopiedElement);
+        //private void Paste(XmlNode parentNode) {
+        //    if (parentNode.NodeType == XmlNodeType.Element) {
+        //        XmlNode xmlNode = null;
+        //        if (parentNode.OwnerDocument != TreeEditorViewModel.CopiedElement.OwnerDocument) {
+        //            xmlNode = parentNode.OwnerDocument.ImportNode(TreeEditorViewModel.CopiedElement, true);
+        //        } else {
+        //            xmlNode = TreeEditorViewModel.CopiedElement;
+        //        }
+        //        parentNode.InsertAfter(xmlNode, parentNode.LastChild);
+        //        Copy(TreeEditorViewModel.CopiedElement);
 
-            }
-        }
+        //    }
+        //}
 
-        private bool CanPaste(XmlNode parentNode) {
-            bool canPaste = false;
-            if (parentNode != null && parentNode.FirstChild != null && parentNode.FirstChild == parentNode.LastChild && parentNode.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (parentNode != null && parentNode.NodeType == XmlNodeType.Element) {
-                if (TreeEditorViewModel.CopiedElement != null) {
-                    canPaste = true;
-                }
+        //private bool CanPaste(XmlNode parentNode) {
+        //    bool canPaste = false;
+        //    if (parentNode != null && parentNode.FirstChild != null && parentNode.FirstChild == parentNode.LastChild && parentNode.FirstChild.NodeType != XmlNodeType.Element) {
+        //        return false;
+        //    }
+        //    if (parentNode != null && parentNode.NodeType == XmlNodeType.Element) {
+        //        if (TreeEditorViewModel.CopiedElement != null) {
+        //            canPaste = true;
+        //        }
 
-            }
-            return canPaste;
-        }
+        //    }
+        //    return canPaste;
+        //}
 
         private void AddPipe(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("pipe");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("name");
             newAttribute.Value = "Descriptive Name of Pipe";
             newNode.Attributes.Append(newAttribute);
+
+            XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("numInstances");
+            newAttribute2.Value = "1";
+            newNode.Attributes.Append(newAttribute2);
 
             SelectedElement.DataModel.AppendChild(newNode);
             OnPropertyChanged("XMLText");
@@ -532,7 +455,121 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         }
 
+        private void AddTypeInput(String type) {
+
+            XmlNode newNode = this.DataModel.CreateElement("input");
+            XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
+            newAttribute.Value = type;
+            XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
+            newAttribute2.Value = "Description of the Node";
+
+            newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute2);
+
+            if (SelectedElement.DataModel.ChildNodes.Count == 0) {
+                SelectedElement.DataModel.AppendChild(newNode);
+            } else {
+                XmlNode lastNode = null;
+                foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
+                    if (n.Name == "output") {
+                        SelectedElement.DataModel.InsertBefore(newNode, n);
+                        break;
+                    } else {
+                        if (lastNode == null) {
+                            SelectedElement.DataModel.AppendChild(newNode);
+                        } else {
+                            lastNode = n;
+                        }
+                    }
+                }
+            }
+
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
+
+        }
+
+        private void AddTypeOutput(String type) {
+
+            XmlNode newNode = this.DataModel.CreateElement("output");
+            XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
+            newAttribute.Value = type;
+            XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
+            newAttribute2.Value = "Description of the Node";
+
+            newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute2);
+
+            if (SelectedElement.DataModel.ChildNodes.Count == 0) {
+                SelectedElement.DataModel.AppendChild(newNode);
+            } else {
+                XmlNode lastNode = null;
+                foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
+                    if (n.Name == "output") {
+                        SelectedElement.DataModel.InsertBefore(newNode, n);
+                        break;
+                    } else {
+                        if (lastNode == null) {
+                            SelectedElement.DataModel.AppendChild(newNode);
+                        } else {
+                            lastNode = n;
+                        }
+                    }
+                }
+            }
+
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
+
+        }
+
+
         private bool CanAddInput(XmlNodeType newNodeType) {
+
+            if (SelectedElement == null || SelectedElement.DataModel == null) {
+                return false;
+            }
+            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
+                return false;
+            }
+
+            if (SelectedElement.DataModel.Name == "pipe") {
+                return true;
+            }
+            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
+                return false;
+            }
+            if (AddXmlNode == null) {
+                return false;
+            } else {
+                return false;
+            }
+        }
+
+
+        private bool CanAddTypeInput(string newNodeType) {
+
+            if (SelectedElement == null || SelectedElement.DataModel == null) {
+                return false;
+            }
+            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
+                return false;
+            }
+
+            if (SelectedElement.DataModel.Name == "pipe") {
+                return true;
+            }
+            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
+                return false;
+            }
+            if (AddXmlNode == null) {
+                return false;
+            } else {
+                return false;
+            }
+        }
+
+        private bool CanAddTypeOutput(string newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
@@ -1093,13 +1130,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                     ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
                 }
             }
-        }
-        private void UnloadDocument(object param) {
-
-            using (TextWriter sw = new StreamWriter(path, false, Encoding.UTF8)) {
-                this.DataModel.Save(sw);
-            }
-            //         this.DataModel.Save(Path);
         }
 
         public void UnloadEditor() {

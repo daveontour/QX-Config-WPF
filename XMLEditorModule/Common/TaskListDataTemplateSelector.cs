@@ -29,10 +29,20 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 return element.FindResource("MonitorNodeTemplate") as DataTemplate;
             } else if (el.Name == "filter") {
                 return element.FindResource("FilterNodeTemplate") as DataTemplate;
+            } else if (el.Name == "service") {
+                return element.FindResource("ServiceNodeTemplate") as DataTemplate;
             } else if (el.Name == "namespace") {
                 return element.FindResource("NamespaceNodeTemplate") as DataTemplate;
             } else if (el.Name == "altqueue") {
                 return element.FindResource("AltQueueNodeTemplate") as DataTemplate;
+            } else if (el.Name == "or") {
+                return element.FindResource("ORExpression") as DataTemplate;
+            } else if (el.Name == "xor") {
+                return element.FindResource("XORExpression") as DataTemplate;
+            } else if (el.Name == "and") {
+                return element.FindResource("ANDExpression") as DataTemplate;
+            } else if (el.Name == "not") {
+                return element.FindResource("NOTExpression") as DataTemplate;
             } else {
                 return element.FindResource("NodeTemplate") as DataTemplate;
             }

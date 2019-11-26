@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
 using System.Xml;
 
 namespace WXE.Internal.Tools.ConfigEditor.Common
@@ -26,10 +27,27 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         AddAltQueue,
         AddDataFilter,
         AddXPathExists,
-        AddServiceSettings
+        AddServiceSettings,
+        AddMSMQInput, 
+        AddMQInput,
+        AddFileInput,
+        AddHTTPInput,
+        AddKafkaInput,
+        AddRabbitInput,
+        AddTestInput,
+        AddMSMQOutput,
+        AddMQOutput,
+        AddFileOutput,
+        AddHTTPOutput,
+        AddHTTPRest,
+        AddKafkaOutput,
+        AddRabbitOutput,
+        AddSINK
     }
 
     public interface IView {
+        Canvas selectedCanvas { get; set; }
+
         void DrawQXConfig();
         void HightLightCanvas(XmlNode node);
         void UpdateParamBindings(string param);

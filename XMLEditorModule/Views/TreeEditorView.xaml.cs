@@ -30,6 +30,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public Dictionary<XmlNode, Canvas> nodeToCanvas = new Dictionary<XmlNode, Canvas>();
         public Dictionary<Canvas, XmlNode> canvasToNode = new Dictionary<Canvas, XmlNode>();
         public Canvas selectedCanvas;
+        private ContextMenu pipeContextMenu;
+        MenuItem inputMenuItem;
+        MenuItem outputMenuItem;
 
         protected void OnPropertyChanged(string propName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
@@ -40,6 +43,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             DataContextChanged += new DependencyPropertyChangedEventHandler(TreeEditorView_DataContextChanged);
             contextMenuProvider = new ContextMenuProvider();
             xmlTreeView.ContextMenu = new ContextMenu();
+
 
         }
 
@@ -54,10 +58,92 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 return;
             }
 
+
             XmlDataProvider dataProvider = this.FindResource("xmlDataProvider") as XmlDataProvider;
             dataProvider.Document = viewModel.DataModel;
             dataProvider.Refresh();
             this.xmlTreeView.ContextMenu.Items.Clear();
+            try {
+                this.inputMenuItem.Items.Clear();
+                this.outputMenuItem.Items.Clear();
+
+            } catch (Exception) {
+
+            }
+            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMSMQInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMSMQInput].CommandParameter = "MSMQ";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQInput].CommandParameter = "MQ";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFileInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFileInput].CommandParameter = "FILE";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPInput].CommandParameter = "HTTP";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaInput].CommandParameter = "KAFKA";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitInput].CommandParameter = "RABBITDEFEX";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddTestInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddTestInput].CommandParameter = "TESTSOURCE";
+
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMSMQOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMSMQOutput].CommandParameter = "MSMQ";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQOutput].CommandParameter = "MQ";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFileOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFileOutput].CommandParameter = "FILE";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPOutput].CommandParameter = "HTTP";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPRest].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPRest].CommandParameter = "REST";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaOutput].CommandParameter = "KAFKA";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddSINK].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddSINK].CommandParameter = "SINK";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+
+            inputMenuItem = contextMenuProvider.ContextMenus[ContextMenuType.AddInput];
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMSMQInput]);
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMQInput]);
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddFileInput]);
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaInput]);
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPInput]);
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitInput]);
+            inputMenuItem.Items.Add(new Separator());
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddTestInput]);
+
+            outputMenuItem = contextMenuProvider.ContextMenus[ContextMenuType.AddOutput];
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMSMQOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMQOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddFileOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPRest]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput]);
+            outputMenuItem.Items.Add(new Separator());
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddSINK]);
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].Command = ViewModel.AddMonitorCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
@@ -84,14 +170,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             // Input and Output Nodes
             this.xmlTreeView.ContextMenu.Items.Add(new Separator());
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddInput]);
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddOutput]);
+            {
+                this.xmlTreeView.ContextMenu.Items.Add(inputMenuItem);
+                this.xmlTreeView.ContextMenu.Items.Add(outputMenuItem);
+            }
 
             this.xmlTreeView.ContextMenu.Items.Add(new Separator());
 
@@ -120,7 +202,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             ViewModel.HighlightNodeInUI = HighlightNode;
         }
-
 
         public Canvas SelectedCanvas {
             get { return this.selectedCanvas; }
@@ -414,7 +495,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 pipeCan.SetValue(Canvas.TopProperty, canTop.Height / 2 - 12);
 
                 pipeCan.PreviewMouseDown += Can_MouseDown;
- 
+
                 this.nodeToCanvas.Add(pipeNode, pipeCan);
                 this.canvasToNode.Add(pipeCan, pipeNode);
 
@@ -462,21 +543,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 pipeCan.Children.Add(end2);
                 pipeCan.Children.Add(tb);
 
-                pipeCan.ContextMenu = new ContextMenu();
+                pipeCan.ContextMenu = pipeContextMenu;
 
-                ContextMenuProvider pipeMenuProvider = new ContextMenuProvider();
-                pipeMenuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
-                pipeMenuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
-                pipeCan.ContextMenu.Items.Add(pipeMenuProvider.ContextMenus[ContextMenuType.AddInput]);
-
-                pipeMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
-                pipeMenuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
-                pipeCan.ContextMenu.Items.Add(pipeMenuProvider.ContextMenus[ContextMenuType.AddOutput]);
-
-                pipeCan.ContextMenu.Items.Add(new Separator());
-
-                pipeMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
-                pipeCan.ContextMenu.Items.Add(pipeMenuProvider.ContextMenus[ContextMenuType.Delete]);
 
                 canTop.Children.Add(pipeCan);
 
@@ -524,6 +592,98 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
                 i++;
             }
+        }
+
+        private ContextMenu GetPipeContextMenu() {
+
+            ContextMenu ctx = new ContextMenu();
+            ContextMenuProvider menuProvider = new ContextMenuProvider();
+
+            //            menuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
+            //          menuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
+
+            menuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
+
+            menuProvider.ContextMenus[ContextMenuType.AddMSMQInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddMSMQInput].CommandParameter = "MSMQ";
+
+            menuProvider.ContextMenus[ContextMenuType.AddMQInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddMQInput].CommandParameter = "MQ";
+
+            menuProvider.ContextMenus[ContextMenuType.AddFileInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddFileInput].CommandParameter = "FILE";
+
+            menuProvider.ContextMenus[ContextMenuType.AddHTTPInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddHTTPInput].CommandParameter = "HTTP";
+
+            menuProvider.ContextMenus[ContextMenuType.AddKafkaInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddKafkaInput].CommandParameter = "KAFKA";
+
+            menuProvider.ContextMenus[ContextMenuType.AddRabbitInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddRabbitInput].CommandParameter = "RABBITDEFEX";
+
+            menuProvider.ContextMenus[ContextMenuType.AddTestInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddTestInput].CommandParameter = "TESTSOURCE";
+
+
+            menuProvider.ContextMenus[ContextMenuType.AddMSMQOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddMSMQOutput].CommandParameter = "MSMQ";
+
+            menuProvider.ContextMenus[ContextMenuType.AddMQOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddMQOutput].CommandParameter = "MQ";
+
+            menuProvider.ContextMenus[ContextMenuType.AddFileOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddFileOutput].CommandParameter = "FILE";
+
+            menuProvider.ContextMenus[ContextMenuType.AddHTTPOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddHTTPOutput].CommandParameter = "HTTP";
+
+            menuProvider.ContextMenus[ContextMenuType.AddHTTPRest].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddHTTPRest].CommandParameter = "REST";
+
+            menuProvider.ContextMenus[ContextMenuType.AddKafkaOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddKafkaOutput].CommandParameter = "KAFKA";
+
+            menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
+
+            menuProvider.ContextMenus[ContextMenuType.AddSINK].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddSINK].CommandParameter = "SINK";
+
+            menuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+
+            MenuItem inputMenuItem = menuProvider.ContextMenus[ContextMenuType.AddInput];
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddMSMQInput]);
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddMQInput]);
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddFileInput]);
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddKafkaInput]);
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddHTTPInput]);
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddRabbitInput]);
+            inputMenuItem.Items.Add(new Separator());
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddTestInput]);
+
+            MenuItem outputMenuItem = menuProvider.ContextMenus[ContextMenuType.AddOutput];
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddMSMQOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddMQOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddFileOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddKafkaOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddHTTPOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddHTTPRest]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput]);
+            outputMenuItem.Items.Add(new Separator());
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddSINK]);
+
+
+            //          ctx.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddInput]);
+            ctx.Items.Add(inputMenuItem);
+            ctx.Items.Add(outputMenuItem);
+            ctx.Items.Add(new Separator());
+
+            ctx.Items.Add(menuProvider.ContextMenus[ContextMenuType.Delete]);
+
+            return ctx;
+
         }
 
         private void ConstructNode(Canvas canTop, XmlNode node, double imHeight, double space, int index, bool inNode) {
@@ -813,6 +973,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         void TreeEditorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
             ViewModel = e.NewValue as TreeEditorViewModel;
             if (ViewModel != null) {
+                pipeContextMenu = GetPipeContextMenu();
                 DrawConfig(viewModel.DataModel);
             }
         }
@@ -829,29 +990,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
+        Canvas IView.selectedCanvas { get { return this.selectedCanvas; } set => throw new NotImplementedException(); }
+
         private void xmlTreeView_Selected(object sender, RoutedEventArgs e) {
             XmlNode selectedItem = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
         }
 
-         public void HighlightNode(XmlNode xmlNode) {
-            bool isSelected = false;
-
-            TreeViewItem rootNode = null;
-            try {
-                rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
-            } catch {
-
-            }
-            if (xmlNode == null) {
-                isSelected = SelectTreeViewItem(ref rootNode, "");
-            } else {
-                isSelected = SelectTreeViewItem(ref rootNode, xmlNode);
-            }
-            if (!isSelected) {
-                MessageBox.Show("Could not locate the node.");
-            }
-        }
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e) {
             TreeViewItem selectedItem = sender as TreeViewItem;
             if (selectedItem != null) {
@@ -931,6 +1076,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         }
 
         public void HightLightCanvas(XmlNode node) {
+
+            Console.WriteLine($"=======> Selected Node = {node.Name}");
+
+            //if (node.Name == "pipes" || node.Name == "settings") {
+            //    if (this.selectedCanvas != null) {
+            //        SolidColorBrush brush = new SolidColorBrush();
+            //        brush.Color = Colors.Transparent;
+            //        this.selectedCanvas.Background = brush;
+            //    }
+            //    HighlightNode(node);
+            //}
+
             if (node == null) {
                 return;
             }
@@ -938,17 +1095,37 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             Canvas c;
             try {
                 c = this.nodeToCanvas[node];
-            } catch (Exception) {
+            } catch (Exception e) {
                 return;
             }
 
-            if (c == null || c == SelectedCanvas) {
+            if (c == null ) {
                 return;
             }
 
-            SolidColorBrush bluishBrush = new SolidColorBrush();
-            bluishBrush.Color = Color.FromArgb(255, 255, 127, 200);
-            c.Background = bluishBrush;
+            if (c == SelectedCanvas) {  
+                return;
+            }
+
+            SolidColorBrush highlightBrush = new SolidColorBrush();
+
+            switch (node.Name) {
+                case "output":
+                    highlightBrush.Color = Color.FromArgb(127, 255, 0, 0);
+                    break;
+                case "input":
+                    highlightBrush.Color = Color.FromArgb(127, 0, 255, 0);
+                    break;
+                case "pipe":
+                    highlightBrush.Color = Color.FromArgb(127, 0, 0, 255);
+                    break;
+                default:
+                    highlightBrush.Color = Color.FromArgb(255, 255, 127, 200);
+                    break;
+            }
+
+            c.Background = highlightBrush;
+
             SelectedCanvas = c;
             HighlightNode(node);
         }
@@ -962,6 +1139,33 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             can.Background = brush;
             SelectedCanvas = can;
             HighlightNode(this.canvasToNode[can]);
+        }
+
+        public void HighlightNode(XmlNode xmlNode) {
+
+            Console.WriteLine($"Selected Node = {xmlNode.Name}");
+
+            bool isSelected = false;
+
+            TreeViewItem rootNode = null;
+            try {
+                rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
+            } catch {
+
+            }
+            if (xmlNode == null) {
+                isSelected = SelectTreeViewItem(ref rootNode, "");
+            } else {
+                isSelected = SelectTreeViewItem(ref rootNode, xmlNode);
+            }
+            if (!isSelected) {
+                //  MessageBox.Show("Could not locate the node.");
+                //if (this.selectedCanvas != null) {
+                //    SolidColorBrush brush = new SolidColorBrush();
+                //    brush.Color = Colors.Transparent;
+                //    this.selectedCanvas.Background = brush;
+                //}
+            }
         }
 
         public void UpdateParamBindings(string param) {

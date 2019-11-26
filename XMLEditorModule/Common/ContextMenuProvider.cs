@@ -21,6 +21,25 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
             ContextMenus.Add(ContextMenuType.Delete, new MenuItem { Header = "Delete" });
             ContextMenus.Add(ContextMenuType.AddPipe, new MenuItem { Header = "Add Pipe" });
             ContextMenus.Add(ContextMenuType.Add, new MenuItem { Header = "Add" });
+            
+            ContextMenus.Add(ContextMenuType.AddMSMQInput, new MenuItem { Header = "MS MQ Input Node" });
+            ContextMenus.Add(ContextMenuType.AddMQInput, new MenuItem { Header = "IBM MQ Input Node" });
+            ContextMenus.Add(ContextMenuType.AddFileInput, new MenuItem { Header = "File Input Node" });
+            ContextMenus.Add(ContextMenuType.AddHTTPInput, new MenuItem { Header = "HTTP POST Input Node" });
+            ContextMenus.Add(ContextMenuType.AddKafkaInput, new MenuItem { Header = "Kafka Topic Input Node" });
+            ContextMenus.Add(ContextMenuType.AddRabbitInput, new MenuItem { Header = "Rabbit MQ Input Node" });
+            ContextMenus.Add(ContextMenuType.AddTestInput, new MenuItem { Header = "Test Message Source" });
+
+            ContextMenus.Add(ContextMenuType.AddMSMQOutput, new MenuItem { Header = "MS MQ Output Node" });
+            ContextMenus.Add(ContextMenuType.AddMQOutput, new MenuItem { Header = "IBM MQ Output Node" });
+            ContextMenus.Add(ContextMenuType.AddFileOutput, new MenuItem { Header = "File Output Node" });
+            ContextMenus.Add(ContextMenuType.AddHTTPOutput, new MenuItem { Header = "HTTP POST Output Node" });
+            ContextMenus.Add(ContextMenuType.AddKafkaOutput, new MenuItem { Header = "Kafka Topic Output Node" });
+            ContextMenus.Add(ContextMenuType.AddRabbitOutput, new MenuItem { Header = "Rabbit MQ Output Node" });
+            ContextMenus.Add(ContextMenuType.AddHTTPRest, new MenuItem { Header = "Rest Server Retrieval Output Node" });
+            ContextMenus.Add(ContextMenuType.AddSINK, new MenuItem { Header = "Message Sink" });
+
+
             ContextMenus.Add(ContextMenuType.AddInput, new MenuItem { Header = "Add Input Node" });
             ContextMenus.Add(ContextMenuType.AddOutput, new MenuItem { Header = "Add Output Node" });
             ContextMenus.Add(ContextMenuType.AddFilter, new MenuItem { Header = "Add Filter" });

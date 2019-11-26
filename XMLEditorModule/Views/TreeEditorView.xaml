@@ -111,9 +111,18 @@
             </HierarchicalDataTemplate.ItemsSource>
         </HierarchicalDataTemplate>
 
+        <HierarchicalDataTemplate x:Key="ServiceNodeTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Service Config"></TextBlock>
+            </StackPanel>
+            <HierarchicalDataTemplate.ItemsSource>
+                <Binding XPath="child::node()" />
+            </HierarchicalDataTemplate.ItemsSource>
+        </HierarchicalDataTemplate>
+
         <HierarchicalDataTemplate x:Key="NamespaceNodeTemplate">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="PaleVioletRed" Text="Namespace: "></TextBlock>
+                <TextBlock Text="Namespace: "></TextBlock>
                 <TextBlock Foreground="Red" Text="{Binding XPath=@prefix}" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
@@ -123,8 +132,8 @@
 
         <HierarchicalDataTemplate x:Key="PipeNodeTemplate">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="Black" Text="PIPE: "></TextBlock>
-                <TextBlock Foreground="Red" Text="{Binding XPath=@name}" />
+                <TextBlock  FontSize="12" FontWeight="DemiBold" Foreground="Black" Text="Pipe: "></TextBlock>
+                <TextBlock Foreground="Blue" Text="{Binding XPath=@name}" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -133,8 +142,8 @@
 
         <HierarchicalDataTemplate x:Key="AltQueueNodeTemplate">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="PaleVioletRed" Text="Alt Queue - "></TextBlock>
-                <TextBlock Foreground="PaleVioletRed" Text="{Binding XPath=@name}" />
+                <TextBlock Text="No Pass Queue: "></TextBlock>
+                <TextBlock Foreground="Red" Text="{Binding XPath=@name}" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -154,7 +163,7 @@
         <HierarchicalDataTemplate x:Key="InputNodeTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Foreground="Black" Text="Input Node: "></TextBlock>
-                <TextBlock Foreground="Red" Text="{Binding XPath=@name}" />
+                <TextBlock FontWeight="DemiBold" Foreground="Green" Text="{Binding XPath=@name}" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -164,7 +173,7 @@
         <HierarchicalDataTemplate x:Key="OutputNodeTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Foreground="Black" Text="Output Node: "></TextBlock>
-                <TextBlock Foreground="Green" Text="{Binding XPath=@name}" />
+                <TextBlock FontWeight="DemiBold" Foreground="Red" Text="{Binding XPath=@name}" />
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -173,7 +182,7 @@
 
         <HierarchicalDataTemplate x:Key="FilterNodeTemplate">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="OrangeRed" Text="Filter"></TextBlock>
+                <TextBlock Foreground="Gray" Text="Filter"></TextBlock>
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />
@@ -183,6 +192,42 @@
         <HierarchicalDataTemplate x:Key="ExpressionNodeTemplate">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Foreground="Green" Text="Output Node"></TextBlock>
+            </StackPanel>
+            <HierarchicalDataTemplate.ItemsSource>
+                <Binding XPath="child::node()" />
+            </HierarchicalDataTemplate.ItemsSource>
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate x:Key="ORExpression">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="Black" Text="Boolean OR"></TextBlock>
+            </StackPanel>
+            <HierarchicalDataTemplate.ItemsSource>
+                <Binding XPath="child::node()" />
+            </HierarchicalDataTemplate.ItemsSource>
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate x:Key="XORExpression">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="Black" Text="Boolean XOR"></TextBlock>
+            </StackPanel>
+            <HierarchicalDataTemplate.ItemsSource>
+                <Binding XPath="child::node()" />
+            </HierarchicalDataTemplate.ItemsSource>
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate x:Key="ANDExpression">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="Black" Text="Boolean AND"></TextBlock>
+            </StackPanel>
+            <HierarchicalDataTemplate.ItemsSource>
+                <Binding XPath="child::node()" />
+            </HierarchicalDataTemplate.ItemsSource>
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate x:Key="NOTExpression">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="Black" Text="Boolean NOT"></TextBlock>
             </StackPanel>
             <HierarchicalDataTemplate.ItemsSource>
                 <Binding XPath="child::node()" />

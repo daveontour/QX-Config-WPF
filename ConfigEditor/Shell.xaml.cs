@@ -48,9 +48,9 @@ namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
             editorsVM.Add(xmlTreeViewModel);
         }
 
-        void commandBarView_SearchRequested(object sender, SearchRequestedEventArgs e)  {          
-           this.editorsVM.ActiveEditor.FindElementCommand.Execute(e.XPath);
-        }
+        //void commandBarView_SearchRequested(object sender, SearchRequestedEventArgs e)  {          
+        //   this.editorsVM.ActiveEditor.FindElementCommand.Execute(e.XPath);
+        //}
 
       
         void commandBarView_DocumentLoaded(object sender, DocumentLoadedEventArgs e){
