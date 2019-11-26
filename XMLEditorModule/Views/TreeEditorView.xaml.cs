@@ -43,6 +43,85 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
 
+        private void BindUIElementToViewModel() {
+            //         this.DataContext = viewModel;
+            try {
+                viewModel.View = this as IView;
+                if (viewModel == null) {
+                    return;
+                }
+            } catch {
+                return;
+            }
+
+            XmlDataProvider dataProvider = this.FindResource("xmlDataProvider") as XmlDataProvider;
+            dataProvider.Document = viewModel.DataModel;
+            dataProvider.Refresh();
+            this.xmlTreeView.ContextMenu.Items.Clear();
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].Command = ViewModel.AddMonitorCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].Command = ViewModel.AddServiceSettingsCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings]);
+
+            // Add Pipes
+            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddPipe].Command = ViewModel.AddPipeCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddPipe].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddPipe]);
+
+            // Input and Output Nodes
+            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddInput]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddOutput]);
+
+            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFilter].Command = ViewModel.AddFilterCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFilter].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddFilter]);
+
+            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].Command = ViewModel.AddAltQueueCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].Command = ViewModel.AddExpressionCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddExpression]);
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Command = ViewModel.AddDataFilterCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].CommandParameter = XmlNodeType.Element;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter]);
+
+            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
+
+            contextMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.Delete]);
+
+            ViewModel.HighlightNodeInUI = HighlightNode;
+        }
+
+
         public Canvas SelectedCanvas {
             get { return this.selectedCanvas; }
             set {
@@ -190,6 +269,24 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             return can;
         }
+
+        public Canvas GetServiceCanvas() {
+            Canvas can = new Canvas() {
+                Height = 44,
+                Width = 35
+            };
+            Canvas nscanvas = GetResourceCopy<Canvas>("service");
+
+            can.Children.Add(nscanvas);
+
+            TextBlock txt = new TextBlock() { Text = "Service", FontSize = 8 };
+            txt.SetValue(Canvas.LeftProperty, 0.0);
+            txt.SetValue(Canvas.TopProperty, (double)32);
+
+            can.Children.Add(txt);
+
+            return can;
+        }
         public void DrawConfig(XmlDocument xmlDoc) {
 
             this.panel.Children.Clear();
@@ -240,6 +337,21 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 logMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
                 logCanvas.ContextMenu.Items.Add(logMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
+
+            XmlNodeList srvs = xmlDoc.SelectNodes("//service");
+            foreach (XmlNode ns in srvs) {
+                Canvas srvCanvas = GetServiceCanvas();
+                srvCanvas.PreviewMouseDown += Can_MouseDown;
+                this.nodeToCanvas.Add(ns, srvCanvas);
+                this.canvasToNode.Add(srvCanvas, ns);
+                settingspanel.Children.Add(srvCanvas);
+
+                srvCanvas.ContextMenu = new ContextMenu();
+                ContextMenuProvider srvMenuProvider = new ContextMenuProvider();
+                srvMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                srvCanvas.ContextMenu.Items.Add(srvMenuProvider.ContextMenus[ContextMenuType.Delete]);
+            }
+
             XmlNodeList nss = xmlDoc.SelectNodes("//namespace");
             foreach (XmlNode ns in nss) {
                 Canvas nsCanvas = GetNSCanvas();
@@ -269,9 +381,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
             setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;
             this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddNamespace]);
+
+            setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].Command = ViewModel.AddServiceSettingsCommand;
+            setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].CommandParameter = XmlNodeType.Element;
+            this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings]);
+
             this.settingspanel.PreviewMouseDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//settings")); };
 
-           int i = 0;
+            int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
             foreach (XmlNode pipeNode in pipes) {
 
@@ -715,93 +832,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         private void xmlTreeView_Selected(object sender, RoutedEventArgs e) {
             XmlNode selectedItem = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
-
-            //if (selectedItem.Name == "input" || selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
-            //    nodeEditorCntrl.Content = new NodeControl(selectedItem, this);
-            //} else if (selectedItem.Name == "pipe") {
-            //    nodeEditorCntrl.Content = new BooleanControl(selectedItem, this);
-            //} else if (selectedItem.Name == "namespace") {
-            //    nodeEditorCntrl.Content = new NamespaceControl(selectedItem, this);
-            //} else {
-            //    nodeEditorCntrl.Content = new NodeEndPointEditorView(selectedItem);
-            //}
         }
 
-        private void BindUIElementToViewModel() {
-            //         this.DataContext = viewModel;
-            try {
-                viewModel.View = this as IView;
-                if (viewModel == null) {
-                    return;
-                }
-            } catch {
-                return;
-            }
-
-            XmlDataProvider dataProvider = this.FindResource("xmlDataProvider") as XmlDataProvider;
-            dataProvider.Document = viewModel.DataModel;
-            dataProvider.Refresh();
-            this.xmlTreeView.ContextMenu.Items.Clear();
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].Command = ViewModel.AddMonitorCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor]);
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace]);
-
-
-            // Add Pipes
-            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddPipe].Command = ViewModel.AddPipeCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddPipe].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddPipe]);
-
-            // Input and Output Nodes
-            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].Command = ViewModel.AddInputCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddInput].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddInput]);
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddOutput]);
-
-            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddFilter].Command = ViewModel.AddFilterCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddFilter].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddFilter]);
-
-            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].Command = ViewModel.AddAltQueueCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddAltQueue]);
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].Command = ViewModel.AddExpressionCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddExpression].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddExpression]);
-
-            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].Command = ViewModel.AddDataFilterCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddDataFilter]);
-
-            this.xmlTreeView.ContextMenu.Items.Add(new Separator());
-
-            contextMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.Delete]);
-
-            ViewModel.HighlightNodeInUI = HighlightNode;
-        }
-        public void HighlightNode(XmlNode xmlNode) {
+         public void HighlightNode(XmlNode xmlNode) {
             bool isSelected = false;
 
             TreeViewItem rootNode = null;

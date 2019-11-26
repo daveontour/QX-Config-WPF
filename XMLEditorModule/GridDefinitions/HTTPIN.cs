@@ -34,5 +34,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             get {return GetAttribute("postURL"); }
             set {SetAttribute("postURL", value); }
         }
+
+        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(3), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
+        public string Buffer {
+            get { return GetAttribute("bufferQueueName"); }
+            set { SetAttribute("bufferQueueName", value); }
+        }
     }
 }

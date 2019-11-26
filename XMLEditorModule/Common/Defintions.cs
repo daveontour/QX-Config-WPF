@@ -116,6 +116,23 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
+        protected bool GetBoolDefaultTrueAttribute(string attribName) {
+
+            if (_node.Attributes[attribName] != null) {
+                return bool.Parse(_node.Attributes[attribName].Value);
+            } else {
+                if (_node.Attributes[attribName] == null) {
+                    XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
+                    newAttribute.Value = "True";
+                    _node.Attributes.Append(newAttribute);
+                } else {
+                    _node.Attributes[attribName].Value = "True";
+                }
+                view.UpdateParamBindings("XMLText");
+                return true;
+            }
+        }
+
         protected int GetIntAttribute(string attribName) {
 
             if (_node.Attributes[attribName] != null) {
@@ -145,6 +162,22 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
         }
 
+        protected void SetAbsoluteAttribute(string attribName, bool value) {
+            if ( _node.Attributes[attribName] != null) {
+                _node.Attributes[attribName].Value = value.ToString();
+            } else {
+
+                if (_node.Attributes[attribName] == null) {
+                    XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
+                    newAttribute.Value = value.ToString();
+                    _node.Attributes.Append(newAttribute);
+                } else {
+                    _node.Attributes[attribName].Value = value.ToString();
+                }
+            }
+
+            view.UpdateParamBindings("XMLText");
+        }
         protected void SetAttribute(string attribName, bool value) {
             if ((!value) && _node.Attributes[attribName] != null) {
                 _node.Attributes.Remove(_node.Attributes[attribName]);
@@ -319,6 +352,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 SetAttribute("priority", value);
             }
         }
+
+        //[CategoryAttribute("Required"), DisplayName("XML Data"), PropertyOrder(10), DescriptionAttribute("True if the message in the data will be XML")]
+        //public bool IsXML {
+        //    get { return GetBoolDefaultTrueAttribute("isXML"); }
+        //    set { SetAbsoluteAttribute("isXML", value); }
+        //}
     }
 
     public class NameSpaceGrid : MyPropertyGrid {
@@ -641,6 +680,35 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 }
                 SetAttribute("contextCacheExpiry", value);
             }
+        }
+    }
+
+
+    [DisplayName("Service Setting")]
+    public class ServiceSetting : MyPropertyGrid {
+
+        public ServiceSetting(XmlNode dataModel, IView view) {
+            this._node = dataModel;
+            this.view = view;
+            this.type = dataModel.Name;
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Service Name"), PropertyOrder(1), DescriptionAttribute("The name of the service")]
+        public string ServiceName {
+            get { return GetAttribute("serviceName"); }
+            set { SetAttribute("serviceName", value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Service Display Name"), PropertyOrder(2), DescriptionAttribute("The display name of the service")]
+        public string Display {
+            get { return GetAttribute("serviceDisplayName"); }
+            set { SetAttribute("serviceDisplayName", value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("Service Description"), PropertyOrder(3), DescriptionAttribute("The description of the service")]
+        public string Description {
+            get { return GetAttribute("serviceDescription"); }
+            set { SetAttribute("serviceDescription", value); }
         }
     }
 }

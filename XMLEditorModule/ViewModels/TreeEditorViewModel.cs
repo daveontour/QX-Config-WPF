@@ -38,6 +38,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.addMonitorCommand = new RelayCommand<XmlNodeType>(AddMonitor, CanAddMonitor);
             this.addLoggerCommand = new RelayCommand<XmlNodeType>(AddLogger, CanAddLogger);
             this.addNamespaceCommand = new RelayCommand<XmlNodeType>(AddNamespace, CanAddNamespace);
+            this.addServiceSettingsCommand = new RelayCommand<XmlNodeType>(AddServiceSetting, CanAddServiceSetting);
             this.saveDocumentCommand = new RelayCommand(p => { Save(); });
             this.saveAsDocumentCommand = new RelayCommand<string>(SaveAs);
             this.saveAsAndExecuteDocumentCommand = new RelayCommand(p => { SaveAsAndExecute(); });
@@ -140,6 +141,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new PIPE(selectedItem, this.View);
             } else if (selectedItem.Name == "namespace") {
                 myGrid = new NameSpaceGrid(selectedItem, this.View);
+            } else if (selectedItem.Name == "service") {
+                myGrid = new ServiceSetting(selectedItem, this.View);
             } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not") {
                 myGrid = new BooleanExpression(selectedItem, this.View);
             } else if (selectedItem.Name == "contains") {
@@ -233,6 +236,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         public ICommand AddNamespaceCommand {
             get { return addNamespaceCommand; }
+        }
+
+        private ICommand addServiceSettingsCommand;
+
+        public ICommand AddServiceSettingsCommand {
+            get { return addServiceSettingsCommand; }
         }
 
         private ICommand addInputCommand;
@@ -496,13 +505,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
             newAttribute2.Value = "Description of the Node";
-            //   XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            //   newAttribute3.Value = @".\private$\QUEUENAME";
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
-            //     newNode.Attributes.Append(newAttribute3);
-
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
@@ -555,13 +560,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
             newAttribute2.Value = "Description of the Node";
-            //         XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            //       newAttribute3.Value = @".\private$\QUEUENAME";
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
-            //     newNode.Attributes.Append(newAttribute3);
-
+ 
             SelectedElement.DataModel.AppendChild(newNode);
 
             OnPropertyChanged("XMLText");
@@ -827,6 +829,48 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return false;
             }
         }
+
+
+        private void AddServiceSetting(XmlNodeType newNodeType) {
+            XmlNode newNode = this.DataModel.CreateElement("service");
+            XmlAttribute newAttribute = this.DataModel.CreateAttribute("serviceName");
+            newAttribute.Value = "Queue Exchange Service";
+            XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("serviceDisplayName");
+            newAttribute2.Value = "Queue Exchange Service";
+            XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("serviceDescription");
+            newAttribute3.Value = "A instance of QueueExchange for connecting inputs to outputs";
+
+            newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute2);
+            newNode.Attributes.Append(newAttribute3);
+
+            SelectedElement.DataModel.AppendChild(newNode);
+
+            OnPropertyChanged("XMLText");
+            View.DrawQXConfig();
+
+        }
+        private bool CanAddServiceSetting(XmlNodeType newNodeType) {
+
+            if (SelectedElement == null || SelectedElement.DataModel == null) {
+                return false;
+            }
+            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
+                return false;
+            }
+
+            if (SelectedElement.DataModel.Name != "settings") {
+                return false;
+            }
+
+            foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
+                if (n.Name == "service") {
+                    return false;
+                }
+            }
+
+            return true;
+        }
         private void AddDataFilter(XmlNodeType newNodeType) {
 
             XmlNode newNode = this.DataModel.CreateElement("contains");
@@ -1039,7 +1083,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                     doc.SelectSingleNode("//add[@key='ServiceDescription']").Attributes["value"].Value = dlg.ServiceDesc;
 
                     using (TextWriter sw = new StreamWriter(@"./Executable/QX.exe.config", false, Encoding.UTF8)) {
-                       doc.Save(sw);
+                        doc.Save(sw);
                     }
 
                     XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;

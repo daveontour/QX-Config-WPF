@@ -25,7 +25,8 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         AddExpression,
         AddAltQueue,
         AddDataFilter,
-        AddXPathExists
+        AddXPathExists,
+        AddServiceSettings
     }
 
     public interface IView {
