@@ -22,18 +22,20 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
     public partial class TreeEditorView : UserControl, INotifyPropertyChanged, IView {
 
-        private ContextMenuProvider contextMenuProvider;
         private const int arrowHeadWidth = 5;
         private const int arrowHeadLength = 12;
+
+        private MenuItem inputMenuItem;
+        private MenuItem outputMenuItem;
+        private ContextMenuProvider contextMenuProvider;
+        private ContextMenu pipeContextMenu;
+
         public event PropertyChangedEventHandler PropertyChanged;
         public TreeEditorViewModel viewModel;
         public Dictionary<XmlNode, Canvas> nodeToCanvas = new Dictionary<XmlNode, Canvas>();
         public Dictionary<Canvas, XmlNode> canvasToNode = new Dictionary<Canvas, XmlNode>();
         public Canvas selectedCanvas;
-        private ContextMenu pipeContextMenu;
-        MenuItem inputMenuItem;
-        MenuItem outputMenuItem;
-
+        
         protected void OnPropertyChanged(string propName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
@@ -43,8 +45,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             DataContextChanged += new DependencyPropertyChangedEventHandler(TreeEditorView_DataContextChanged);
             contextMenuProvider = new ContextMenuProvider();
             xmlTreeView.ContextMenu = new ContextMenu();
-
-
         }
 
         private void BindUIElementToViewModel() {
@@ -467,7 +467,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].CommandParameter = XmlNodeType.Element;
             this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings]);
 
-            this.settingspanel.PreviewMouseDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//settings")); };
+            this.settingspanel.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//settings")); };
 
             int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
@@ -484,7 +484,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 topMenuProvider.ContextMenus[ContextMenuType.AddPipe].Command = ViewModel.AddPipeCommand;
                 topMenuProvider.ContextMenus[ContextMenuType.AddPipe].CommandParameter = XmlNodeType.Element;
                 canTop.ContextMenu.Items.Add(topMenuProvider.ContextMenus[ContextMenuType.AddPipe]);
-                canTop.PreviewMouseDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//pipes")); };
+                canTop.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//pipes")); };
 
                 Canvas pipeCan = new Canvas() {
                     Height = 24,
@@ -584,12 +584,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 }
 
                 this.panel.Children.Add(canTop);
-                //Separator sep = new Separator() {
-                //    Opacity = 127,
-                //    Height = 15
-                //};
-                //this.panel.Children.Add(sep);
-
                 i++;
             }
         }
@@ -736,7 +730,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 // Add the event handlers
                 canvasToNode.Add(filterCanvas, node.FirstChild);
                 nodeToCanvas.Add(node.FirstChild, filterCanvas);
-                filterCanvas.PreviewMouseDown += Can_MouseDown;
+                filterCanvas.MouseDown += Can_MouseDown;
                 filterCanvas.Background = transBrush;
 
                 filterCanvas.ContextMenu = new ContextMenu();
@@ -844,7 +838,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         private void CanCanvas_MouseDown(object sender, MouseButtonEventArgs e, XmlNode node) {
             if (sender == null) {
-                return;
+               return;
             }
             ViewModel.ViewAttributesCommand.Execute(node);
             HighlightNode(node);
@@ -992,7 +986,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         Canvas IView.selectedCanvas { get { return this.selectedCanvas; } set => throw new NotImplementedException(); }
 
+        #region Selection Handling
         private void xmlTreeView_Selected(object sender, RoutedEventArgs e) {
+            Console.WriteLine("Tree Item Selected");
             XmlNode selectedItem = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
         }
@@ -1071,6 +1067,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
+        #endregion
+
+
         public void DrawQXConfig() {
             DrawConfig(viewModel.DataModel);
         }
@@ -1078,15 +1077,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public void HightLightCanvas(XmlNode node) {
 
             Console.WriteLine($"=======> Selected Node = {node.Name}");
-
-            //if (node.Name == "pipes" || node.Name == "settings") {
-            //    if (this.selectedCanvas != null) {
-            //        SolidColorBrush brush = new SolidColorBrush();
-            //        brush.Color = Colors.Transparent;
-            //        this.selectedCanvas.Background = brush;
-            //    }
-            //    HighlightNode(node);
-            //}
 
             if (node == null) {
                 return;
@@ -1096,6 +1086,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             try {
                 c = this.nodeToCanvas[node];
             } catch (Exception e) {
+
+                if (this.selectedCanvas != null) {
+                    SolidColorBrush brush = new SolidColorBrush();
+                    brush.Color = Colors.Transparent;
+                    this.selectedCanvas.Background = brush;
+                }
+
                 return;
             }
 

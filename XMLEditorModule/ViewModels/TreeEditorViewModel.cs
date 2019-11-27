@@ -5,8 +5,6 @@ using System.Xml;
 
 using System.Windows.Input;
 using WXE.Internal.Tools.ConfigEditor.Common;
-using System.ComponentModel;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using Xceed.Wpf.Toolkit;
 using System.IO;
@@ -15,14 +13,11 @@ using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
 using System.Diagnostics;
 using System.IO.Compression;
 using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
-using System.Windows.Media;
 
 namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
-
     public class TreeEditorViewModel : BaseViewModel {
 
-    //    private ICommand findElementCommand;
         private ICommand viewAttributesCommand;
         private ICommand addPipeCommand;
         private ICommand addMonitorCommand;
@@ -43,13 +38,47 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         private ICommand saveAsAndExecuteDocumentCommand;
         private ICommand packageCommand;
 
-        private string prevXPath;
+        private string path;
+        private string fileName;
+        private SelectedElementViewModel selectedElement = new SelectedElementViewModel(null);   
+        
+        public MyPropertyGrid myGrid { get; set; }
+        public XmlDocument DataModel { get; private set; }
+        public IView View { get; set; }
+        public string Path { get { return path; } }
+        public string FileName { get { return fileName; } }
+        public Func<XmlNodeType, XmlNode> AddXmlNode { get; set; }
+        public Action<XmlNode> HighlightNodeInUI { get; set; }
+
+        #region Commands
+
+        public ICommand ViewAttributesCommand { get { return viewAttributesCommand; } }
+        public ICommand AddPipeCommand { get { return addPipeCommand; } }
+        public ICommand AddMonitorCommand { get { return addMonitorCommand; } }
+        public ICommand AddLoggerCommand { get { return addLoggerCommand; } }
+        public ICommand AddNamespaceCommand { get { return addNamespaceCommand; } }
+        public ICommand AddServiceSettingsCommand { get { return addServiceSettingsCommand; } }
+        public ICommand AddInputCommand { get { return addInputCommand; } }
+        public ICommand AddTypeInputCommand { get { return addTypeInputCommand; } }
+        public ICommand AddTypeOutputCommand { get { return addTypeOutputCommand; } }
+        public ICommand AddOutputCommand { get { return addOutputCommand; } }
+        public ICommand AddFilterCommand { get { return addFilterCommand; } }
+        public ICommand AddExpressionCommand { get { return addExpressionCommand; } }
+        public ICommand AddAltQueueCommand { get { return addAltQueueCommand; } }
+        public ICommand AddDataFilterCommand { get { return addDataFilterCommand; } }
+        public ICommand DeleteElementCommand { get { return deleteElementCommand; } }
+        public ICommand SaveDocumentCommand { get { return saveDocumentCommand; } }
+        public ICommand SaveAsDocumentCommand { get { return saveAsDocumentCommand; } }
+        public ICommand SaveAsAndExecuteCommand { get { return saveAsAndExecuteDocumentCommand; } }
+        public ICommand PackageCommand { get { return packageCommand; } }
+
+        #endregion
+
 
         public TreeEditorViewModel(XmlDocument dataModel, string filePath, string fileName) {
             this.DataModel = dataModel;
             this.path = filePath;
             this.fileName = fileName;
-  //          this.findElementCommand = new RelayCommand<string>(HighlightElement, CanHighlightElement);
             this.viewAttributesCommand = new RelayCommand<XmlNode>(ViewAttributes);
             this.addPipeCommand = new RelayCommand<XmlNodeType>(AddPipe, CanAddPipe);
             this.addInputCommand = new RelayCommand<XmlNodeType>(AddInput, CanAddInput);
@@ -72,38 +101,34 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         }
 
-        public MyPropertyGrid myGrid { get; set; }
-        public XmlDocument DataModel { get; private set; }
-
-        public static XmlNode CopiedElement;
-
-        public IView View { get; set; }
-
-        private string path;
-
-        public string Path {
-            get { return path; }
-        }
-
-        private string fileName;
-
-        public string FileName {
-            get { return fileName; }
-        }
-
-
-        private SelectedElementViewModel selectedElement = new SelectedElementViewModel(null);
-
         public SelectedElementViewModel SelectedElement {
             get { return selectedElement; }
             private set {
                 selectedElement = value;
-                SelectedNodeXpath = GetXPathToNode(SelectedElement.DataModel);
                 UpdatePropertiesPanel(selectedElement.DataModel);
                 View.HightLightCanvas(selectedElement.DataModel);
             }
         }
+        public string XMLText {
+            get {
+                StringBuilder sb = new StringBuilder();
+                System.IO.TextWriter tr = new System.IO.StringWriter(sb);
+                XmlTextWriter wr = new XmlTextWriter(tr);
+                wr.Formatting = Formatting.Indented;
+                DataModel.Save(wr);
+                wr.Close();
+                return sb.ToString();
+            }
+        }
+        private void ViewAttributes(XmlNode newNode) {
 
+            if (SelectedElement != null) {
+                SelectedElement.AddXmlNode = null;
+            }
+            SelectedElement = new SelectedElementViewModel(newNode);
+            SelectedElement.AddXmlNode = this.AddXmlNode;
+        } 
+        
         private void UpdatePropertiesPanel(XmlNode selectedItem) {
 
 
@@ -197,191 +222,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             OnPropertyChanged("myGrid");
         }
 
-        public string XMLText {
-            get {
-                StringBuilder sb = new StringBuilder();
-                System.IO.TextWriter tr = new System.IO.StringWriter(sb);
-                XmlTextWriter wr = new XmlTextWriter(tr);
-                wr.Formatting = Formatting.Indented;
-                DataModel.Save(wr);
-                wr.Close();
-                return sb.ToString();
-            }
-        }
 
-        private string selectedNodeXpath = string.Empty;
+        #region actions
 
-        public string SelectedNodeXpath {
-            get { return selectedNodeXpath; }
-            set {
-                selectedNodeXpath = value;
-                OnPropertyChanged("SelectedNodeXpath");
-            }
-        }
-
-
-
-        public Func<XmlNodeType, XmlNode> AddXmlNode { get; set; }
-
-
-         public Action<XmlNode> HighlightNodeInUI { get; set; }
-
-        #region Commands
-
- //       public ICommand FindElementCommand { get { return findElementCommand; } }
-        public ICommand ViewAttributesCommand { get { return viewAttributesCommand; } }
-        public ICommand AddPipeCommand { get { return addPipeCommand; } }
-        public ICommand AddMonitorCommand { get { return addMonitorCommand; } }
-        public ICommand AddLoggerCommand { get { return addLoggerCommand; } }
-        public ICommand AddNamespaceCommand { get { return addNamespaceCommand; }}
-        public ICommand AddServiceSettingsCommand {  get { return addServiceSettingsCommand; }}
-        public ICommand AddInputCommand { get { return addInputCommand; } }
-        public ICommand AddTypeInputCommand { get { return addTypeInputCommand; }}
-        public ICommand AddTypeOutputCommand { get { return addTypeOutputCommand; }}
-        public ICommand AddOutputCommand { get { return addOutputCommand; }}
-        public ICommand AddFilterCommand {get { return addFilterCommand; }}
-        public ICommand AddExpressionCommand { get { return addExpressionCommand; }}
-        public ICommand AddAltQueueCommand { get { return addAltQueueCommand; }}
-        public ICommand AddDataFilterCommand { get { return addDataFilterCommand; }}
-        public ICommand DeleteElementCommand { get { return deleteElementCommand; } }
-        public ICommand SaveDocumentCommand { get { return saveDocumentCommand; }}
-        public ICommand SaveAsDocumentCommand {get { return saveAsDocumentCommand; }}
-        public ICommand SaveAsAndExecuteCommand { get { return saveAsAndExecuteDocumentCommand; }}
-        public ICommand PackageCommand { get { return packageCommand; }}
-
-        #endregion
-
-
-
-        private bool canMoveNext;
-
-        public bool CanMoveNext {
-            get { return canMoveNext; }
-            private set {
-                canMoveNext = value;
-
-                if (!value) {
-                    prevXPath = null;
-                }
-            }
-        }
-
-        IEnumerator<XmlNode> enumerator;
-        //public void HighlightElement(string xPath) {
-
-
-        //    //
-        //    if (xPath != prevXPath) {
-        //        try {
-        //            XmlNodeList nodeList = null;
-
-        //            if (DataModel.DocumentElement.Attributes["xmlns:xsi"] != null) {
-
-        //                string xmlns = DataModel.DocumentElement.Attributes["xmlns:xsi"].Value;
-        //                xPath = DataModel.DocumentElement.Name + xPath + "/*";
-        //                XmlNamespaceManager nsmgr = new XmlNamespaceManager(DataModel.NameTable);
-
-        //                nsmgr.AddNamespace(DataModel.DocumentElement.Name, xmlns);
-        //                xmlns = DataModel.DocumentElement.Attributes["xmlns:xsd"].Value;
-        //                nsmgr.AddNamespace(DataModel.DocumentElement.Name, xmlns);
-        //                nodeList = DataModel.SelectNodes(xPath, nsmgr);
-        //            } else {
-        //                nodeList = DataModel.SelectNodes(xPath);
-        //            }
-
-
-        //            if (nodeList.Count > 0) {
-        //                CanMoveNext = true;
-        //                prevXPath = xPath;
-        //            } else {
-        //                CanMoveNext = false;
-
-        //            }
-        //            enumerator = GetNextNode(nodeList);
-        //            CanMoveNext = enumerator.MoveNext();
-        //        } catch {
-        //            CanMoveNext = false;
-        //        }
-        //    }
-        //    if (enumerator != null) {
-        //        XmlNode xmlNode = enumerator.Current;
-        //        CanMoveNext = enumerator.MoveNext();
-        //        if (xmlNode == null) {
-        //            CanMoveNext = false;
-        //        }
-        //        if (HighlightNodeInUI != null) {
-        //            HighlightNodeInUI(xmlNode);
-        //        }
-        //    } else {
-        //        CanMoveNext = false;
-        //    }
-
-
-        //}
-
-        IEnumerator<XmlNode> GetNextNode(XmlNodeList nodeList) {
-            if (nodeList == null) {
-                yield return null;
-            }
-            foreach (XmlNode xmlNode in nodeList) {
-
-                yield return xmlNode;
-            }
-        }
-
-
-        private bool CanHighlightElement(string xPath) {
-            return (!string.IsNullOrEmpty(xPath));
-        }
-
-
-        private void ViewAttributes(XmlNode newNode) {
-
-            //TODO: Populate SelectedElementViewModel.
-            if (SelectedElement != null) {
-                SelectedElement.AddXmlNode = null;
-            }
-            SelectedElement = new SelectedElementViewModel(newNode);
-            SelectedElement.AddXmlNode = this.AddXmlNode;
-        }
-
-
-        //private void Copy(XmlNode node) {
-        //    TreeEditorViewModel.CopiedElement = node.CloneNode(true);
-
-        //}
-
-        //private bool CanCopy(XmlNode node) {
-        //    return node != null;
-        //}
-
-        //private void Paste(XmlNode parentNode) {
-        //    if (parentNode.NodeType == XmlNodeType.Element) {
-        //        XmlNode xmlNode = null;
-        //        if (parentNode.OwnerDocument != TreeEditorViewModel.CopiedElement.OwnerDocument) {
-        //            xmlNode = parentNode.OwnerDocument.ImportNode(TreeEditorViewModel.CopiedElement, true);
-        //        } else {
-        //            xmlNode = TreeEditorViewModel.CopiedElement;
-        //        }
-        //        parentNode.InsertAfter(xmlNode, parentNode.LastChild);
-        //        Copy(TreeEditorViewModel.CopiedElement);
-
-        //    }
-        //}
-
-        //private bool CanPaste(XmlNode parentNode) {
-        //    bool canPaste = false;
-        //    if (parentNode != null && parentNode.FirstChild != null && parentNode.FirstChild == parentNode.LastChild && parentNode.FirstChild.NodeType != XmlNodeType.Element) {
-        //        return false;
-        //    }
-        //    if (parentNode != null && parentNode.NodeType == XmlNodeType.Element) {
-        //        if (TreeEditorViewModel.CopiedElement != null) {
-        //            canPaste = true;
-        //        }
-
-        //    }
-        //    return canPaste;
-        //}
 
         private void AddPipe(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("pipe");
@@ -1063,7 +906,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                         OnPropertyChanged("FileName");
                         OnPropertyChanged("Path");
                     }
-                    UnloadEditor();
+      //              UnloadEditor();
                     return;
                 } else {
                     return;
@@ -1132,42 +975,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
         }
 
-        public void UnloadEditor() {
-            //    UnloadDocument(null);
-            SelectedNodeXpath = string.Empty;
-        }
-
-        #region Getting Xpath
-
-        private static string GetXPathToNode(XmlNode node) {
-            if (node == null)
-                return string.Empty;
-            if (node.NodeType == XmlNodeType.Attribute) {
-                // attributes have an OwnerElement, not a ParentNode; also they have
-                // to be matched by name, not found by position
-                return String.Format(
-                    "{0}/@{1}",
-                    GetXPathToNode(((XmlAttribute)node).OwnerElement),
-                    node.Name
-                    );
-            }
-            if (node.ParentNode == null) {
-                // the only node with no parent is the root node, which has no path
-                return "";
-            }
-            //get the index
-            int iIndex = 1;
-            XmlNode xnIndex = node;
-            while (xnIndex.PreviousSibling != null) { iIndex++; xnIndex = xnIndex.PreviousSibling; }
-            // the path to a node is the path to its parent, plus "/node()[n]", where 
-            // n is its position among its siblings.
-            return String.Format(
-                "{0}/{1}",
-                GetXPathToNode(node.ParentNode),
-                node.Name
-                );
-        }
-
         #endregion
+
     }
 }

@@ -69,7 +69,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
         public void Remove(TreeEditorViewModel treeEditor)
         {
             try {
-                treeEditor.UnloadEditor();
+        //        treeEditor.UnloadEditor();
                 this.TreeEditors.Remove(treeEditor);
             } catch (Exception ex) {
                 Console.WriteLine(ex);
