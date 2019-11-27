@@ -71,5 +71,6 @@ namespace WXE.Internal.Tools.ConfigEditor.Common
         void RabbitIn(XmlNode node);
         void SinkOut(XmlNode node);
         void TestSource(XmlNode node);
+        void RefreshDraw();
     }
 }

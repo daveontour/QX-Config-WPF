@@ -40,8 +40,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         private string path;
         private string fileName;
-        private SelectedElementViewModel selectedElement = new SelectedElementViewModel(null);   
-        
+        private SelectedElementViewModel selectedElement = new SelectedElementViewModel(null);
+
         public MyPropertyGrid myGrid { get; set; }
         public XmlDocument DataModel { get; private set; }
         public IView View { get; set; }
@@ -127,8 +127,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
             SelectedElement = new SelectedElementViewModel(newNode);
             SelectedElement.AddXmlNode = this.AddXmlNode;
-        } 
-        
+        }
+
         private void UpdatePropertiesPanel(XmlNode selectedItem) {
 
 
@@ -298,6 +298,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
         }
 
+        private XmlNode CreateNodeFromText(string xmlContent) {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(xmlContent);
+            XmlNode newNode = doc.DocumentElement;
+
+            return newNode;
+        }
+
         private void AddTypeInput(String type) {
 
             XmlNode newNode = this.DataModel.CreateElement("input");
@@ -308,6 +316,21 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
+
+            switch (type) {
+                case "AMSMVTUPDATEDMESSAGES":
+
+                    string xml = @"<input type=""MSMQ"" name=""AMS Source"" queue="".\private$\fromams"">
+                                    <filter>
+                                        <altqueue type = ""MSMQ"" name=""Messages that fail the filter"" queue="".\private$\nonmvtupdated"" />
+                                            <xpexists xpath = ""/ams:Envelope/ams:Content/ams:MovementUpdatedNotification"" />
+                                    </ filter >
+                                </ input > ";
+                    newNode = CreateNodeFromText(xml);
+                    break;
+                default:
+                    break;
+            }
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
@@ -342,6 +365,31 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
+
+            switch (type) {
+                case "REST":
+                    XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("maxMessages");
+                    newAttribute3.Value = "10";
+                    newNode.Attributes.Append(newAttribute3);
+
+                    XmlAttribute newAttribute4 = this.DataModel.CreateAttribute("requestURL");
+                    newAttribute4.Value = "http://localhost:8080/qxrestout/";
+                    newNode.Attributes.Append(newAttribute4);
+
+                    XmlAttribute newAttribute5 = this.DataModel.CreateAttribute("bufferQueueName");
+                    newAttribute5.Value = @".\private$\qxrestbuffer";
+                    newNode.Attributes.Append(newAttribute5);
+
+                    break;
+                case "RABBITDEFEX":
+                    XmlAttribute newAttribute5R = this.DataModel.CreateAttribute("bufferQueueName");
+                    newAttribute5R.Value = @".\private$\qxrabbitbuffer";
+                    newNode.Attributes.Append(newAttribute5R);
+
+                    break;
+                default:
+                    break;
+            }
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
@@ -443,7 +491,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
- 
+
             SelectedElement.DataModel.AppendChild(newNode);
 
             OnPropertyChanged("XMLText");
@@ -906,7 +954,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                         OnPropertyChanged("FileName");
                         OnPropertyChanged("Path");
                     }
-      //              UnloadEditor();
+                    //              UnloadEditor();
                     return;
                 } else {
                     return;

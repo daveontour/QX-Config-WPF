@@ -82,21 +82,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
     [CategoryOrder("Required", 1)]
     [CategoryOrder("Required - Connection", 2)]
-    [CategoryOrder("Optional - Connection", 3)]
-    [CategoryOrder("Optional", 4)]
-    [CategoryOrder("Optional - Transformation", 5)]
-    [CategoryOrder("Optional - Temporal Context Awareness", 6)]
+    [CategoryOrder("Required - Set One of the Below to Route the Message",3)]
+    [CategoryOrder("Optional - Connection", 4)]
+    [CategoryOrder("Optional", 5)]
+    [CategoryOrder("Optional - Transformation", 6)]
+    [CategoryOrder("Optional - Temporal Context Awareness", 7)]
     [RefreshProperties(RefreshProperties.All)]
     public class MyPropertyGrid  {
-  //      public enum NodeTypeEnum {[Description("Microsoft MQ")] MSMQ, [Description("IBM MQ")] IBMMQ, [Description("File")] FILE, [Description("HTTP")] HTTP, [Description("HTTP Rest")] REST, [Description("Kafka")] KAFKA, [Description("Rabbit MQ")] RABBIT, [Description("SINK")] SINK, };
- //       public enum XSLVerEnum {[Description("1.0")] ONE, [Description("2.0")] TWO, [Description("3.0")] THREE }
         public int maxMsgPerMinute = -1;
         public int maxMsg = -1;
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
-
-//        public event PropertyChangedEventHandler PropertyChanged;
 
         protected string GetAttribute(string attribName) {
 
@@ -139,6 +136,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 return int.Parse(_node.Attributes[attribName].Value);
             } else {
                 return -1;
+            }
+        }
+
+        protected int GetIntAttribute(string attribName, int def) {
+
+            if (_node.Attributes[attribName] != null) {
+                return int.Parse(_node.Attributes[attribName].Value);
+            } else {
+                return def;
             }
         }
 
@@ -325,6 +331,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
+
+                view.RefreshDraw();
 
             }
         }

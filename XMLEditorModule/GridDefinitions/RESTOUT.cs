@@ -30,8 +30,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
 
         [CategoryAttribute("Required"), DisplayName("Rest URL"), PropertyOrder(2), Browsable(true), DescriptionAttribute("The URL on the local machine that the output messages will be made available on. The form of the URL is 'http://localhost:8080/endpoint/'. Important! - it must include the '/' at the end")]
         public string URL {
-            get {return GetAttribute("requestURL"); }
-            set {SetAttribute("requestURL", value); }
+            get { return GetAttribute("requestURL"); }
+            set { SetAttribute("requestURL", value); }
         }
 
         [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(3), Browsable(true), DescriptionAttribute("The MS MQ queue that the messages will be held on until they are retrieved")]
@@ -42,7 +42,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
 
         [CategoryAttribute("Optional"), DisplayName("Buffer Queue Max Size"), PropertyOrder(4), Browsable(true), DescriptionAttribute("The maximum number of messages to hold in the buffer. Oldest messages are deleted")]
         public int BufferSize {
-            get { return GetIntAttribute("maxMessages"); }
+            get {
+                int val = GetIntAttribute("maxMessages", 10);
+                view.UpdateParamBindings("XMLText");
+                return val;
+            }
             set { SetAttribute("maxMessages", value); }
         }
 

@@ -37,24 +37,24 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
         }
 
  
-        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(6),  DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
+        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), Browsable(true), PropertyOrder(6),  DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
         public string Buffer {
             get { return GetAttribute("bufferQueueName"); }
             set { SetAttribute("bufferQueueName", value); }
         }
 
-        [CategoryAttribute("Required - Set One of the Below to Route the Message"), DisplayName("Queue Name"), PropertyOrder(2), DescriptionAttribute("The Rabbit MQ Queue Name")]
+        [CategoryAttribute("Required - Set One of the Below to Route the Message"), Browsable(true), DisplayName("Queue Name"), PropertyOrder(2), DescriptionAttribute("The Rabbit MQ Queue Name")]
         public string QueueName {
             get { return GetAttribute("queueName"); }
             set { SetAttribute("queueName", value); }
         }
-        [CategoryAttribute("Required - Set One of the Below to Route the Message"), DisplayName("XPath Destination"), PropertyOrder(2), DescriptionAttribute("The XPath for the Routing Key")]
+        [CategoryAttribute("Required - Set One of the Below to Route the Message"), Browsable(true), DisplayName("XPath Destination"), PropertyOrder(2), DescriptionAttribute("The XPath for the Routing Key")]
         public string XpathDestination {
             get { return GetAttribute("xpathDestination"); }
             set { SetAttribute("xpathDestination", value); }
         }
 
-        [CategoryAttribute("Required - Set One of the Below to Route the Message"), DisplayName("XPath Content Destination"),  PropertyOrder(3), DescriptionAttribute("The XPath for the Routing Key Data")]
+        [CategoryAttribute("Required - Set One of the Below to Route the Message"), Browsable(true), DisplayName("XPath Content Destination"),  PropertyOrder(3), DescriptionAttribute("The XPath for the Routing Key Data")]
         public string XpathContentDestination {
             get { return GetAttribute("xpathContentDestination"); }
             set { SetAttribute("xpathContentDestination", value); }

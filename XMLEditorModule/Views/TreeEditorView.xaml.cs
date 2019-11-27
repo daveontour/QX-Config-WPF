@@ -642,6 +642,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
 
+ //           menuProvider.ContextMenus[ContextMenuType.AddAMSMVTUpdatedOutput].Command = ViewModel.AddTypeOutputCommand;
+ //           menuProvider.ContextMenus[ContextMenuType.AddAMSMVTUpdatedOutput].CommandParameter = "RABBITDEFEX";
+
             menuProvider.ContextMenus[ContextMenuType.AddSINK].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddSINK].CommandParameter = "SINK";
 
@@ -958,7 +961,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
 
-
+        public void RefreshDraw() {
+            DrawConfig(viewModel.DataModel);
+        }
         internal void ControlPropertyChange() {
             viewModel.OnPropertyChanged("XMLText");
             DrawConfig(viewModel.DataModel);
