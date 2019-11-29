@@ -149,9 +149,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
             this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMonitor]);
 
-            contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
-            contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
-            this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
+            //contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
+            //contextMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
+            //this.xmlTreeView.ContextMenu.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;
@@ -405,19 +405,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 monitorCanvas.ContextMenu.Items.Add(monMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
 
-            XmlNodeList loggers = xmlDoc.SelectNodes("//logger");
-            foreach (XmlNode logger in loggers) {
-                Canvas logCanvas = GetLoggerCanvas();
-                logCanvas.PreviewMouseDown += Can_MouseDown;
-                this.nodeToCanvas.Add(logger, logCanvas);
-                this.canvasToNode.Add(logCanvas, logger);
-                settingspanel.Children.Add(logCanvas);
+            //XmlNodeList loggers = xmlDoc.SelectNodes("//logger");
+            //foreach (XmlNode logger in loggers) {
+            //    Canvas logCanvas = GetLoggerCanvas();
+            //    logCanvas.PreviewMouseDown += Can_MouseDown;
+            //    this.nodeToCanvas.Add(logger, logCanvas);
+            //    this.canvasToNode.Add(logCanvas, logger);
+            //    settingspanel.Children.Add(logCanvas);
 
-                logCanvas.ContextMenu = new ContextMenu();
-                ContextMenuProvider logMenuProvider = new ContextMenuProvider();
-                logMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
-                logCanvas.ContextMenu.Items.Add(logMenuProvider.ContextMenus[ContextMenuType.Delete]);
-            }
+            //    logCanvas.ContextMenu = new ContextMenu();
+            //    ContextMenuProvider logMenuProvider = new ContextMenuProvider();
+            //    logMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+            //    logCanvas.ContextMenu.Items.Add(logMenuProvider.ContextMenus[ContextMenuType.Delete]);
+            //}
 
             XmlNodeList srvs = xmlDoc.SelectNodes("//service");
             foreach (XmlNode ns in srvs) {
@@ -455,9 +455,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             setMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
             this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddMonitor]);
 
-            setMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
-            setMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
-            this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
+            //setMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
+            //setMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
+            //this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
 
             setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
             setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;

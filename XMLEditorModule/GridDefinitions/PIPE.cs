@@ -48,12 +48,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             }
         }
 
-        [CategoryAttribute("Optional"), DisplayName("Enable Logging"), Browsable(true), PropertyOrder(4), DescriptionAttribute("Log envent on this pipe")]
-        public bool EnableLogging {
-            get { return GetBoolAttribute("enableLog"); }
-            set { SetAttribute("enableLog", value); }
-        }
-
         [CategoryAttribute("Optional"), DisplayName("Maximum Messages/Min"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
         public int MessPerMinute {
             get { return GetIntAttribute("maxMsgPerMinute"); }

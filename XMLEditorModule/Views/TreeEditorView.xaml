@@ -308,7 +308,7 @@
                         <RowDefinition Height="20"/>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Text="Logger, Monitor and Namespaces" Grid.Row="0" Margin="10,0,0,0" FontWeight="Bold"/>
+                    <TextBlock Text="Monitor and Namespaces" Grid.Row="0" Margin="10,0,0,0" FontWeight="Bold"/>
                     <Border  Padding="10,5,5,5" Grid.Row="1">
                         <StackPanel VerticalAlignment="Center" Background="Transparent"  x:Name="settingspanel" Orientation="Horizontal" Height="48">
                             <StackPanel.Resources>

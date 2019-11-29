@@ -342,6 +342,27 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             get { return GetAttribute("xslVersion"); }
             set { SetAttribute("xslVersion", value); ; }
         }
+
+        [CategoryAttribute("Optional"), DisplayName("JSON Format"), ReadOnly(false), Browsable(true), PropertyOrder(3), DescriptionAttribute("By default, monitor records are XML format. Select for monitor records to be sent in JSON format")]
+        public bool JSON {
+            get {
+                bool value = GetBoolAttribute("json");
+                PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["JSON"];
+                BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                if (_node.Name == "monitor") {
+                    isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
+                } else {
+                    isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
+                }
+
+
+                return value; 
+                
+                }
+            set { SetAttribute("json", value); ; }
+        }
     }
 
     // Base Class for the input and output types.
