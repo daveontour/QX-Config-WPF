@@ -35,7 +35,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         private ICommand deleteElementCommand;
         private ICommand saveDocumentCommand;
         private ICommand saveAsDocumentCommand;
-        private ICommand saveAsAndExecuteDocumentCommand;
+        private ICommand executeDocumentCommand;
         private ICommand packageCommand;
 
         private string path;
@@ -69,7 +69,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         public ICommand DeleteElementCommand { get { return deleteElementCommand; } }
         public ICommand SaveDocumentCommand { get { return saveDocumentCommand; } }
         public ICommand SaveAsDocumentCommand { get { return saveAsDocumentCommand; } }
-        public ICommand SaveAsAndExecuteCommand { get { return saveAsAndExecuteDocumentCommand; } }
+        public ICommand SaveAsAndExecuteCommand { get { return executeDocumentCommand; } }
         public ICommand PackageCommand { get { return packageCommand; } }
 
         #endregion
@@ -95,7 +95,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.addServiceSettingsCommand = new RelayCommand<XmlNodeType>(AddServiceSetting, CanAddServiceSetting);
             this.saveDocumentCommand = new RelayCommand(p => { Save(); });
             this.saveAsDocumentCommand = new RelayCommand<string>(SaveAs);
-            this.saveAsAndExecuteDocumentCommand = new RelayCommand(p => { SaveAsAndExecute(); });
+            this.executeDocumentCommand = new RelayCommand(p => { ExecuteQX(); });
             this.packageCommand = new RelayCommand(p => { PackageAndSave(); });
             this.deleteElementCommand = new RelayCommand<XmlNode>(p => { DeleteElement(SelectedElement.DataModel); }, p => { return CanDeleteElement(SelectedElement.DataModel); });
 
@@ -980,7 +980,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             OnPropertyChanged("FileName");
             OnPropertyChanged("Path");
         }
-        private void SaveAsAndExecute() {
+        private void ExecuteQX() {
             XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
             using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
                 newDoc.Save(sw);
@@ -999,27 +999,34 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "Zip Files (*.zip)|*.zip";
             if (dialog.ShowDialog() == true) {
-                ServiceConfig dlg = new ServiceConfig();
 
-                if (dlg.ShowDialog() == true) {
-
-                    XmlDocument doc = new XmlDocument();
-                    doc.Load("./Executable/QX.exe.config");
-
-                    doc.SelectSingleNode("//add[@key='ServiceName']").Attributes["value"].Value = dlg.ServiceShortName;
-                    doc.SelectSingleNode("//add[@key='ServiceDisplayName']").Attributes["value"].Value = dlg.ServiceName;
-                    doc.SelectSingleNode("//add[@key='ServiceDescription']").Attributes["value"].Value = dlg.ServiceDesc;
-
-                    using (TextWriter sw = new StreamWriter(@"./Executable/QX.exe.config", false, Encoding.UTF8)) {
-                        doc.Save(sw);
-                    }
-
-                    XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
-                    using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
-                        newDoc.Save(sw);
-                    }
-                    ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
+                XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
+                using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
+                    newDoc.Save(sw);
                 }
+                ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
+
+                //ServiceConfig dlg = new ServiceConfig();
+
+                //if (dlg.ShowDialog() == true) {
+
+                //    XmlDocument doc = new XmlDocument();
+                //    doc.Load("./Executable/QX.exe.config");
+
+                //    doc.SelectSingleNode("//add[@key='ServiceName']").Attributes["value"].Value = dlg.ServiceShortName;
+                //    doc.SelectSingleNode("//add[@key='ServiceDisplayName']").Attributes["value"].Value = dlg.ServiceName;
+                //    doc.SelectSingleNode("//add[@key='ServiceDescription']").Attributes["value"].Value = dlg.ServiceDesc;
+
+                //    using (TextWriter sw = new StreamWriter(@"./Executable/QX.exe.config", false, Encoding.UTF8)) {
+                //        doc.Save(sw);
+                //    }
+
+                //    XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
+                //    using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
+                //        newDoc.Save(sw);
+                //    }
+                //    ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
+                //}
             }
         }
 
