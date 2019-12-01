@@ -27,7 +27,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         private MenuItem inputMenuItem;
         private MenuItem outputMenuItem;
-        private ContextMenuProvider contextMenuProvider;
+        private readonly ContextMenuProvider contextMenuProvider;
         private ContextMenu pipeContextMenu;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -209,16 +209,17 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
                 // If there is a currently selected Canvas, then reset the background
                 if (this.selectedCanvas != null) {
-                    SolidColorBrush brush = new SolidColorBrush();
-                    brush.Color = Colors.Transparent;
+                    SolidColorBrush brush = new SolidColorBrush {
+                        Color = Colors.Transparent
+                    };
                     this.selectedCanvas.Background = brush;
 
 
                     // Check if the canvas contains the filter icon and reset that if required
-                    Path path = LogicalTreeHelper.FindLogicalNode(this.selectedCanvas, "filter") as Path;
-                    if (path != null) {
-                        SolidColorBrush greenBrush = new SolidColorBrush();
-                        greenBrush.Color = Color.FromArgb(255, 0, 0, 0);
+                    if (LogicalTreeHelper.FindLogicalNode(this.selectedCanvas, "filter") is Path path) {
+                        SolidColorBrush greenBrush = new SolidColorBrush {
+                            Color = Color.FromArgb(255, 0, 0, 0)
+                        };
                         path.Fill = greenBrush;
                     }
                 }
@@ -243,16 +244,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             path.Height = h;
             path.Width = w;
 
-            TextBlock txt = new TextBlock();
-            txt.Text = title;
-            txt.HorizontalAlignment = HorizontalAlignment.Center;
-            txt.FontSize = fs;
+            TextBlock txt = new TextBlock {
+                Text = title,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                FontSize = fs
+            };
             txt.SetValue(Canvas.LeftProperty, tX);
             txt.SetValue(Canvas.TopProperty, tY);
 
-            Canvas can = new Canvas();
-            can.Height = imHeight;
-            can.Width = w;
+            Canvas can = new Canvas {
+                Height = imHeight,
+                Width = w
+            };
             can.Children.Add(imcanvas);
             can.Children.Add(txt);
 
@@ -279,16 +282,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             //mySolidColorBrush.Color = Color.FromArgb(255, 128, 128, 128);
             //path.Fill = mySolidColorBrush;
 
-            TextBlock txt = new TextBlock();
-            txt.Text = title;
-            txt.HorizontalAlignment = HorizontalAlignment.Center;
-            txt.FontSize = fs;
+            TextBlock txt = new TextBlock {
+                Text = title,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                FontSize = fs
+            };
             txt.SetValue(Canvas.LeftProperty, tX);
             txt.SetValue(Canvas.TopProperty, tY);
 
-            Canvas can = new Canvas();
-            can.Height = imHeight;
-            can.Width = w;
+            Canvas can = new Canvas {
+                Height = imHeight,
+                Width = w
+            };
             can.Children.Add(imcanvas);
             can.Children.Add(txt);
 
@@ -375,20 +380,25 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             this.canvasToNode.Clear();
             this.nodeToCanvas.Clear();
 
-            SolidColorBrush blackBrush = new SolidColorBrush();
-            blackBrush.Color = Colors.Black;
+            SolidColorBrush blackBrush = new SolidColorBrush {
+                Color = Colors.Black
+            };
 
-            SolidColorBrush whiteBrush = new SolidColorBrush();
-            whiteBrush.Color = Colors.White;
+            SolidColorBrush whiteBrush = new SolidColorBrush {
+                Color = Colors.White
+            };
 
-            SolidColorBrush bluishBrush = new SolidColorBrush();
-            bluishBrush.Color = Color.FromArgb(255, 135, 206, 250);
+            SolidColorBrush bluishBrush = new SolidColorBrush {
+                Color = Color.FromArgb(255, 135, 206, 250)
+            };
 
-            SolidColorBrush transBrush = new SolidColorBrush();
-            transBrush.Color = Colors.Transparent;
+            SolidColorBrush transBrush = new SolidColorBrush {
+                Color = Colors.Transparent
+            };
 
-            SolidColorBrush aliceBrush = new SolidColorBrush();
-            aliceBrush.Color = Colors.AliceBlue;
+            SolidColorBrush aliceBrush = new SolidColorBrush {
+                Color = Colors.AliceBlue
+            };
 
 
             XmlNodeList monitors = xmlDoc.SelectNodes("//monitor");
@@ -467,16 +477,17 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].CommandParameter = XmlNodeType.Element;
             this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings]);
 
-            this.settingspanel.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//settings")); };
+            this.settingspanel.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender,  xmlDoc.SelectSingleNode("//settings")); };
 
             int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
             foreach (XmlNode pipeNode in pipes) {
 
-                Canvas canTop = new Canvas();
-                canTop.Height = 200;
-                canTop.Width = this.panel.Width;
-                canTop.Background = transBrush;
+                Canvas canTop = new Canvas {
+                    Height = 200,
+                    Width = this.panel.Width,
+                    Background = transBrush
+                };
                 canTop.SetValue(Canvas.LeftProperty, (double)0);
 
                 canTop.ContextMenu = new ContextMenu();
@@ -484,7 +495,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 topMenuProvider.ContextMenus[ContextMenuType.AddPipe].Command = ViewModel.AddPipeCommand;
                 topMenuProvider.ContextMenus[ContextMenuType.AddPipe].CommandParameter = XmlNodeType.Element;
                 canTop.ContextMenu.Items.Add(topMenuProvider.ContextMenus[ContextMenuType.AddPipe]);
-                canTop.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, e, xmlDoc.SelectSingleNode("//pipes")); };
+                canTop.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender,  xmlDoc.SelectSingleNode("//pipes")); };
 
                 Canvas pipeCan = new Canvas() {
                     Height = 24,
@@ -510,9 +521,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 rect.StrokeThickness = 1;
                 rect.Stroke = blackBrush;
 
-                TextBlock tb = new TextBlock();
-                tb.Text = pipeNode.Attributes["name"].Value;
-                tb.FontSize = 12;
+                TextBlock tb = new TextBlock {
+                    Text = pipeNode.Attributes["name"].Value,
+                    FontSize = 12
+                };
                 tb.SetValue(Canvas.LeftProperty, 15.0);
                 tb.SetValue(Canvas.TopProperty, 4.0);
 
@@ -685,11 +697,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         private void ConstructNode(Canvas canTop, XmlNode node, double imHeight, double space, int index, bool inNode) {
 
-            SolidColorBrush blackBrush = new SolidColorBrush();
-            blackBrush.Color = Colors.Black;
+            SolidColorBrush blackBrush = new SolidColorBrush {
+                Color = Colors.Black
+            };
 
-            SolidColorBrush transBrush = new SolidColorBrush();
-            transBrush.Color = Colors.Transparent;
+            SolidColorBrush transBrush = new SolidColorBrush {
+                Color = Colors.Transparent
+            };
 
             //The node canvas
             Canvas can = GetOutputCanvas((double)imHeight, node.Attributes["type"].Value);
@@ -808,11 +822,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             if (inNode) {
                 double startArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                 double startArrrowX = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4;
-                p = drawLineArrow(new Point(startArrrowX, startArrrowY), new Point(this.panel.Width * 0.33, 100), arrowpath);
+                p = DrawLineArrow(new Point(startArrrowX, startArrrowY), new Point(this.panel.Width * 0.33, 100), arrowpath);
             } else {
                 double stopArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                 double stopArrrowX = (double)can.GetValue(Canvas.LeftProperty) - 4;
-                p = drawLineArrow(new Point(this.panel.Width * 0.66, 100), new Point(stopArrrowX, stopArrrowY), arrowpath);
+                p = DrawLineArrow(new Point(this.panel.Width * 0.66, 100), new Point(stopArrrowX, stopArrrowY), arrowpath);
             }
 
             canTop.Children.Add(p.Item1);
@@ -820,7 +834,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
         private void Can_MouseDown(object sender, MouseButtonEventArgs e) {
-
             Console.WriteLine("Mouse Down");
 
             if (sender == null) {
@@ -830,16 +843,16 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             ViewModel.ViewAttributesCommand.Execute(node);
             HightLightCanvas(sender as Canvas);
 
-            Path path = LogicalTreeHelper.FindLogicalNode(sender as Canvas, "filter") as Path;
-            if (path != null) {
-                SolidColorBrush brush = new SolidColorBrush();
-                brush.Color = Colors.Red;
+            if (LogicalTreeHelper.FindLogicalNode(sender as Canvas, "filter") is Path path) {
+                SolidColorBrush brush = new SolidColorBrush {
+                    Color = Colors.Red
+                };
                 path.Fill = brush;
             }
 
         }
 
-        private void CanCanvas_MouseDown(object sender, MouseButtonEventArgs e, XmlNode node) {
+        private void CanCanvas_MouseDown(object sender,  XmlNode node) {
             if (sender == null) {
                return;
             }
@@ -849,7 +862,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public Tuple<int, int> GetSizing(int num, double height) {
 
-            double imHeight = 70;
             double spacing;
 
             int maxImageHeight = 50;
@@ -860,7 +872,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 return Tuple.Create(maxImageHeight, Convert.ToInt32(spacing));
             }
 
-            imHeight = maxImageHeight;
+            double imHeight = maxImageHeight;
             while ((num * (imHeight + minSpacing)) > height) {
                 imHeight -= 1;
             }
@@ -876,9 +888,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         /// Clones an element.
         /// </summary>
         public static T ElementClone<T>(T element) {
-            T clone = default(T);
+            //T clone = default(T);
             MemoryStream memStream = ElementToStream(element);
-            clone = ElementFromStream<T>(memStream);
+            T clone = ElementFromStream<T>(memStream);
             return clone;
         }
 
@@ -906,12 +918,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             return (T)reconstructedElement;
         }
 
-        private Tuple<Polygon, Path> drawLineArrow(Point startPoint, Point endPoint, Path arrowpath) {
+        private Tuple<Polygon, Path> DrawLineArrow(Point startPoint, Point endPoint, Path arrowpath) {
 
             GeometryGroup geometryGroup = new GeometryGroup();
             //line
-            LineGeometry line = new LineGeometry();
-            line.StartPoint = startPoint;
+            LineGeometry line = new LineGeometry {
+                StartPoint = startPoint
+            };
             double length = Math.Sqrt(Math.Abs(startPoint.X - endPoint.X) * Math.Abs(startPoint.X - endPoint.X) +
                 Math.Abs(startPoint.Y - endPoint.Y) * Math.Abs(startPoint.Y - endPoint.Y));
             Point EndPoint = new Point(startPoint.X + length, startPoint.Y);
@@ -924,9 +937,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             arrowpath.Fill = Brushes.SteelBlue;
 
             //rotate
-            RotateTransform form = new RotateTransform();
-            form.CenterX = startPoint.X;
-            form.CenterY = startPoint.Y;
+            RotateTransform form = new RotateTransform {
+                CenterX = startPoint.X,
+                CenterY = startPoint.Y
+            };
             //calculate the angle 
             double angle = Math.Asin(Math.Abs(startPoint.Y - endPoint.Y) / length);
             double angle2 = 180 / Math.PI * angle;
@@ -947,13 +961,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             Point p2 = form.Transform(p2P);
             Point p3 = form.Transform(p3P);
 
-            Polygon p = new Polygon();
-            p.Stroke = Brushes.Black;
-            p.Fill = Brushes.SteelBlue;
-            p.StrokeThickness = 2;
-            p.HorizontalAlignment = HorizontalAlignment.Left;
-            p.VerticalAlignment = VerticalAlignment.Center;
-            p.Points = new PointCollection() { p1, p2, p3 };
+            Polygon p = new Polygon {
+                Stroke = Brushes.Black,
+                Fill = Brushes.SteelBlue,
+                StrokeThickness = 2,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Points = new PointCollection() { p1, p2, p3 }
+            };
             //         this.canvas.Children.Add(p);
 
             return new Tuple<Polygon, Path>(p, arrowpath);
@@ -993,14 +1008,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         #region Selection Handling
         private void xmlTreeView_Selected(object sender, RoutedEventArgs e) {
-            Console.WriteLine("Tree Item Selected");
             XmlNode selectedItem = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
         }
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e) {
-            TreeViewItem selectedItem = sender as TreeViewItem;
-            if (selectedItem != null) {
+            if (sender is TreeViewItem selectedItem) {
                 selectedItem.IsSelected = true;
             }
         }
@@ -1015,8 +1028,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 rootNode.Focus();
                 rootNode.IsExpanded = true;
             }
-            XmlNode tempNode = rootNode.Header as XmlNode;
-            if (tempNode == null) {
+            if (!(rootNode.Header is XmlNode tempNode)) {
                 return isSelected;
             }
             if (tempNode == toBeSelectedNode)
@@ -1050,8 +1062,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 rootNode.Focus();
                 rootNode.IsExpanded = true;
             }
-            XmlNode tempNode = rootNode.Header as XmlNode;
-            if (tempNode == null) {
+            if (!(rootNode.Header is XmlNode tempNode)) {
                 return isSelected;
             }
             if (string.Compare(tempNode.Name, elementName, true) == 0) {
@@ -1081,8 +1092,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public void HightLightCanvas(XmlNode node) {
 
-            Console.WriteLine($"=======> Selected Node = {node.Name}");
-
             if (node == null) {
                 return;
             }
@@ -1090,11 +1099,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             Canvas c;
             try {
                 c = this.nodeToCanvas[node];
-            } catch (Exception e) {
+            } catch (Exception) {
 
                 if (this.selectedCanvas != null) {
-                    SolidColorBrush brush = new SolidColorBrush();
-                    brush.Color = Colors.Transparent;
+                    SolidColorBrush brush = new SolidColorBrush {
+                        Color = Colors.Transparent
+                    };
                     this.selectedCanvas.Background = brush;
                 }
 
@@ -1136,8 +1146,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             if (can == null || can == SelectedCanvas) {
                 return;
             }
-            SolidColorBrush brush = new SolidColorBrush();
-            brush.Color = Color.FromArgb(255, 255, 127, 200);
+            SolidColorBrush brush = new SolidColorBrush {
+                Color = Color.FromArgb(255, 255, 127, 200)
+            };
             can.Background = brush;
             SelectedCanvas = can;
             HighlightNode(this.canvasToNode[can]);
@@ -1147,8 +1158,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             Console.WriteLine($"Selected Node = {xmlNode.Name}");
 
-            bool isSelected = false;
-
             TreeViewItem rootNode = null;
             try {
                 rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
@@ -1156,17 +1165,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             }
             if (xmlNode == null) {
-                isSelected = SelectTreeViewItem(ref rootNode, "");
+               SelectTreeViewItem(ref rootNode, "");
             } else {
-                isSelected = SelectTreeViewItem(ref rootNode, xmlNode);
-            }
-            if (!isSelected) {
-                //  MessageBox.Show("Could not locate the node.");
-                //if (this.selectedCanvas != null) {
-                //    SolidColorBrush brush = new SolidColorBrush();
-                //    brush.Color = Colors.Transparent;
-                //    this.selectedCanvas.Background = brush;
-                //}
+               SelectTreeViewItem(ref rootNode, xmlNode);
             }
         }
 

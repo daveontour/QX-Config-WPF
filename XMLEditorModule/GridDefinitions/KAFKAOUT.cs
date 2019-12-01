@@ -42,6 +42,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             set { SetAttribute("topic", value); }
         }
 
+        [CategoryAttribute("Optional"), DisplayName("Key"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Key for routing to a particuular Kafka partitiion")]
+        public string Key {
+            get { return GetAttribute("key"); }
+            set { SetAttribute("key", value); }
+        }
+
+
         [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(6), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
         public string Buffer {
             get { return GetAttribute("bufferQueueName"); }

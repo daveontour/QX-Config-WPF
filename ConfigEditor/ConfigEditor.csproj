@@ -167,19 +167,14 @@
     <Content Include="Executable\amqmdxcs.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Executable\Confluent.Kafka.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="QXEd.ico" />
     <None Include="Executable\Confluent.Kafka.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Resource Include="Executable\ExchangeConfig - Copy %282%29.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <None Include="Executable\ExchangeConfig.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="Executable\Confluent.Kafka.dll" />
     <Content Include="Executable\IBM.XMS.Admin.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
