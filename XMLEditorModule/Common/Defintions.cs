@@ -139,7 +139,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
-
         protected int GetIntAttribute(string attribName, int def) {
 
             if (_node.Attributes[attribName] != null) {

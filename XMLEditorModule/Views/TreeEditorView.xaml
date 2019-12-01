@@ -264,7 +264,7 @@
             <TreeView Name="xmlTreeView"
                   ItemsSource="{Binding Source={StaticResource xmlDataProvider}, XPath=*}"
                   ItemTemplateSelector="{StaticResource myDataTemplateSelector}"
-                  TreeViewItem.Selected="XmlTreeView_Selected"  >
+                  TreeViewItem.Selected="xmlTreeView_Selected"  >
                 <TreeView.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                       Color="LightGray" />

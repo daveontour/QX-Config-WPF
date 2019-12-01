@@ -18,31 +18,31 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
     public class TreeEditorViewModel : BaseViewModel {
 
-        private readonly ICommand viewAttributesCommand;
-        private readonly ICommand addPipeCommand;
-        private readonly ICommand addMonitorCommand;
-        private readonly ICommand addLoggerCommand;
-        private readonly ICommand addNamespaceCommand;
-        private readonly ICommand addServiceSettingsCommand;
-        private readonly ICommand addInputCommand;
-        private readonly ICommand addTypeInputCommand;
-        private readonly ICommand addTypeOutputCommand;
-        private readonly ICommand addOutputCommand;
-        private readonly ICommand addFilterCommand;
-        private readonly ICommand addExpressionCommand;
-        private readonly ICommand addAltQueueCommand;
-        private readonly ICommand addDataFilterCommand;
-        private readonly ICommand deleteElementCommand;
-        private readonly ICommand saveDocumentCommand;
-        private readonly ICommand saveAsDocumentCommand;
-        private readonly ICommand executeDocumentCommand;
-        private readonly ICommand packageCommand;
+        private ICommand viewAttributesCommand;
+        private ICommand addPipeCommand;
+        private ICommand addMonitorCommand;
+        private ICommand addLoggerCommand;
+        private ICommand addNamespaceCommand;
+        private ICommand addServiceSettingsCommand;
+        private ICommand addInputCommand;
+        private ICommand addTypeInputCommand;
+        private ICommand addTypeOutputCommand;
+        private ICommand addOutputCommand;
+        private ICommand addFilterCommand;
+        private ICommand addExpressionCommand;
+        private ICommand addAltQueueCommand;
+        private ICommand addDataFilterCommand;
+        private ICommand deleteElementCommand;
+        private ICommand saveDocumentCommand;
+        private ICommand saveAsDocumentCommand;
+        private ICommand executeDocumentCommand;
+        private ICommand packageCommand;
 
         private string path;
         private string fileName;
         private SelectedElementViewModel selectedElement = new SelectedElementViewModel(null);
 
-        public MyPropertyGrid MyGrid { get; set; }
+        public MyPropertyGrid myGrid { get; set; }
         public XmlDocument DataModel { get; private set; }
         public IView View { get; set; }
         public string Path { get { return path; } }
@@ -113,9 +113,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             get {
                 StringBuilder sb = new StringBuilder();
                 System.IO.TextWriter tr = new System.IO.StringWriter(sb);
-                XmlTextWriter wr = new XmlTextWriter(tr) {
-                    Formatting = Formatting.Indented
-                };
+                XmlTextWriter wr = new XmlTextWriter(tr);
+                wr.Formatting = Formatting.Indented;
                 DataModel.Save(wr);
                 wr.Close();
                 return sb.ToString();
@@ -126,9 +125,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement != null) {
                 SelectedElement.AddXmlNode = null;
             }
-            SelectedElement = new SelectedElementViewModel(newNode) {
-                AddXmlNode = this.AddXmlNode
-            };
+            SelectedElement = new SelectedElementViewModel(newNode);
+            SelectedElement.AddXmlNode = this.AddXmlNode;
         }
 
         private void UpdatePropertiesPanel(XmlNode selectedItem) {
@@ -137,84 +135,84 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (selectedItem.Name == "input") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        MyGrid = new MSMQIN(selectedItem, this.View);
+                        myGrid = new MSMQIN(selectedItem, this.View);
                         break;
                     case "MQ":
-                        MyGrid = new MQIN(selectedItem, this.View);
+                        myGrid = new MQIN(selectedItem, this.View);
                         break;
                     case "FILE":
-                        MyGrid = new FILEIN(selectedItem, this.View);
+                        myGrid = new FILEIN(selectedItem, this.View);
                         break;
                     case "KAFKA":
-                        MyGrid = new KAFKAIN(selectedItem, this.View);
+                        myGrid = new KAFKAIN(selectedItem, this.View);
                         break;
                     case "HTTP":
-                        MyGrid = new HTTPIN(selectedItem, this.View);
+                        myGrid = new HTTPIN(selectedItem, this.View);
                         break;
                     case "RABBITDEFEX":
-                        MyGrid = new RABBITIN(selectedItem, this.View);
+                        myGrid = new RABBITIN(selectedItem, this.View);
                         break;
                     case "TESTSOURCE":
-                        MyGrid = new TESTSOURCE(selectedItem, this.View);
+                        myGrid = new TESTSOURCE(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        MyGrid = new MSMQOUT(selectedItem, this.View);
+                        myGrid = new MSMQOUT(selectedItem, this.View);
                         break;
                     case "MQ":
-                        MyGrid = new MQOUT(selectedItem, this.View);
+                        myGrid = new MQOUT(selectedItem, this.View);
                         break;
                     case "FILE":
-                        MyGrid = new FILEOUT(selectedItem, this.View);
+                        myGrid = new FILEOUT(selectedItem, this.View);
                         break;
                     case "KAFKA":
-                        MyGrid = new KAFKAOUT(selectedItem, this.View);
+                        myGrid = new KAFKAOUT(selectedItem, this.View);
                         break;
                     case "REST":
-                        MyGrid = new RESTOUT(selectedItem, this.View);
+                        myGrid = new RESTOUT(selectedItem, this.View);
                         break;
                     case "HTTP":
-                        MyGrid = new HTTPOUT(selectedItem, this.View);
+                        myGrid = new HTTPOUT(selectedItem, this.View);
                         break;
                     case "RABBITDEFEX":
-                        MyGrid = new RABBITOUT(selectedItem, this.View);
+                        myGrid = new RABBITOUT(selectedItem, this.View);
                         break;
                     case "SINK":
-                        MyGrid = new SINK(selectedItem, this.View);
+                        myGrid = new SINK(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "filter") {
-                MyGrid = new Filter(selectedItem, this.View);
+                myGrid = new Filter(selectedItem, this.View);
             } else if (selectedItem.Name == "pipe") {
-                MyGrid = new PIPE(selectedItem, this.View);
+                myGrid = new PIPE(selectedItem, this.View);
             } else if (selectedItem.Name == "namespace") {
-                MyGrid = new NameSpaceGrid(selectedItem, this.View);
+                myGrid = new NameSpaceGrid(selectedItem, this.View);
             } else if (selectedItem.Name == "service") {
-                MyGrid = new ServiceSetting(selectedItem, this.View);
+                myGrid = new ServiceSetting(selectedItem, this.View);
             } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not") {
-                MyGrid = new BooleanExpression(selectedItem, this.View);
+                myGrid = new BooleanExpression(selectedItem, this.View);
             } else if (selectedItem.Name == "contains") {
-                MyGrid = new ContainsFilter(selectedItem, this.View);
+                myGrid = new ContainsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "equals") {
-                MyGrid = new EqualsFilter(selectedItem, this.View);
+                myGrid = new EqualsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "matches") {
-                MyGrid = new MatchesFilter(selectedItem, this.View);
+                myGrid = new MatchesFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "length") {
-                MyGrid = new LengthFilter(selectedItem, this.View);
+                myGrid = new LengthFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpexists") {
-                MyGrid = new XPExistsFilter(selectedItem, this.View);
+                myGrid = new XPExistsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpmatches") {
-                MyGrid = new XPMatchesFilter(selectedItem, this.View);
+                myGrid = new XPMatchesFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpequals") {
-                MyGrid = new XPEqualsFilter(selectedItem, this.View);
+                myGrid = new XPEqualsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "dateRange") {
-                MyGrid = new DateRangeFilter(selectedItem, this.View);
+                myGrid = new DateRangeFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "contextContains") {
-                MyGrid = new ContextFilter(selectedItem, this.View);
+                myGrid = new ContextFilter(selectedItem, this.View);
             } else {
-                MyGrid = null;
+                myGrid = null;
                 //if (View.selectedCanvas != null) {
                 //    SolidColorBrush brush = new SolidColorBrush();
                 //    brush.Color = Colors.Transparent;
@@ -907,7 +905,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         internal bool CanChangeElementType(string value) {
             if (value == "not" && SelectedElement.DataModel.ChildNodes.Count > 1) {
                 MessageBox.Show("Cannot change to 'not' beacause a 'not' can only have one direct child", "QueueExchange Configuration");
-                MyGrid = new BooleanExpression(SelectedElement.DataModel, this.View);
+                myGrid = new BooleanExpression(SelectedElement.DataModel, this.View);
                 OnPropertyChanged("myGrid");
                 return false;
             } else {
@@ -943,9 +941,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
 
             if (Path == null) {
-                SaveFileDialog dialog = new SaveFileDialog {
-                    Filter = "XML Files (*.xml)|*.xml"
-                };
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.Filter = "XML Files (*.xml)|*.xml";
                 if (dialog.ShowDialog() == true) {
                     using (TextWriter sw = new StreamWriter(dialog.FileName, false, Encoding.UTF8)) {
                         this.DataModel.Save(sw);
@@ -989,20 +986,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 newDoc.Save(sw);
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo {
-                CreateNoWindow = false,
-                UseShellExecute = false,
-                FileName = @"./Executable/QX.exe"
-            };
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = false;
+            startInfo.UseShellExecute = false;
+            startInfo.FileName = @"./Executable/QX.exe";
 
             System.Diagnostics.Process.Start(startInfo);
         }
 
         private void PackageAndSave() {
 
-            SaveFileDialog dialog = new SaveFileDialog {
-                Filter = "Zip Files (*.zip)|*.zip"
-            };
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "Zip Files (*.zip)|*.zip";
             if (dialog.ShowDialog() == true) {
 
                 XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
