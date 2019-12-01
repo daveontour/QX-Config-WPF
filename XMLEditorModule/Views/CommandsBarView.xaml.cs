@@ -36,29 +36,29 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             this.MenuBar.Items.Clear();
             MenuItem fileMenuItem = new MenuItem { Header = "_File" };
             MenuItem newMenuItem = new MenuItem { Header = "_New" };
-            newMenuItem.Click += new RoutedEventHandler(newMenuItem_Click);
+            newMenuItem.Click += new RoutedEventHandler(NewMenuItem_Click);
             Path newI = GetResourceCopy<Path>("new");
             newMenuItem.Icon = newI;
 
             MenuItem openMenuItem = new MenuItem { Header = "_Open" };
-            openMenuItem.Click += new RoutedEventHandler(openMenuItem_Click);
+            openMenuItem.Click += new RoutedEventHandler(OpenMenuItem_Click);
             Path open = GetResourceCopy<Path>("open");
             openMenuItem.Icon = open;
 
             saveMenuItem = new MenuItem { Header = "_Save" };
-            saveMenuItem.Click += new RoutedEventHandler(saveMenuItem_Click);
+            saveMenuItem.Click += new RoutedEventHandler(SaveMenuItem_Click);
             saveMenuItem.IsEnabled = false;
             Path save = GetResourceCopy<Path>("save");
             saveMenuItem.Icon = save;
 
             saveAsMenuItem = new MenuItem { Header = "Save _As" };
-            saveAsMenuItem.Click += new RoutedEventHandler(saveAsMenuItem_Click);
+            saveAsMenuItem.Click += new RoutedEventHandler(SaveAsMenuItem_Click);
             saveAsMenuItem.IsEnabled = false;
             Path saveas = GetResourceCopy<Path>("save");
             saveAsMenuItem.Icon = saveas;
 
             exportMenuItem = new MenuItem { Header = "Package and Export" };
-            exportMenuItem.Click += new RoutedEventHandler(exportMenuItem_Click);
+            exportMenuItem.Click += new RoutedEventHandler(ExportMenuItem_Click);
             exportMenuItem.IsEnabled = false;
             Path export = GetResourceCopy<Path>("export");
             exportMenuItem.Icon = export;
@@ -78,7 +78,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             Path go = GetResourceCopy<Path>("go");
             executeMenuItem.Icon = go;
-            executeMenuItem.Click += new RoutedEventHandler(executeMenuItem_Click);
+            executeMenuItem.Click += new RoutedEventHandler(ExecuteMenuItem_Click);
 
             this.MenuBar.Items.Add(executeMenuItem);
         }
@@ -90,16 +90,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public event EventHandler<SaveAsEventArgs> SaveAsRequested;
 
         private void OnDocumentLoaded(object sender, DocumentLoadedEventArgs e) {
-            if (DocumentLoaded != null) {
-                DocumentLoaded(sender, e);
-            }
+            DocumentLoaded?.Invoke(sender, e);
         }
 
         #region Menu Click Handlers
 
-        void openMenuItem_Click(object sender, RoutedEventArgs e) {
-            OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "XML Files (*.xml)|*.xml";
+        void OpenMenuItem_Click(object sender, RoutedEventArgs e) {
+            OpenFileDialog open = new OpenFileDialog {
+                Filter = "XML Files (*.xml)|*.xml"
+            };
             if (open.ShowDialog() == true) {
                 XmlDocument document = new XmlDocument();
                 try {
@@ -113,7 +112,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             }
         }
 
-        void newMenuItem_Click(object sender, RoutedEventArgs e) {
+        void NewMenuItem_Click(object sender, RoutedEventArgs e) {
 
             XmlDocument document = new XmlDocument();
             document.LoadXml("<?xml version=\"1.0\" encoding=\"utf - 8\"?><config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">  <settings> </settings><pipes></pipes></config>"); ;
@@ -129,32 +128,27 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
 
-        void saveAsMenuItem_Click(object sender, RoutedEventArgs e) {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "XML Files (*.xml)|*.xml";
+        void SaveAsMenuItem_Click(object sender, RoutedEventArgs e) {
+            SaveFileDialog dialog = new SaveFileDialog {
+                Filter = "XML Files (*.xml)|*.xml"
+            };
             if (dialog.ShowDialog() == true) {
                 SaveAsEventArgs args = new SaveAsEventArgs { FileName = dialog.SafeFileName, Path = dialog.FileName };
-                if (SaveAsRequested != null) {
-                    SaveAsRequested(this, args);
-                }
+                SaveAsRequested?.Invoke(this, args);
             }
         }
 
-        void saveMenuItem_Click(object sender, RoutedEventArgs e) {
+        void SaveMenuItem_Click(object sender, RoutedEventArgs e) {
 
             SaveRequested?.Invoke(this, e);
         }
 
-        void exportMenuItem_Click(object sender, RoutedEventArgs e) {
-            if (PackageRequested != null) {
-                PackageRequested(this, e);
-            }
+        void ExportMenuItem_Click(object sender, RoutedEventArgs e) {
+            PackageRequested?.Invoke(this, e);
         }
 
-        void executeMenuItem_Click(object sender, RoutedEventArgs e) {
-            if (SaveAsAndExecuteRequested != null) {
-                SaveAsAndExecuteRequested(this, e);
-            }
+        void ExecuteMenuItem_Click(object sender, RoutedEventArgs e) {
+            SaveAsAndExecuteRequested?.Invoke(this, e);
         }
         #endregion
 
@@ -167,9 +161,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         /// Clones an element.
         /// </summary>
         public static T ElementClone<T>(T element) {
-            T clone = default(T);
+        //    T clone = default(T);
             MemoryStream memStream = ElementToStream(element);
-            clone = ElementFromStream<T>(memStream);
+            T clone = ElementFromStream<T>(memStream);
             return clone;
         }
 

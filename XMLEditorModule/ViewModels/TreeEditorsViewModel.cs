@@ -9,9 +9,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
 {
     public class TreeEditorsViewModel : BaseViewModel
     {
-        private int activeTabIndex;
         private ObservableCollection<TreeEditorViewModel> treeEditors = new ObservableCollection<TreeEditorViewModel>();
-
         private TreeEditorViewModel activeEditor;
 
         public TreeEditorViewModel ActiveEditor
@@ -27,12 +25,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
 
         public int ActiveEditorIndex
         {
-            get { return activeEditorIndex; }
+            get { return _activeEditorIndex; }
             set
             {
-                activeEditorIndex = value;
+                _activeEditorIndex = value;
                 OnPropertyChanged("ActiveEditorIndex");
-                if (activeEditorIndex > -1 && activeEditorIndex < TreeEditors.Count)
+                if (_activeEditorIndex > -1 && _activeEditorIndex < TreeEditors.Count)
                 {
                     CommandsBarView.executeMenuItem.IsEnabled = true;
                     CommandsBarView.exportMenuItem.IsEnabled = true;
@@ -78,6 +76,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
             ActiveEditorIndex = this.TreeEditors.Count - 1;
         }
 
-        public int activeEditorIndex { get; set; }
+        public int _activeEditorIndex;
     }
 }
