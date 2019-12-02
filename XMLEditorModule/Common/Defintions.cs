@@ -83,6 +83,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
     [CategoryOrder("Required", 1)]
     [CategoryOrder("Required - Connection", 2)]
     [CategoryOrder("Required - Set One of the Below to Route the Message",3)]
+    [CategoryOrder("Required - One of the below for Kafka Topic", 3)]
     [CategoryOrder("Optional - Connection", 4)]
     [CategoryOrder("Optional", 5)]
     [CategoryOrder("Optional - Transformation", 6)]

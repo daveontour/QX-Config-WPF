@@ -36,13 +36,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             set { SetAttribute("connection", value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Topic"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Kafka Topic to listen to.")]
-        public string Topic {
-            get { return GetAttribute("topic"); }
-            set { SetAttribute("topic", value); }
-        }
-
-        [CategoryAttribute("Optional"), DisplayName("Key"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Key for routing to a particuular Kafka partitiion")]
+         [CategoryAttribute("Optional"), DisplayName("Key"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Key for routing to a particuular Kafka partitiion")]
         public string Key {
             get { return GetAttribute("key"); }
             set { SetAttribute("key", value); }
@@ -55,13 +49,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             set { SetAttribute("bufferQueueName", value); }
         }
 
-        [CategoryAttribute("Optional - Content Dependant Routing"), DisplayName("XPath Destination"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Kafka Consumer Group for the connection")]
+        [CategoryAttribute("Required - One of the below for Kafka Topic"), DisplayName("Topic"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The Kafka Topic to listen to.")]
+        public string Topic {
+            get { return GetAttribute("topic"); }
+            set { SetAttribute("topic", value); }
+        }
+
+        [CategoryAttribute("Required - One of the below for Kafka Topic"), DisplayName("XPath Destination"), Browsable(true), PropertyOrder(2), DescriptionAttribute("The Kafka Consumer Group for the connection")]
         public string XpathDestination {
             get { return GetAttribute("xpathDestination"); }
             set { SetAttribute("xpathDestination", value); }
         }
 
-        [CategoryAttribute("Optional - Content Dependant Routing"), DisplayName("XPath Content Destination"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Kafka Consumer Group for the connection")]
+        [CategoryAttribute("Required - One of the below for Kafka Topic"), DisplayName("XPath Content Destination"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Kafka Consumer Group for the connection")]
         public string XpathContentDestination {
             get { return GetAttribute("xpathContentDestination"); }
             set { SetAttribute("xpathContentDestination", value); }
