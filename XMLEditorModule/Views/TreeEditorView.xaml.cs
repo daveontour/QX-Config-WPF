@@ -834,8 +834,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
         private void Can_MouseDown(object sender, MouseButtonEventArgs e) {
-            Console.WriteLine("Mouse Down");
-
+           
             if (sender == null) {
                 return;
             }
@@ -1092,6 +1091,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public void HightLightCanvas(XmlNode node) {
 
+            
+
             if (node == null) {
                 return;
             }
@@ -1107,7 +1108,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                     };
                     this.selectedCanvas.Background = brush;
                 }
-
                 return;
             }
 
@@ -1261,9 +1261,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 return;
             }
 
-            Canvas can = this.nodeToCanvas[node];
+           
             try {
-
+                Canvas can = this.nodeToCanvas[node];
                 foreach (var child in can.Children) {
                     if (child is TextBlock) {
                         TextBlock tb = child as TextBlock;
@@ -1277,9 +1277,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
          * Updates the title in the graphical representation of the pipe when the tpye is changed
          */
         public void UpdateSelectedPipeCanvas(XmlNode node) {
-            Canvas can = this.nodeToCanvas[node];
+           
             try {
-
+                Canvas can = this.nodeToCanvas[node];
                 foreach (var child in can.Children) {
                     if (child is TextBlock) {
                         TextBlock tb = child as TextBlock;

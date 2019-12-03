@@ -18,7 +18,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
             this.DataModel = dataModel;
             removeChildrenCommand = new RelayCommand((p) => { RemoveChildren(); });
 
-            addAttributeCommand = new RelayCommand<XmlNodeType>(p => { AddElement(p); });
+            //addAttributeCommand = new RelayCommand<XmlNodeType>(p => { AddElement(p); });
             Children = new ObservableCollection<ChildViewModel>();
             UpdateChildren();
         }
@@ -96,28 +96,28 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
             UpdateChildren();
         }
 
-        private void AddElement(XmlNodeType param)
-        {
-            XmlNode xmlNode = null;
-            if (AddXmlNode != null)
-            {
-                xmlNode = AddXmlNode(param);
-            }
-            if (xmlNode == null)
-            {
-                return;
-            }
-            if (xmlNode.NodeType == XmlNodeType.Attribute)
-            {
-                DataModel.Attributes.Append(xmlNode as XmlAttribute);
-            }
-            else if (xmlNode.NodeType == XmlNodeType.Text)
-            {
-                DataModel.AppendChild(xmlNode as XmlText);
-            }
+        //private void AddElement(XmlNodeType param)
+        //{
+        //    XmlNode xmlNode = null;
+        //    if (AddXmlNode != null)
+        //    {
+        //        xmlNode = AddXmlNode(param);
+        //    }
+        //    if (xmlNode == null)
+        //    {
+        //        return;
+        //    }
+        //    if (xmlNode.NodeType == XmlNodeType.Attribute)
+        //    {
+        //        DataModel.Attributes.Append(xmlNode as XmlAttribute);
+        //    }
+        //    else if (xmlNode.NodeType == XmlNodeType.Text)
+        //    {
+        //        DataModel.AppendChild(xmlNode as XmlText);
+        //    }
            
-            UpdateChildren();
-        }
+        //    UpdateChildren();
+        //}
 
         #endregion
 

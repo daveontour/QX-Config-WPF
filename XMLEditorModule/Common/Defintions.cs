@@ -369,7 +369,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
     // Base Class for the input and output types.
     public class MyNodeInPropertyGrid : MyNodePropertyGrid {
 
-        [CategoryAttribute("Optional"), DisplayName("Priority"), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
+        [CategoryAttribute("Optional"), DisplayName("Priority"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
         public int Priority {
             get {
                 int val = GetIntAttribute("priority");
@@ -396,13 +396,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.view = view;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Prefix"), PropertyOrder(1), DescriptionAttribute("Namespace Prefix")]
+        [CategoryAttribute("Required"), DisplayName("Prefix"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Namespace Prefix")]
         public string Prefix {
             get { return GetAttribute("prefix"); }
             set { SetAttribute("prefix", value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("URI"), PropertyOrder(2), DescriptionAttribute("Namespace URI")]
+        [CategoryAttribute("Required"), DisplayName("URI"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Namespace URI")]
         public string URI {
             get { return GetAttribute("uri"); }
             set { SetAttribute("uri", value); }
@@ -419,7 +419,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             type = dataModel.Name;
         }
 
-        [DisplayName("Alt Queue"), PropertyOrder(1), DescriptionAttribute("The queue the message is sent to if it fails to pass the filter")]
+        [DisplayName("Alt Queue"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The queue the message is sent to if it fails to pass the filter")]
         public string AltQueue {
             get {
 
@@ -431,7 +431,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
-        [DisplayName("Filter Type"), PropertyOrder(1), DescriptionAttribute("Filters can either be a single data filter or a compound boolean expression made up of several data filters")]
+        [DisplayName("Filter Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("Filters can either be a single data filter or a compound boolean expression made up of several data filters")]
         public string Type {
             get {
                 if (_node.InnerXml.Contains("<and>") || _node.InnerXml.Contains("<or>") || _node.InnerXml.Contains("<xor>") || _node.InnerXml.Contains("<not>")) {
@@ -446,16 +446,18 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
     }
+
+    [DisplayName("Boolean Expression of Child Nodes")]
     public class BooleanExpression : MyPropertyGrid {
 
-
+       
         public BooleanExpression(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Boolean Type"), PropertyOrder(1), DescriptionAttribute("The selected boolean operator is applied to all the child nodes to produce a result"), ItemsSource(typeof(BooleanTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Boolean Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The selected boolean operator is applied to all the child nodes to produce a result"), ItemsSource(typeof(BooleanTypeList))]
         public string Type {
             get { return this._node.Name; }
             set {
@@ -465,27 +467,35 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
     }
+
+    [DisplayName("Data Contains Filter")]
     public class ContainsFilter : MyPropertyGrid {
 
         public ContainsFilter(XmlNode dataModel, IView view) {
-            this._node = dataModel;
-            this.view = view;
-            this.type = dataModel.Name;
+            try {
+                this._node = dataModel;
+                this.view = view;
+                this.type = dataModel.Name;
+            } catch (Exception e) {
+                Console.WriteLine("ERROR IN FILTER GRID CONSTRUCTOR");
+                Console.WriteLine(e.Message);
+            }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "Data Contains Value"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The string the data must contain for the filter to pass")]
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The string the data must contain for the filter to pass")]
         public string Value {
             get { return GetAttribute("value"); }
             set { SetAttribute("value", value); }
         }
     }
 
+    [DisplayName("Data Equals Filter")]
     public class EqualsFilter : MyPropertyGrid {
 
         public EqualsFilter(XmlNode dataModel, IView view) {
@@ -494,13 +504,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true),PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "Data Equals Value"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The string the data must equal for the filter to pass")]
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The string the data must equal for the filter to pass")]
         public string Value {
             get { return GetAttribute("value"); }
             set { SetAttribute("value", value); }
@@ -509,6 +519,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
 
 
 
+
+    [DisplayName("Data Matched RegEx Filter")]
     public class MatchesFilter : MyPropertyGrid {
 
         public MatchesFilter(XmlNode dataModel, IView view) {
@@ -517,19 +529,20 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "Data Equals Value"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The Regex that the data must match")]
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The Regex that the data must match")]
         public string Value {
             get { return GetAttribute("value"); }
             set { SetAttribute("value", value); }
         }
     }
 
+    [DisplayName("Data Minimum Length Filter")]
     public class LengthFilter : MyPropertyGrid {
 
         public LengthFilter(XmlNode dataModel, IView view) {
@@ -538,18 +551,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "Data Minimum Length"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Minimum Length"), PropertyOrder(1), DescriptionAttribute("The Minimum Length of the Data")]
+        [CategoryAttribute("Required"), DisplayName("Minimum Length"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The Minimum Length of the Data")]
         public int Value {
             get { return GetIntAttribute("value"); }
             set { SetAttribute("value", value); }
         }
     }
+    [DisplayName("XPath Exists Filter")]
     public class XPExistsFilter : MyPropertyGrid {
 
         public XPExistsFilter(XmlNode dataModel, IView view) {
@@ -558,18 +572,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "XPath Exists"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath that must exist for the filter to pass")]
+        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The XPath that must exist for the filter to pass")]
         public string Value {
             get { return GetAttribute("xpath"); }
             set { SetAttribute("xpath", value); }
         }
     }
+    [DisplayName("Value at XPath Matches RegEx Filter")]
     public class XPMatchesFilter : MyPropertyGrid {
 
         public XPMatchesFilter(XmlNode dataModel, IView view) {
@@ -578,26 +593,27 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "XPath Matches"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath of the data element")]
+        [CategoryAttribute("Required"), DisplayName("XPath"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The XPath of the data element")]
         public string XPath {
             get { return GetAttribute("xpath"); }
             set { SetAttribute("xpath", value); }
         }
 
 
-        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The RegEx that the data at the specified XPath must match")]
+        [CategoryAttribute("Required"), DisplayName("Value"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The RegEx that the data at the specified XPath must match")]
         public string Value {
             get { return GetAttribute("value"); }
             set { SetAttribute("value", value); }
         }
     }
 
+    [DisplayName("Value at XPath Equals Filter")]
     public class XPEqualsFilter : MyPropertyGrid {
 
         public XPEqualsFilter(XmlNode dataModel, IView view) {
@@ -606,26 +622,27 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "XPath Equals"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath of the data element")]
+        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The XPath of the data element")]
         public string XPath {
             get { return GetAttribute("xpath"); }
             set { SetAttribute("xpath", value); }
         }
 
 
-        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), DescriptionAttribute("The value at the specified XPath must equal")]
+        [CategoryAttribute("Required"), DisplayName("Value"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The value at the specified XPath must equal")]
         public string Value {
             get { return GetAttribute("value"); }
             set { SetAttribute("value", value); }
         }
     }
 
+    [DisplayName("Date at XPath fall within Offset Filter")]
     public class DateRangeFilter : MyPropertyGrid {
 
         public DateRangeFilter(XmlNode dataModel, IView view) {
@@ -634,25 +651,25 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "XPath Date Within Offset"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), DescriptionAttribute("The XPath Date Element to test")]
+        [CategoryAttribute("Required"), DisplayName("XPath"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The XPath Date Element to test")]
         public string Value {
             get { return GetAttribute("xpath"); }
             set { SetAttribute("xpath", value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("From Offset"), PropertyOrder(1), DescriptionAttribute("From Date Offset in Days from Now")]
+        [CategoryAttribute("Required"), DisplayName("From Offset"), PropertyOrder(1), Browsable(true), DescriptionAttribute("From Date Offset in Days from Now")]
         public int From {
             get { return GetIntAttribute("fromOffset"); }
             set { SetAttribute("fromOffset", value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("To Offset"), PropertyOrder(1), DescriptionAttribute("To Date Offset in Days from Now")]
+        [CategoryAttribute("Required"), DisplayName("To Offset"), PropertyOrder(1), Browsable(true), DescriptionAttribute("To Date Offset in Days from Now")]
         public int To {
             get { return GetIntAttribute("toOffset"); }
             set { SetAttribute("toOffset", value); }
@@ -668,13 +685,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "Context Contains"; }
             set { this.view.ChangeFilterType(value); }
         }
 
-        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Use Message Hash As Key"), PropertyOrder(1), DescriptionAttribute("Use a SHA256 hash of the entire message for the Context Cache Key (Duplicate Messages)")]
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Use Message Hash As Key"), PropertyOrder(1), Browsable(true), DescriptionAttribute("Use a SHA256 hash of the entire message for the Context Cache Key (Duplicate Messages)")]
         public bool UseMessageAsKey {
             get {
                 bool value = GetBoolAttribute("useMessageAsKey");
@@ -690,7 +707,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Key"), PropertyOrder(2), DescriptionAttribute("XPath for the Context Key")]
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Key"), PropertyOrder(2), Browsable(true), DescriptionAttribute("XPath for the Context Key")]
         public string ContextKey {
             get { return GetAttribute("contextCacheKeyXPath"); }
             set {
@@ -701,7 +718,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             }
         }
 
-        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Cache Expiry"), PropertyOrder(3), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Cache Expiry"), PropertyOrder(3), Browsable(true), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
         public int ContextExpiry {
             get { return GetIntAttribute("contextCacheExpiry"); }
             set {
@@ -723,19 +740,19 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Service Name"), PropertyOrder(1), DescriptionAttribute("The name of the service")]
+        [CategoryAttribute("Required"), DisplayName("Service Name"), PropertyOrder(1), Browsable(true), DescriptionAttribute("The name of the service")]
         public string ServiceName {
             get { return GetAttribute("serviceName"); }
             set { SetAttribute("serviceName", value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Service Display Name"), PropertyOrder(2), DescriptionAttribute("The display name of the service")]
+        [CategoryAttribute("Required"), DisplayName("Service Display Name"), PropertyOrder(2), Browsable(true), DescriptionAttribute("The display name of the service")]
         public string Display {
             get { return GetAttribute("serviceDisplayName"); }
             set { SetAttribute("serviceDisplayName", value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Service Description"), PropertyOrder(3), DescriptionAttribute("The description of the service")]
+        [CategoryAttribute("Required"), DisplayName("Service Description"), PropertyOrder(3), Browsable(true), DescriptionAttribute("The description of the service")]
         public string Description {
             get { return GetAttribute("serviceDescription"); }
             set { SetAttribute("serviceDescription", value); }

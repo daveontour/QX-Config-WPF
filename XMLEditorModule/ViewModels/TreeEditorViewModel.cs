@@ -79,7 +79,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.DataModel = dataModel;
             this.path = filePath;
             this.fileName = fileName;
-            this.viewAttributesCommand = new RelayCommand<XmlNode>(ViewAttributes);
+            this.viewAttributesCommand = new RelayCommand<XmlNode>(TreeLeafSelected);
             this.addPipeCommand = new RelayCommand<XmlNodeType>(AddPipe, CanAddPipe);
             this.addInputCommand = new RelayCommand<XmlNodeType>(AddInput, CanAddInput);
             this.addTypeInputCommand = new RelayCommand<String>(AddTypeInput, CanAddTypeInput);
@@ -90,7 +90,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.addDataFilterCommand = new RelayCommand<XmlNodeType>(AddDataFilter, CanAddExpression);
             this.addAltQueueCommand = new RelayCommand<XmlNodeType>(AddAltQueue, CanAddAltQueue);
             this.addMonitorCommand = new RelayCommand<XmlNodeType>(AddMonitor, CanAddMonitor);
-            this.addLoggerCommand = new RelayCommand<XmlNodeType>(AddLogger, CanAddLogger);
             this.addNamespaceCommand = new RelayCommand<XmlNodeType>(AddNamespace, CanAddNamespace);
             this.addServiceSettingsCommand = new RelayCommand<XmlNodeType>(AddServiceSetting, CanAddServiceSetting);
             this.saveDocumentCommand = new RelayCommand(p => { Save(); });
@@ -105,8 +104,16 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             get { return selectedElement; }
             private set {
                 selectedElement = value;
-                UpdatePropertiesPanel(selectedElement.DataModel);
-                View.HightLightCanvas(selectedElement.DataModel);
+                try {
+                    UpdatePropertiesPanel(selectedElement.DataModel);
+                } catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
+                try {
+                    View.HightLightCanvas(selectedElement.DataModel);
+                } catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
         public string XMLText {
@@ -120,13 +127,13 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return sb.ToString();
             }
         }
-        private void ViewAttributes(XmlNode newNode) {
+        private void TreeLeafSelected(XmlNode newNode) {
 
-            if (SelectedElement != null) {
-                SelectedElement.AddXmlNode = null;
+        try {
+                SelectedElement = new SelectedElementViewModel(newNode);
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
             }
-            SelectedElement = new SelectedElementViewModel(newNode);
-            SelectedElement.AddXmlNode = this.AddXmlNode;
         }
 
         private void UpdatePropertiesPanel(XmlNode selectedItem) {
@@ -156,7 +163,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                         myGrid = new TESTSOURCE(selectedItem, this.View);
                         break;
                 }
-            } else if (selectedItem.Name == "output" || selectedItem.Name == "logger" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
+            } else if (selectedItem.Name == "output" ||  selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
                         myGrid = new MSMQOUT(selectedItem, this.View);
@@ -211,14 +218,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 myGrid = new DateRangeFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "contextContains") {
                 myGrid = new ContextFilter(selectedItem, this.View);
-            } else {
-                myGrid = null;
-                //if (View.selectedCanvas != null) {
-                //    SolidColorBrush brush = new SolidColorBrush();
-                //    brush.Color = Colors.Transparent;
-                //    View.selectedCanvas.Background = brush;
-                //}
             }
+            //       else {
+            //              myGrid = null;
+            //          }
             OnPropertyChanged("myGrid");
         }
 
@@ -247,18 +250,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "pipes") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -420,18 +413,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "pipe") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -443,18 +426,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "pipe") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -465,18 +438,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "pipe") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -504,18 +467,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "pipe") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -528,7 +481,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return;
             if (newNode.NodeType == XmlNodeType.Attribute) {
                 SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
+                TreeLeafSelected(SelectedElement.DataModel);
             } else {
                 SelectedElement.DataModel.AppendChild(newNode);
             }
@@ -540,27 +493,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
         private bool CanAddFilter(XmlNodeType newNodeType) {
 
-
-
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
-            if (SelectedElement.DataModel.HasChildNodes) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "input" || SelectedElement.DataModel.Name == "output") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -626,7 +563,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return;
             if (newNode.NodeType == XmlNodeType.Attribute) {
                 SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
+                TreeLeafSelected(SelectedElement.DataModel);
             } else {
                 SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
             }
@@ -656,62 +593,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
 
             return true;
         }
-        private void AddLogger(XmlNodeType newNodeType) {
-            XmlNode newNode = this.DataModel.CreateElement("logger");
-            XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
-            newAttribute.Value = "MSMQ";
-            XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
-            newAttribute2.Value = "descriptive queue name";
-            XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            newAttribute3.Value = @".\private$\QUEUENAME";
-
-            newNode.Attributes.Append(newAttribute);
-            newNode.Attributes.Append(newAttribute2);
-            newNode.Attributes.Append(newAttribute3);
-
-            if (newNode == null)
-                return;
-            if (newNode.NodeType == XmlNodeType.Attribute) {
-                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
-            } else {
-                try {
-                    if (SelectedElement.DataModel.FirstChild.Name == "monitor") {
-                        SelectedElement.DataModel.InsertAfter(newNode, SelectedElement.DataModel.FirstChild);
-                    } else {
-                        SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
-                    }
-                } catch {
-                    SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
-                }
-            }
-
-            OnPropertyChanged("XMLText");
-            View.DrawQXConfig();
-
-        }
-        private bool CanAddLogger(XmlNodeType newNodeType) {
-
-            if (SelectedElement == null || SelectedElement.DataModel == null) {
-                return false;
-            }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
-            if (SelectedElement.DataModel.Name != "settings") {
-                return false;
-            }
-
-            foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
-                if (n.Name == "logger") {
-                    return false;
-                }
-            }
-
-            return true;
-
-        }
         private void AddNamespace(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("namespace");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("prefix");
@@ -727,7 +608,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                 return;
             if (newNode.NodeType == XmlNodeType.Attribute) {
                 SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                ViewAttributes(SelectedElement.DataModel);
+                TreeLeafSelected(SelectedElement.DataModel);
             } else {
                 SelectedElement.DataModel.AppendChild(newNode);
             }
@@ -741,18 +622,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
             }
-            if (SelectedElement.DataModel.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-
             if (SelectedElement.DataModel.Name == "settings") {
                 return true;
-            }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
             } else {
                 return false;
             }
@@ -844,14 +715,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
                     return true;
                 }
             }
-            if (SelectedElement.DataModel.FirstChild != null && SelectedElement.DataModel.FirstChild == SelectedElement.DataModel.LastChild && SelectedElement.DataModel.FirstChild.NodeType != XmlNodeType.Element) {
-                return false;
-            }
-            if (AddXmlNode == null) {
-                return false;
-            } else {
-                return false;
-            }
+
+            return false;
         }
 
         private void DeleteElement(XmlNode currentNode) {
