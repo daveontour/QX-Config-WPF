@@ -35,7 +35,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public Dictionary<XmlNode, Canvas> nodeToCanvas = new Dictionary<XmlNode, Canvas>();
         public Dictionary<Canvas, XmlNode> canvasToNode = new Dictionary<Canvas, XmlNode>();
         public Canvas selectedCanvas;
-        
+
         protected void OnPropertyChanged(string propName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
@@ -477,7 +477,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings].CommandParameter = XmlNodeType.Element;
             this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddServiceSettings]);
 
-            this.settingspanel.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender,  xmlDoc.SelectSingleNode("//settings")); };
+            this.settingspanel.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, xmlDoc.SelectSingleNode("//settings")); };
 
             int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
@@ -495,7 +495,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 topMenuProvider.ContextMenus[ContextMenuType.AddPipe].Command = ViewModel.AddPipeCommand;
                 topMenuProvider.ContextMenus[ContextMenuType.AddPipe].CommandParameter = XmlNodeType.Element;
                 canTop.ContextMenu.Items.Add(topMenuProvider.ContextMenus[ContextMenuType.AddPipe]);
-                canTop.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender,  xmlDoc.SelectSingleNode("//pipes")); };
+                canTop.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, xmlDoc.SelectSingleNode("//pipes")); };
 
                 Canvas pipeCan = new Canvas() {
                     Height = 24,
@@ -654,8 +654,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
 
- //           menuProvider.ContextMenus[ContextMenuType.AddAMSMVTUpdatedOutput].Command = ViewModel.AddTypeOutputCommand;
- //           menuProvider.ContextMenus[ContextMenuType.AddAMSMVTUpdatedOutput].CommandParameter = "RABBITDEFEX";
+            //           menuProvider.ContextMenus[ContextMenuType.AddAMSMVTUpdatedOutput].Command = ViewModel.AddTypeOutputCommand;
+            //           menuProvider.ContextMenus[ContextMenuType.AddAMSMVTUpdatedOutput].CommandParameter = "RABBITDEFEX";
 
             menuProvider.ContextMenus[ContextMenuType.AddSINK].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddSINK].CommandParameter = "SINK";
@@ -834,7 +834,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
         private void Can_MouseDown(object sender, MouseButtonEventArgs e) {
-           
+
             if (sender == null) {
                 return;
             }
@@ -851,9 +851,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         }
 
-        private void CanCanvas_MouseDown(object sender,  XmlNode node) {
+        private void CanCanvas_MouseDown(object sender, XmlNode node) {
             if (sender == null) {
-               return;
+                return;
             }
             ViewModel.ViewAttributesCommand.Execute(node);
             HighlightNode(node);
@@ -1091,7 +1091,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public void HightLightCanvas(XmlNode node) {
 
-            
+
 
             if (node == null) {
                 return;
@@ -1111,11 +1111,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 return;
             }
 
-            if (c == null ) {
+            if (c == null) {
                 return;
             }
 
-            if (c == SelectedCanvas) {  
+            if (c == SelectedCanvas) {
                 return;
             }
 
@@ -1130,6 +1130,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                     break;
                 case "pipe":
                     highlightBrush.Color = Color.FromArgb(127, 0, 0, 255);
+                    break;
+                case "filter":
+                    if (LogicalTreeHelper.FindLogicalNode(c, "filter") is Path path) {
+                        SolidColorBrush brush = new SolidColorBrush {
+                            Color = Colors.Red
+                        };
+                        path.Fill = brush;
+                    }
                     break;
                 default:
                     highlightBrush.Color = Color.FromArgb(255, 255, 127, 200);
@@ -1156,8 +1164,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
         public void HighlightNode(XmlNode xmlNode) {
 
-            Console.WriteLine($"Selected Node = {xmlNode.Name}");
-
             TreeViewItem rootNode = null;
             try {
                 rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
@@ -1165,9 +1171,9 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
 
             }
             if (xmlNode == null) {
-               SelectTreeViewItem(ref rootNode, "");
+                SelectTreeViewItem(ref rootNode, "");
             } else {
-               SelectTreeViewItem(ref rootNode, xmlNode);
+                SelectTreeViewItem(ref rootNode, xmlNode);
             }
         }
 
@@ -1261,7 +1267,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
                 return;
             }
 
-           
+
             try {
                 Canvas can = this.nodeToCanvas[node];
                 foreach (var child in can.Children) {
@@ -1277,7 +1283,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
          * Updates the title in the graphical representation of the pipe when the tpye is changed
          */
         public void UpdateSelectedPipeCanvas(XmlNode node) {
-           
+
             try {
                 Canvas can = this.nodeToCanvas[node];
                 foreach (var child in can.Children) {

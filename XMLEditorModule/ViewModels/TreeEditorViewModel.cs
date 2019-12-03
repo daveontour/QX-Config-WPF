@@ -21,7 +21,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         private ICommand viewAttributesCommand;
         private ICommand addPipeCommand;
         private ICommand addMonitorCommand;
-        private ICommand addLoggerCommand;
         private ICommand addNamespaceCommand;
         private ICommand addServiceSettingsCommand;
         private ICommand addInputCommand;
@@ -55,7 +54,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         public ICommand ViewAttributesCommand { get { return viewAttributesCommand; } }
         public ICommand AddPipeCommand { get { return addPipeCommand; } }
         public ICommand AddMonitorCommand { get { return addMonitorCommand; } }
-        public ICommand AddLoggerCommand { get { return addLoggerCommand; } }
         public ICommand AddNamespaceCommand { get { return addNamespaceCommand; } }
         public ICommand AddServiceSettingsCommand { get { return addServiceSettingsCommand; } }
         public ICommand AddInputCommand { get { return addInputCommand; } }
@@ -81,10 +79,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.fileName = fileName;
             this.viewAttributesCommand = new RelayCommand<XmlNode>(TreeLeafSelected);
             this.addPipeCommand = new RelayCommand<XmlNodeType>(AddPipe, CanAddPipe);
-            this.addInputCommand = new RelayCommand<XmlNodeType>(AddInput, CanAddInput);
-            this.addTypeInputCommand = new RelayCommand<String>(AddTypeInput, CanAddTypeInput);
-            this.addOutputCommand = new RelayCommand<XmlNodeType>(AddOutput, CanAddOutput);
-            this.addTypeOutputCommand = new RelayCommand<String>(AddTypeOutput, CanAddTypeOutput);
+            this.addInputCommand = new RelayCommand<XmlNodeType>(AddInput, CanAddInOrOut);
+            this.addTypeInputCommand = new RelayCommand<String>(AddTypeInput, CanAddTypeInOrOut);
+            this.addOutputCommand = new RelayCommand<XmlNodeType>(AddOutput, CanAddInOrOut);
+            this.addTypeOutputCommand = new RelayCommand<String>(AddTypeOutput, CanAddTypeInOrOut);
             this.addFilterCommand = new RelayCommand<XmlNodeType>(AddFilter, CanAddFilter);
             this.addExpressionCommand = new RelayCommand<XmlNodeType>(AddExpression, CanAddExpression);
             this.addDataFilterCommand = new RelayCommand<XmlNodeType>(AddDataFilter, CanAddExpression);
@@ -408,7 +406,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
 
-        private bool CanAddInput(XmlNodeType newNodeType) {
+        private bool CanAddInOrOut(XmlNodeType newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
@@ -421,7 +419,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         }
 
 
-        private bool CanAddTypeInput(string newNodeType) {
+        private bool CanAddTypeInOrOut(string newNodeType) {
 
             if (SelectedElement == null || SelectedElement.DataModel == null) {
                 return false;
@@ -433,17 +431,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
         }
 
-        private bool CanAddTypeOutput(string newNodeType) {
-
-            if (SelectedElement == null || SelectedElement.DataModel == null) {
-                return false;
-            }
-            if (SelectedElement.DataModel.Name == "pipe") {
-                return true;
-            } else {
-                return false;
-            }
-        }
 
         private void AddOutput(XmlNodeType newNodeType) {
             XmlNode newNode = this.DataModel.CreateElement("output");
@@ -460,18 +447,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
 
-        }
-
-        private bool CanAddOutput(XmlNodeType newNodeType) {
-
-            if (SelectedElement == null || SelectedElement.DataModel == null) {
-                return false;
-            }
-            if (SelectedElement.DataModel.Name == "pipe") {
-                return true;
-            } else {
-                return false;
-            }
         }
         private void AddFilter(XmlNodeType newNodeType) {
 
