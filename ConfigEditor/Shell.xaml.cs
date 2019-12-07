@@ -33,6 +33,7 @@ namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
             this.commandBarView.SaveRequested += new EventHandler(commandBarView_SaveRequested);
             this.commandBarView.SaveAsAndExecuteRequested += new EventHandler(commandBarView_SaveAsAndExecuteRequested);
             this.commandBarView.PackageRequested += new EventHandler(commandBarView_PackageRequested);
+            this.commandBarView.AboutRequested += new EventHandler(commandBarView_AboutRequested);
             this.commandBarView.SaveAsRequested += new EventHandler<SaveAsEventArgs>(commandBarView_SaveAsRequested);
             editorsVM = new TreeEditorsViewModel();
            
@@ -72,6 +73,10 @@ namespace WXE.Internal.Tools.ConfigEditor.ConfigEditor
 
         void commandBarView_PackageRequested(object sender, EventArgs e) {
             editorsVM.ActiveEditor.PackageCommand.Execute(null);
+        }
+
+        void commandBarView_AboutRequested(object sender, EventArgs e) {
+            editorsVM.ActiveEditor.AboutCommand.Execute(null);
         }
     }
 }

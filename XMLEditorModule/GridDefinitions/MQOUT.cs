@@ -36,5 +36,14 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
                 SetAttribute("maxMessages", value);
             }
         }
+
+        [CategoryAttribute("Optional"), DisplayName("Undeliverable Queue"), PropertyOrder(4), ReadOnly(false), Browsable(true), DescriptionAttribute("Local MSMQ queue to send messages if they cannot be delivered")]
+        public string Undeliverable {
+            get { return GetAttribute("undeliverableQueue"); }
+            set {SetAttribute("undeliverableQueue", value);
+            }
+        }
+
+        
     }
 }

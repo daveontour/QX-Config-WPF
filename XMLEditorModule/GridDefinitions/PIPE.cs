@@ -48,7 +48,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
             }
         }
 
-        [CategoryAttribute("Optional"), DisplayName("Maximum Messages/Min"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
+        [CategoryAttribute("Optional"), DisplayName("Max Msgs/Min"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
         public int MessPerMinute {
             get { return GetIntAttribute("maxMsgPerMinute"); }
             set {

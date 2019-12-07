@@ -183,23 +183,19 @@
                 </Setter.Value>
             </Setter>
             <Setter Property="Header" Value="{Binding}"/>
-            <Setter Property="HeaderTemplate" 
-                    Value="{DynamicResource CloseableTabItemHeaderTemplate}"/>
+            <Setter Property="HeaderTemplate" Value="{DynamicResource CloseableTabItemHeaderTemplate}"/>
             <Setter Property="Content" Value="{Binding}"/>
-            <Setter Property="ContentTemplate" 
-                    Value="{DynamicResource CloseableTabItemContentTemplate}"/>
+            <Setter Property="ContentTemplate" Value="{DynamicResource CloseableTabItemContentTemplate}"/>
             <EventSetter Event="CloseTab"  Handler="CloseTab_Handler"></EventSetter>
 
         </Style>
 
     </UserControl.Resources>
-  
+
     <Grid >
-   
         <views:CloseableTabControl x:Name="configEditorTabControl" SelectedIndex="{Binding Path=ActiveEditorIndex, Mode=TwoWay}"
             Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
             Background="Transparent"  ItemsSource="{Binding Path=TreeEditors}" >
-          </views:CloseableTabControl>
- 
+        </views:CloseableTabControl>
     </Grid>
 </UserControl>

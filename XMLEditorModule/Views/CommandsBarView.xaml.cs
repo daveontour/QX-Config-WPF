@@ -30,6 +30,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public static MenuItem exportMenuItem;
         public static MenuItem saveMenuItem;
         public static MenuItem saveAsMenuItem;
+        public static MenuItem aboutMenuItem;
 
         public CommandsBarView() {
             InitializeComponent();
@@ -63,6 +64,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             Path export = GetResourceCopy<Path>("export");
             exportMenuItem.Icon = export;
 
+            aboutMenuItem = new MenuItem { Header = "About" };
+            aboutMenuItem.Click += new RoutedEventHandler(aboutMenuItem_Click);
+            aboutMenuItem.IsEnabled = true;
+
 
             fileMenuItem.Items.Add(newMenuItem);
             fileMenuItem.Items.Add(openMenuItem);
@@ -71,7 +76,12 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             fileMenuItem.Items.Add(saveAsMenuItem);
             fileMenuItem.Items.Add(new Separator());
             fileMenuItem.Items.Add(exportMenuItem);
+            fileMenuItem.Items.Add(new Separator());
+            fileMenuItem.Items.Add(aboutMenuItem);
+
             this.MenuBar.Items.Add(fileMenuItem);
+            
+
 
             executeMenuItem = new MenuItem { Header = "_Execute" };
             executeMenuItem.IsEnabled = false;
@@ -87,6 +97,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
         public event EventHandler SaveRequested;
         public event EventHandler SaveAsAndExecuteRequested;
         public event EventHandler PackageRequested;
+        public event EventHandler AboutRequested;
+        public event EventHandler<SaveAsEventArgs> SaveAs;
         public event EventHandler<SaveAsEventArgs> SaveAsRequested;
 
         private void OnDocumentLoaded(object sender, DocumentLoadedEventArgs e) {
@@ -149,6 +161,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
             if (PackageRequested != null) {
                 PackageRequested(this, e);
             }
+        }
+
+        void aboutMenuItem_Click(object sender, RoutedEventArgs e) {
+                AboutRequested(this, e);
         }
 
         void executeMenuItem_Click(object sender, RoutedEventArgs e) {

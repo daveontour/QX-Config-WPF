@@ -36,6 +36,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         private ICommand saveAsDocumentCommand;
         private ICommand executeDocumentCommand;
         private ICommand packageCommand;
+        private ICommand aboutCommand;
 
         private string path;
         private string fileName;
@@ -69,6 +70,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
         public ICommand SaveAsDocumentCommand { get { return saveAsDocumentCommand; } }
         public ICommand SaveAsAndExecuteCommand { get { return executeDocumentCommand; } }
         public ICommand PackageCommand { get { return packageCommand; } }
+        public ICommand AboutCommand { get { return aboutCommand; } }
 
         #endregion
 
@@ -94,6 +96,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             this.saveAsDocumentCommand = new RelayCommand<string>(SaveAs);
             this.executeDocumentCommand = new RelayCommand(p => { ExecuteQX(); });
             this.packageCommand = new RelayCommand(p => { PackageAndSave(); });
+            this.aboutCommand = new RelayCommand(p => { AboutQX(); });
             this.deleteElementCommand = new RelayCommand<XmlNode>(p => { DeleteElement(SelectedElement.DataModel); }, p => { return CanDeleteElement(SelectedElement.DataModel); });
 
         }
@@ -870,6 +873,11 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
             }
         }
 
+        private void AboutQX() {
+
+            QXAbout dlg = new QXAbout();
+            dlg.ShowDialog();
+        }
         #endregion
 
     }

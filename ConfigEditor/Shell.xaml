@@ -5,18 +5,14 @@
         Icon="QXEd.ico"
         Title="Queue Exchange Configuration Utility" Height="800" Width="1400" WindowStartupLocation="CenterScreen" Background="WhiteSmoke">
     <Window.Resources>
-        
+
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <!--Commands Bar-->           
             <RowDefinition Height="auto"/>
-            <!--Tab control-->
-            <RowDefinition Height="*"/>            
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-       
-       
         <editorModule:CommandsBarView Name="commandBarView"  Grid.Row="0"></editorModule:CommandsBarView>
         <editorModule:TreeEditorsView Grid.Row="1" x:Name="editorsView"></editorModule:TreeEditorsView>
-          </Grid>
+    </Grid>
 </Window>

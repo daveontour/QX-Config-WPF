@@ -96,29 +96,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
             UpdateChildren();
         }
 
-        //private void AddElement(XmlNodeType param)
-        //{
-        //    XmlNode xmlNode = null;
-        //    if (AddXmlNode != null)
-        //    {
-        //        xmlNode = AddXmlNode(param);
-        //    }
-        //    if (xmlNode == null)
-        //    {
-        //        return;
-        //    }
-        //    if (xmlNode.NodeType == XmlNodeType.Attribute)
-        //    {
-        //        DataModel.Attributes.Append(xmlNode as XmlAttribute);
-        //    }
-        //    else if (xmlNode.NodeType == XmlNodeType.Text)
-        //    {
-        //        DataModel.AppendChild(xmlNode as XmlText);
-        //    }
-           
-        //    UpdateChildren();
-        //}
-
         #endregion
 
 
