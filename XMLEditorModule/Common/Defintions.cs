@@ -90,8 +90,8 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
     [CategoryOrder("Optional - Temporal Context Awareness", 7)]
     [RefreshProperties(RefreshProperties.All)]
     public class MyPropertyGrid  {
-        public int maxMsgPerMinute = -1;
-        public int maxMsg = -1;
+ //       public int maxMsgPerMinute = -1;
+//        public int maxMsg = -1;
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
@@ -134,7 +134,15 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
         protected int GetIntAttribute(string attribName) {
 
             if (_node.Attributes[attribName] != null) {
-                return int.Parse(_node.Attributes[attribName].Value);
+                int value;
+                try {
+                    value = int.Parse(_node.Attributes[attribName].Value);
+                } catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                    value = -1;
+                } 
+               
+                return value;
             } else {
                 return -1;
             }
@@ -226,37 +234,37 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         SetAttribute("type", "MQ");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.MQInSource(_node);
-                        if (_node.Name == "output") view.MQOutSource(_node);
+                        if (_node.Name == "output"  || _node.Name == "altqueue") view.MQOutSource(_node);
                         break;
                     case "Microsoft MQ":
                         SetAttribute("type", "MSMQ");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.MSMQIn(_node);
-                        if (_node.Name == "output") view.MSMQOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.MSMQOut(_node);
                         break;
                     case "File":
                         SetAttribute("type", "FILE");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.FileInSource(_node);
-                        if (_node.Name == "output") view.FileOutSource(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.FileOutSource(_node);
                         break;
                     case "Kafka":
                         SetAttribute("type", "KAFKA");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.KafkaIn(_node);
-                        if (_node.Name == "output") view.KafkaOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.KafkaOut(_node);
                         break;
                     case "HTTP Post":
                         SetAttribute("type", "HTTP");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.HTTPIn(_node);
-                        if (_node.Name == "output") view.HTTPOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.HTTPOut(_node);
                         break;
                     case "Rabbit MQ":
                         SetAttribute("type", "RABBITDEFEX");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.RabbitIn(_node);
-                        if (_node.Name == "output") view.RabbitOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.RabbitOut(_node);
                         break;
                     case "SINK":
                         if (_node.Name == "input") {
@@ -265,7 +273,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         }
                         SetAttribute("type", "SINK");
                         view.UpdateSelectedNodeCanvas(_node);
-                        if (_node.Name == "output") view.SinkOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.SinkOut(_node);
                         break;
                     case "Test Source":
                         if (_node.Name == "output") {
@@ -284,7 +292,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         }
                         SetAttribute("type", "REST");
                         view.UpdateSelectedNodeCanvas(_node);
-                        if (_node.Name == "output") view.RestOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue") view.RestOut(_node);
                         break;
 
                 }

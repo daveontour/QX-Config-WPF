@@ -21,11 +21,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
         public PIPE(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
-
-            bool value = GetBoolAttribute("useMessageAsKey");
-            string contextKey = GetAttribute("contextCacheKeyXPath");
-            bool aware = value || contextKey != "";
-
         }
 
         [CategoryAttribute("Required"), DisplayName("Name"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Descriptive name of the pipe")]
@@ -50,7 +45,10 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
 
         [CategoryAttribute("Optional"), DisplayName("Max Msgs/Min"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
         public int MessPerMinute {
-            get { return GetIntAttribute("maxMsgPerMinute"); }
+            get { 
+                int value = GetIntAttribute("maxMsgPerMinute");
+                return value; 
+                }
             set {
                 if (value < -1) {
                     SetAttribute("maxMsgPerMinute", -1);
@@ -61,6 +59,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
                 }
             }
         }
+
         [CategoryAttribute("Optional"), DisplayName("Output Isolation"), Browsable(true), PropertyOrder(4), DescriptionAttribute("Isolate distribution of outputs from each other")]
         public bool OutputIsolation {
             get { return GetBoolAttribute("outputIsolation"); }
@@ -102,7 +101,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
                     SetAttribute("useMessageAsKey", "");
                     SetAttribute("contextCacheKeyXPath", "");
                     SetAttribute("contextCacheExpiry", "");
-                    SetAttribute("maxMsgPerMinute", "");
+               //     SetAttribute("maxMsgPerMinute", "");
                     SetAttribute("discardInCache", "");
                 }
 
@@ -134,7 +133,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
                     SetAttribute("useMessageAsKey", "");
                     SetAttribute("contextCacheKeyXPath", "");
                     SetAttribute("contextCacheExpiry", "");
-                    SetAttribute("maxMsgPerMinute", "");
+               //     SetAttribute("maxMsgPerMinute", "");
                     SetAttribute("discardInCache", "");
 
                 PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextKey"];
@@ -207,7 +206,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
         public string ContextKey {
             get { return GetAttribute("contextCacheKeyXPath"); }
             set {
-                SetAttribute("maxMsgPerMinute", "");
+                //SetAttribute("maxMsgPerMinute", "");
                 SetAttribute("contextCacheKeyXPath", value);
                 if (ContextExpiry <= 0) {
                     ContextExpiry = 10;
