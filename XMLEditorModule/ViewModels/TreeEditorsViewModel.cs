@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
+using QXEditorModule.Views;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
+namespace QXEditorModule.ViewModels
 {
     public class TreeEditorsViewModel : BaseViewModel
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Input;
 using System.Diagnostics;
 
-namespace WXE.Internal.Tools.ConfigEditor.Common
+namespace QXEditorModule.Common
 {
     public class RelayCommand<T> : ICommand
     {

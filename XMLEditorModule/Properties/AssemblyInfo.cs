@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("XMLEditorModule")]
+[assembly: AssemblyTitle("QXEditorModule")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Thomson Reuters")]
-[assembly: AssemblyProduct("XMLEditorModule")]
-[assembly: AssemblyCopyright("Copyright © Thomson Reuters 2011")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("QXEditorModule")]
+[assembly: AssemblyCopyright("Copyright © David Burton 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

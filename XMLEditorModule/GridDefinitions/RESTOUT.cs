@@ -4,15 +4,12 @@ using System.Text;
 using System.Xml;
 
 using System.Windows.Input;
-using WXE.Internal.Tools.ConfigEditor.Common;
+using QXEditorModule.Common;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
-using System.Globalization;
-using System.Reflection;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
+
+namespace QXEditorModule.GridDefinitions {
     public class RESTOUT : MyNodePropertyGrid {
 
 

@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
+namespace QXEditorModule.Views {
     public partial class QXAbout : Window {
 
         

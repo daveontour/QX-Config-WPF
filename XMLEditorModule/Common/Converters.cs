@@ -7,7 +7,7 @@ using System.Xml;
 using System.Windows;
 
 
-namespace WXE.Internal.Tools.ConfigEditor.Common {
+namespace QXEditorModule.Common {
     public class TreeViewHeightConverter:IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

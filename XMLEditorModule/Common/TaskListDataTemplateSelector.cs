@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Xml;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
+namespace QXEditorModule.Common {
     public class TaskListDataTemplateSelector : DataTemplateSelector {
 
         public override DataTemplate

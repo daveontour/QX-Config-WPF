@@ -1,11 +1,9 @@
 ﻿using System.Xml;
-using WXE.Internal.Tools.ConfigEditor.Common;
+using QXEditorModule.Common;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 
-
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions {
     [DisplayName("Microsoft MQ Input Node")]
     public class MSMQIN : MyNodeInPropertyGrid {
 

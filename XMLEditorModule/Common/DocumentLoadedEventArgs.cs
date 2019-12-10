@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 
-namespace WXE.Internal.Tools.ConfigEditor.Common
+namespace QXEditorModule.Common
 {
     public class DocumentLoadedEventArgs :EventArgs
     {

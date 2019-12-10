@@ -8,17 +8,16 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml;
 
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels;
-using WXE.Internal.Tools.ConfigEditor.Common;
+using QXEditorModule.ViewModels;
+using QXEditorModule.Common;
 using System.ComponentModel;
 using System.IO;
 
 using Path = System.Windows.Shapes.Path;
 using System.Windows.Markup;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
+using QXEditorModule.GridDefinitions;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
+namespace QXEditorModule.Views {
 
     public partial class TreeEditorView : UserControl, INotifyPropertyChanged, IView {
 

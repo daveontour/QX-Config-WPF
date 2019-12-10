@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <service serviceName="Queue Exchange Service" serviceDisplayName="Queue Exchange Service" serviceDescription="A instance of QueueExchange for connecting inputs to outputs" />
+    <namespace prefix="ams" uri="http://www.sita.aero/ams6-xml-api-messages" />
+  </settings>
+  <pipes>
+    <pipe name="MSMQ to Rabbit" numInstances="1">
+      <input type="MSMQ" name="AMS Source" queue=".\private$\fromams" />
+      <output type="RABBITDEFEX" name="TORABBIT" connection="localhost" bufferQueueName="rabbit" xpathDestination="/ams:Envelope/ams:Content/*[1]" />
+    </pipe>
+    <pipe name="Rabbit to File" numInstances="1">
+      <input type="RABBITDEFEX" name="FROMKAFKA" connection="localhost" queue="MovementUpdatedNotification" bufferQueueName="rabbiti1" />
+      <output type="FILE" name="Description of the Node" path="C:\Users\dave_\Desktop\RABBIT\mvt.xml" />
+    </pipe>
+  </pipes>
+</config>

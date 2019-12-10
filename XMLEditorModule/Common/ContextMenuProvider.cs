@@ -7,7 +7,7 @@ using System.Windows.Input;
 using System.Windows;
 using System.Xml;
 
-namespace WXE.Internal.Tools.ConfigEditor.Common
+namespace QXEditorModule.Common
 {
    
     public class ContextMenuProvider

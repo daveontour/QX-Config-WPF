@@ -5,9 +5,9 @@ using System.Text;
 using System.Xml;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WXE.Internal.Tools.ConfigEditor.Common;
+using QXEditorModule.Common;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
+namespace QXEditorModule.ViewModels
 {
     public class SelectedElementViewModel: BaseViewModel
     {

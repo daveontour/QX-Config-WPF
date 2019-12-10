@@ -11,9 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels;
+using QXEditorModule.ViewModels;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views
+namespace QXEditorModule.Views
 {
     /// <summary>
     /// Interaction logic for TreeEditorsView.xaml

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels
+namespace QXEditorModule.ViewModels
 {
    public class BaseViewModel :INotifyPropertyChanged
     {

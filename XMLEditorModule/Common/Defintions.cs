@@ -4,16 +4,15 @@ using System.Text;
 using System.Xml;
 
 using System.Windows.Input;
-using WXE.Internal.Tools.ConfigEditor.Common;
+using QXEditorModule.Common;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
 using System.Globalization;
 using System.Reflection;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
+using QXEditorModule.Views;
 using Xceed.Wpf.Toolkit;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
+namespace QXEditorModule.Common {
 
 
     public class GenericTypes {
@@ -234,37 +233,37 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         SetAttribute("type", "MQ");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.MQInSource(_node);
-                        if (_node.Name == "output"  || _node.Name == "altqueue") view.MQOutSource(_node);
+                        if (_node.Name == "output"  || _node.Name == "altqueue" || _node.Name == "monitor") view.MQOutSource(_node);
                         break;
                     case "Microsoft MQ":
                         SetAttribute("type", "MSMQ");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.MSMQIn(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.MSMQOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.MSMQOut(_node);
                         break;
                     case "File":
                         SetAttribute("type", "FILE");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.FileInSource(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.FileOutSource(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.FileOutSource(_node);
                         break;
                     case "Kafka":
                         SetAttribute("type", "KAFKA");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.KafkaIn(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.KafkaOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.KafkaOut(_node);
                         break;
                     case "HTTP Post":
                         SetAttribute("type", "HTTP");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.HTTPIn(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.HTTPOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.HTTPOut(_node);
                         break;
                     case "Rabbit MQ":
                         SetAttribute("type", "RABBITDEFEX");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.RabbitIn(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.RabbitOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.RabbitOut(_node);
                         break;
                     case "SINK":
                         if (_node.Name == "input") {
@@ -273,7 +272,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         }
                         SetAttribute("type", "SINK");
                         view.UpdateSelectedNodeCanvas(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.SinkOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.SinkOut(_node);
                         break;
                     case "Test Source":
                         if (_node.Name == "output") {
@@ -292,7 +291,7 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                         }
                         SetAttribute("type", "REST");
                         view.UpdateSelectedNodeCanvas(_node);
-                        if (_node.Name == "output" || _node.Name == "altqueue") view.RestOut(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.RestOut(_node);
                         break;
 
                 }
@@ -365,8 +364,6 @@ namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common {
                 } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
-
-
                 return value; 
                 
                 }

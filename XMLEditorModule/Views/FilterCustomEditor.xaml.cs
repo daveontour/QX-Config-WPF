@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
+namespace QXEditorModule.Views {
     /// <summary>
     /// Interaction logic for FilterCustomEditor.xaml
     /// </summary>

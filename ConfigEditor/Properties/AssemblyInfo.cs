@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("ConfigEditor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Thomson Reuters")]
-[assembly: AssemblyProduct("ConfigEditor")]
-[assembly: AssemblyCopyright("Copyright © Thomson Reuters 2011")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("QXConfigEditor")]
+[assembly: AssemblyCopyright("Copyright © David Burton 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

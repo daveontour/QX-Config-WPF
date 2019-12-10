@@ -4,17 +4,16 @@ using System.Text;
 using System.Xml;
 
 using System.Windows.Input;
-using WXE.Internal.Tools.ConfigEditor.Common;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Common;
+using QXEditorModule.Common;
 using Xceed.Wpf.Toolkit;
 using System.IO;
 using Microsoft.Win32;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.GridDefinitions;
+using QXEditorModule.GridDefinitions;
 using System.Diagnostics;
 using System.IO.Compression;
-using WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views;
+using QXEditorModule.Views;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.ViewModels {
+namespace QXEditorModule.ViewModels {
 
     public class TreeEditorViewModel : BaseViewModel {
 

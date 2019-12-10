@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Xml;
 
-namespace WXE.Internal.Tools.ConfigEditor.Common
+namespace QXEditorModule.Common
 {
    
 

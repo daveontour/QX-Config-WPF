@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using WXE.Internal.Tools.ConfigEditor.Common;
+using QXEditorModule.Common;
 using System.Xml;
 using System.Diagnostics;
 using Microsoft.Win32;
@@ -20,7 +20,7 @@ using System.Windows.Markup;
 
 using Path = System.Windows.Shapes.Path;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
+namespace QXEditorModule.Views {
     /// <summary>
     /// Interaction logic for CommandsBarView.xaml
     /// </summary>

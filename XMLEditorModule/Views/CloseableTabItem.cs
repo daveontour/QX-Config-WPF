@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace WXE.Internal.Tools.ConfigEditor.XMLEditorModule.Views {
+namespace QXEditorModule.Views {
     public class CloseableTabItem : TabItem  {
         static CloseableTabItem()        {
             //This OverrideMetadata call tells the system that this element wants to provide a style that is different than its base class.
