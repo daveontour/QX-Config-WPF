@@ -305,7 +305,17 @@ namespace QXEditorModule.Common {
 
         [CategoryAttribute("Required"), DisplayName("Name"), ReadOnly(false), Browsable(true), PropertyOrder(1), DescriptionAttribute("Name of the Output")]
         public string Name {
-            get { return GetAttribute("name"); }
+            get {
+                PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["JSON"];
+                BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                if (_node.Name == "monitor") {
+                    isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
+                } else {
+                    isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
+                }
+                return GetAttribute("name"); }
             set { SetAttribute("name", value); }
         }
 
@@ -351,7 +361,7 @@ namespace QXEditorModule.Common {
             set { SetAttribute("xslVersion", value); ; }
         }
 
-        [CategoryAttribute("Optional"), DisplayName("JSON Format"), ReadOnly(false), Browsable(true), PropertyOrder(3), DescriptionAttribute("By default, monitor records are XML format. Select for monitor records to be sent in JSON format")]
+        [CategoryAttribute("Optional"), DisplayName("JSON Format"), Browsable(true), PropertyOrder(3), DescriptionAttribute("By default, monitor records are XML format. Select for monitor records to be sent in JSON format")]
         public bool JSON {
             get {
                 bool value = GetBoolAttribute("json");
