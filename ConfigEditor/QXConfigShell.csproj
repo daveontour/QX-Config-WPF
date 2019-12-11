@@ -121,10 +121,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QX\QXRuntime.csproj">
-      <Project>{9f34d235-6422-4c8c-b4c0-9a17b4f7f90e}</Project>
-      <Name>QXRuntime</Name>
-    </ProjectReference>
     <ProjectReference Include="..\XMLEditorModule\QXConfigShellCore.csproj">
       <Project>{773EA176-EE1D-450C-93FF-EC44D9CE5D2E}</Project>
       <Name>QXConfigShellCore</Name>
@@ -139,6 +135,26 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="QXEd.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="QX Examples\AMS Input Base.xml" />
+    <Resource Include="QX Examples\AMS MSMQ to 2  IBM MQ - Random.xml" />
+    <Resource Include="QX Examples\AMS MSMQ to 2  IBM MQ.xml" />
+    <Resource Include="QX Examples\AMS MSMQ to IBM MQ.xml" />
+    <Resource Include="QX Examples\AMS to  File - Simple Filter %28Slow Queue%29.xml" />
+    <Resource Include="QX Examples\AMS to Kafka Broadcast.xml" />
+    <Resource Include="QX Examples\AMS to Kafka Routed.xml" />
+    <Resource Include="QX Examples\AMS to Rabbit Routed.xml" />
+    <Resource Include="QX Examples\AMS to Rest and File - Compound Filter.xml" />
+    <Resource Include="QX Examples\AMS to Rest and File - Simple Filter %28Slow Queue%29.xml" />
+    <Resource Include="QX Examples\AMS to Rest and File - Simple Filter.xml" />
+    <Resource Include="QX Examples\AMS to Rest and File.xml" />
+    <Resource Include="QX Examples\Empty AMS Notification Queue.xml" />
+    <Resource Include="QX Examples\Monitor to RestServer.xml" />
+    <Resource Include="QX Examples\MSMQ to Two IBMMQ.xml" />
+    <Resource Include="QX Examples\MSMS to Two IBMMQ.xml" />
+    <Resource Include="QX Examples\Priority Inputs.xml" />
+    <Resource Include="QX Examples\Round Robin Distribution.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

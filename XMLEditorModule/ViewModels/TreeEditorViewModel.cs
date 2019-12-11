@@ -129,7 +129,7 @@ namespace QXEditorModule.ViewModels {
         }
         private void TreeLeafSelected(XmlNode newNode) {
 
-        try {
+            try {
                 SelectedElement = new SelectedElementViewModel(newNode);
             } catch (Exception e) {
                 Console.WriteLine(e.Message);
@@ -163,7 +163,7 @@ namespace QXEditorModule.ViewModels {
                         myGrid = new TESTSOURCE(selectedItem, this.View);
                         break;
                 }
-            } else if (selectedItem.Name == "output" ||  selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
+            } else if (selectedItem.Name == "output" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
                         myGrid = new MSMQOUT(selectedItem, this.View);
@@ -842,10 +842,59 @@ namespace QXEditorModule.ViewModels {
             dialog.Filter = "Zip Files (*.zip)|*.zip";
             if (dialog.ShowDialog() == true) {
 
+                try {
+
+                    // If the service settings are set, then write them into the QX.exe.config file
+                    XmlNode serviceSettings = this.DataModel.SelectSingleNode("//service");
+
+                    string serviceName = "Queue Exchange Service";
+                    try {
+                        serviceName = serviceSettings.Attributes["serviceName"].Value;
+                    } catch (Exception) {
+                        serviceName = "Queue Exchange Service";
+                    }
+
+                    string serviceDisplayName = "Queue Exchange Service";
+                    try {
+                        serviceDisplayName = serviceSettings.Attributes["serviceDisplayName"].Value;
+                    } catch (Exception) {
+                        serviceDisplayName = "Queue Exchange Service";
+                    }
+
+                    string serviceDescription = "Connects input nodes with output nodes";
+                    try {
+                        serviceDescription = serviceSettings.Attributes["serviceDescription"].Value;
+                    } catch (Exception) {
+                        serviceDescription = "Connects input nodes with output nodes";
+                    }
+
+                    
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load("./Executable/QX.exe.config");
+
+                    doc.SelectSingleNode("//add[@key='ServiceName']").Attributes["value"].Value = serviceName;
+                    doc.SelectSingleNode("//add[@key='ServiceDisplayName']").Attributes["value"].Value = serviceDisplayName;
+                    doc.SelectSingleNode("//add[@key='ServiceDescription']").Attributes["value"].Value = serviceDescription;
+
+                    using (TextWriter sw = new StreamWriter(@"./Executable/QX.exe.config", false, Encoding.UTF8)) {
+                        doc.Save(sw);
+                    }
+
+                } catch (Exception e) {
+                    Console.WriteLine($"Setting Service Parameters Not Found in ExchangeConfig.xml - using defaults. Error Message  {e.Message}");
+                }
+
+
                 XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
                 using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
                     newDoc.Save(sw);
                 }
+
+                if (File.Exists(dialog.FileName)) {
+                    File.Delete(dialog.FileName);
+                }
+
+
                 ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
 
                 //ServiceConfig dlg = new ServiceConfig();

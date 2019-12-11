@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <namespace prefix="ams" uri="http://www.sita.aero/ams6-xml-api-messages" />
+    <service serviceName="Queue Exchange Service" serviceDisplayName="Queue Exchange Service" serviceDescription="A instance of QueueExchange for connecting inputs to outputs" />
+  </settings>
+  <pipes>
+    <pipe name="AMS MovementUpdated Messages Only" numInstances="1">
+      <input type="MSMQ" name="AMS Source" queue=".\private$\fromams">
+        <filter>
+          <altqueue type="MSMQ" name="Messages that fail the filter" queue=".\private$\daveoutaltqueue" />
+          <xpexists xpath="/ams:Envelope/ams:Content/ams:MovementUpdatedNotification" />
+        </filter>
+      </input>
+      <output type="FILE" name="Description of the Node" path="C:\Users\dave_\Desktop\AMS\fastamsx.xml" />
+    </pipe>
+    <pipe name="All the other messages (Slow)" numInstances="1" maxMsgPerMinute="10">
+      <input type="MSMQ" name="The Rejected Messages" queue=".\private$\daveoutaltqueue" />
+      <output type="FILE" name="File Destination for Rejected Messages" path="C:\Users\dave_\Desktop\AMS\slowrejected.xml" />
+    </pipe>
+  </pipes>
+</config>

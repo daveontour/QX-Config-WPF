@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings />
+  <pipes>
+    <pipe name="Logs to Rest" numInstances="1">
+      <input type="MSMQ" name="Log Queue" queue=".\private$\logs" />
+      <output type="REST" name="Rest Server" maxMessages="100" requestURL="http://localhost:8080/logs/" bufferQueueName=".\private$\logsbuffer" />
+    </pipe>
+  </pipes>
+</config>

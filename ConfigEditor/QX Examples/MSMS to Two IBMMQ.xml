@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings />
+  <pipes>
+    <pipe name="Descriptive Name of Pipe" numInstances="1" maxMsgPerMinute="20">
+      <input type="MSMQ" name="MSMQ Source" queue=".\private$\fromams" />
+      <output type="MQ" name="Description of the Node" queueMgr="AIEQMGR" queue="AMS.IN.LIMITED" channel="AMS.SVRCONN" host="localhost" port="1415" maxMessages="10" />
+      <output type="MQ" name="IBM MQ Destination" queueMgr="AIEQMGR" queue="AMS.IN" channel="AMS.SVRCONN" host="localhost" port="1415" />
+    </pipe>
+  </pipes>
+</config>

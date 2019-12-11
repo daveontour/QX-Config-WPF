@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <service serviceName="Queue Exchange Service" serviceDisplayName="Queue Exchange Service" serviceDescription="A instance of QueueExchange for connecting inputs to outputs" />
+    <namespace prefix="ams" uri="http://www.sita.aero/ams6-xml-api-messages" />
+  </settings>
+  <pipes>
+    <pipe name="MSMQ to Kafka" numInstances="1">
+      <input type="MSMQ" name="AMS Source" queue=".\private$\fromams" />
+      <output type="KAFKA" name="TOKAFKA" connection="localhost:9092" bufferQueueName="kaflabuffertest" xpathDestination="/ams:Envelope/ams:Content/*[1]" />
+    </pipe>
+    <pipe name="Kafka to File" numInstances="1">
+      <input type="KAFKA" name="FROMKAFKA" connection="localhost:9092" topic="MovementUpdatedNotification" bufferQueueName="kafkainbufftest" />
+      <output type="FILE" name="Description of the Node" path="C:\Users\dave_\Desktop\KAFKAOUT\mvt.xml" />
+    </pipe>
+    <pipe name="Descriptive Name of Pipe" numInstances="1">
+      <input type="KAFKA" name="Description of the Node" connection="localhost:9092" bufferQueueName="kafkaoutbuff2" topic="FlightUpdatedNotification" />
+      <output type="FILE" name="Description of the Node" path="C:\Users\dave_\Desktop\KAFKAOUT\flt.xml" />
+    </pipe>
+  </pipes>
+</config>

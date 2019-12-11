@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings />
+  <pipes>
+    <pipe name="Round Robin Distribution" numInstances="1" distribution="roundRobin">
+      <input type="MSMQ" name="Input Messages" queue="inputforroundrobin" />
+      <output type="MSMQ" name="Destination  1" createQueue="True" queue="dest1" />
+      <output type="MSMQ" name="Destination 2" queue="dest2" createQueue="True" />
+      <output type="MSMQ" name="Desrination 3" queue="dest3" createQueue="True" />
+    </pipe>
+  </pipes>
+</config>

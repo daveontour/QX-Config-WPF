@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace QueueExchange {
@@ -30,7 +31,14 @@ namespace QueueExchange {
 
         public Exchange() { }
 
-        public void Start() {
+        public bool Start() {
+            Thread thr = new Thread(new ThreadStart(StartThread));
+            thr.Start();
+
+            return true;
+        }
+
+        public void StartThread() {
 
             // Set up all the Pipelines
             this.Configure();

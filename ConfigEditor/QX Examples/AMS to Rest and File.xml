@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <service serviceName="Queue Exchange Service" serviceDisplayName="Queue Exchange Service" serviceDescription="A instance of QueueExchange for connecting inputs to outputs" />
+  </settings>
+  <pipes>
+    <pipe name="Distribution of AMS Messages" numInstances="1">
+      <input type="MSMQ" name="AMS Notification Queue" queue=".\private$\fromams" />
+      <output type="REST" name="RESTful Output" maxMessages="10" requestURL="http://localhost:8080/qxrestout/" bufferQueueName=".\private$\qxrestbuffer" />
+      <output type="FILE" name="Message Folder" path="c:\Users\dave_\Desktop\AMS\messages.xml" />
+    </pipe>
+  </pipes>
+</config>

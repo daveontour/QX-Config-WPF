@@ -38,27 +38,11 @@ namespace QueueExchange {
                 string serviceDisplayName = string.IsNullOrEmpty(appSettings["ServiceDisplayName"]) ? "Service Display Name Default" : appSettings["ServiceDisplayName"];
                 string serviceDescription = string.IsNullOrEmpty(appSettings["ServiceDescription"]) ? "Service Description Default" : appSettings["ServiceDescription"];
 
-                // Try setting the service parametes fron the ExchangeConfig file 
-                XmlDocument doc = new XmlDocument();
-                try {
-                    doc.Load("./ExchangeConfig.xml");
-                } catch {
-                    doc.Load("./Executable/ExchangeConfig.xml");
-                }
-
-                try {
-                    XmlNode serviceSettings = doc.SelectSingleNode("//service");
-                    serviceName = serviceSettings.Attributes["serviceName"].Value;
-                    serviceDisplayName = serviceSettings.Attributes["serviceDisplayName"].Value;
-                    serviceDescription = serviceSettings.Attributes["serviceDescription"].Value;
-
-                } catch (Exception e) {
-                    Console.WriteLine($"Setting Service Parameters Not Found in ExchangeConfig.xml - using defaults. Error Message  {e.Message}");
-                }
-
                 x.SetServiceName(serviceName);
                 x.SetDisplayName(serviceDisplayName);
                 x.SetDescription(serviceDescription);
+
+
             });
 
             int exitCodeValue = (int)Convert.ChangeType(exitCode, exitCode.GetTypeCode());

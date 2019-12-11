@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <namespace prefix="ams" uri="http://www.sita.aero/ams6-xml-api-messages" />
+  </settings>
+  <pipes>
+    <pipe name="AMS Messages" numInstances="1">
+      <input type="MSMQ" name="MSMQ Source" queue=".\private$\fromams" />
+      <output type="MQ" name="AMS Messages" queueMgr="AIEQMGR" queue="AMS.IN" channel="AMS.SVRCONN" host="localhost" port="1415" />
+      <output type="MQ" name="AMS Messages 2" queueMgr="AIEQMGR" queue="AMS.DEBUG" channel="AMS.SVRCONN" host="localhost" port="1415" />
+      <output type="MQ" name="Filtered AMS " queueMgr="AIEQMGR" queue="AMS.IN.FILTERED" channel="AMS.SVRCONN" host="localhost" port="1415">
+        <filter>
+          <altqueue type="MQ" name="Messages that fail the filter" queueMgr="AIEQMGR" queue="AMS.IN.FILTERED.FAIL" channel="AMS.SVRCONN" host="localhost" port="1415" />
+          <xpexists xpath="/ams:Envelope/ams:Content/ams:MovementUpdatedNotification" />
+        </filter>
+      </output>
+    </pipe>
+  </pipes>
+</config>

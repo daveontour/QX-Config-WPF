@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <namespace prefix="ams" uri="http://www.sita.aero/ams6-xml-api-messages" />
+    <service serviceName="Queue Exchange Service" serviceDisplayName="Queue Exchange Service" serviceDescription="A instance of QueueExchange for connecting inputs to outputs" />
+  </settings>
+  <pipes>
+    <pipe name="AMS MovementUpdated Messages Only" numInstances="1">
+      <input type="MSMQ" name="AMS Source" queue=".\private$\fromams">
+        <filter>
+          <altqueue type="MSMQ" name="Messages that fail the filter" queue=".\private$\daveoutaltqueue" />
+          <or>
+            <xpexists xpath="/ams:Envelope/ams:Content/ams:MovementUpdatedNotification" />
+            <xpexists xpath="/ams:Envelope/ams:Content/ams:FlightUpdatedNotification" />
+          </or>
+        </filter>
+      </input>
+      <output type="REST" name="AMS Messages" queue=".\private$\daveout5" maxMessages="10" createQueue="True" requestURL="http://localhost:8080/amsmvt/" bufferQueueName=".\private$\restbuff" />
+      <output type="FILE" name="Description of the Node" path="C:\Users\dave_\Desktop\AMS\amsx.xml" />
+    </pipe>
+    <pipe name="All the other messages" numInstances="1">
+      <input type="MSMQ" name="The Rejected Messages" queue=".\private$\daveoutaltqueue" />
+      <output type="REST" name="Rest Output for Rejected Messages" requestURL="http://localhost:8080/alt/" bufferQueueName=".\private$\daveoutaltqueuebuff" maxMessages="10" />
+      <output type="FILE" name="File Destination for Rejected Messages" path="C:\Users\dave_\Desktop\AMS\rejected.xml" />
+    </pipe>
+  </pipes>
+</config>

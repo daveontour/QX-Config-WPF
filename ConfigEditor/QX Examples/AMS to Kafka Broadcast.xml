@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <settings>
+    <service serviceName="Queue Exchange Service" serviceDisplayName="Queue Exchange Service" serviceDescription="A instance of QueueExchange for connecting inputs to outputs" />
+  </settings>
+  <pipes>
+    <pipe name="MSMQ to Kafka" numInstances="1">
+      <input type="MSMQ" name="AMS Source" queue=".\private$\fromams" />
+      <output type="KAFKA" name="TOKAFKA" connection="localhost:9092" topic="AMSTEST" bufferQueueName="kaflabuffertest" />
+    </pipe>
+    <pipe name="Kafka to File" numInstances="1">
+      <input type="KAFKA" name="FROMKAFKA" connection="localhost:9092" topic="AMSTEST" bufferQueueName="kafkainbufftest" />
+      <output type="FILE" name="Description of the Node" path="C:\Users\dave_\Desktop\KAFKAOUT\kafka.out.xml" />
+    </pipe>
+  </pipes>
+</config>
