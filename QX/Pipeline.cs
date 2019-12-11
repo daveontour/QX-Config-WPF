@@ -33,6 +33,7 @@ namespace QueueExchange {
         protected readonly string contextCacheKeyXPath;
         protected readonly double contextCacheExpiry = 10.0;
         protected readonly MemoryCache _contextCache;
+        protected readonly MemoryCache _fistProcessed; 
         protected readonly bool discardInCache = false;
         protected readonly Dictionary<String, Queue<ExchangeMessage>> _bufferMemoryQueueDict = new Dictionary<String, Queue<ExchangeMessage>>();
         protected readonly Dictionary<String, System.Timers.Timer> _bufferTimerDict = new Dictionary<String, System.Timers.Timer>();
@@ -41,6 +42,7 @@ namespace QueueExchange {
 
         protected string name;
         protected static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        protected bool firstOnly;
 
         public Pipeline(XElement pipeConfig) {
 
@@ -151,6 +153,12 @@ namespace QueueExchange {
                 this.discardInCache = bool.Parse(pipeConfig.Attribute("discardInCache").Value);
             } catch (Exception) {
                 this.discardInCache = false;
+            }
+
+            try {
+                this.firstOnly = bool.Parse(pipeConfig.Attribute("firstOnly").Value);
+            } catch (Exception) {
+                this.firstOnly = false;
             }
 
             try {
@@ -301,6 +309,11 @@ namespace QueueExchange {
                     }
                 }
 
+                if (firstOnly && _fistProcessed.Contains(nodeValue)) {
+                    await InjectMessage(xm);
+                    return;
+                }
+
                 Queue<ExchangeMessage> _bufferMemoryQueue = null;
                 System.Timers.Timer _bufferPopperTimer = null;
 
@@ -350,6 +363,8 @@ namespace QueueExchange {
 
                 } else {
                     logger.Trace("The key was found in the Context Cache");
+
+                    _fistProcessed.AddOrGetExisting(nodeValue, nodeValue, DateTime.Now.AddHours(18));
 
                     if (this.discardInCache) {
                         return;

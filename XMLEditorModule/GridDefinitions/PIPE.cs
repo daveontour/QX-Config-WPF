@@ -124,6 +124,11 @@ namespace QXEditorModule.GridDefinitions {
                 isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
 
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["FirstOnly"];
+                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+
                 return value;
             }
             set {
@@ -155,6 +160,12 @@ namespace QXEditorModule.GridDefinitions {
                 theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["FirstOnly"];
+                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+
 
                 SetAttribute("contextAware", value);
             }
@@ -212,6 +223,7 @@ namespace QXEditorModule.GridDefinitions {
             }
         }
 
+
         [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Cache Expiry"), Browsable(true), PropertyOrder(3), DescriptionAttribute("How long items remain in the context cache which also determines the rate of messages meeting the key will be sent")]
         public int ContextExpiry {
             get { return GetIntAttribute("contextCacheExpiry"); }
@@ -227,6 +239,12 @@ namespace QXEditorModule.GridDefinitions {
         public bool DiscardCacheItems {
             get { return GetBoolAttribute("discardInCache"); }
             set { SetAttribute("discardInCache", value); }
+        }
+
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Cache First Only"), Browsable(true), PropertyOrder(5), DescriptionAttribute("Only apply Context Cache to first occurance")]
+        public bool FirstOnly {
+            get { return GetBoolAttribute("firstOnly"); }
+            set { SetAttribute("firstOnly", value); }
         }
     }
 }
