@@ -304,13 +304,13 @@ namespace QueueExchange {
 
                         logger.Trace($"\n\n KEY = {nodeValue}\n\n");
                     } catch {
-                        _ = InjectMessage(xm);
+                        _ =  InjectMessage(xm);
                         return;
                     }
                 }
 
                 if (firstOnly && _fistProcessed.Contains(nodeValue)) {
-                    await InjectMessage(xm);
+                    _ = InjectMessage(xm);
                     return;
                 }
 

@@ -838,6 +838,11 @@ namespace QXEditorModule.ViewModels {
 
         private void PackageAndSave() {
 
+            string serviceName = "Queue Exchange Service";
+            string serviceDisplayName = "Queue Exchange Service";
+            string serviceDescription = "Connects input nodes with output nodes";
+
+
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "Zip Files (*.zip)|*.zip";
             if (dialog.ShowDialog() == true) {
@@ -847,21 +852,18 @@ namespace QXEditorModule.ViewModels {
                     // If the service settings are set, then write them into the QX.exe.config file
                     XmlNode serviceSettings = this.DataModel.SelectSingleNode("//service");
 
-                    string serviceName = "Queue Exchange Service";
-                    try {
+                     try {
                         serviceName = serviceSettings.Attributes["serviceName"].Value;
                     } catch (Exception) {
                         serviceName = "Queue Exchange Service";
                     }
 
-                    string serviceDisplayName = "Queue Exchange Service";
                     try {
                         serviceDisplayName = serviceSettings.Attributes["serviceDisplayName"].Value;
                     } catch (Exception) {
                         serviceDisplayName = "Queue Exchange Service";
                     }
 
-                    string serviceDescription = "Connects input nodes with output nodes";
                     try {
                         serviceDescription = serviceSettings.Attributes["serviceDescription"].Value;
                     } catch (Exception) {
@@ -894,6 +896,8 @@ namespace QXEditorModule.ViewModels {
                     File.Delete(dialog.FileName);
                 }
 
+                QXPackageMsg dlg = new QXPackageMsg(serviceName, serviceDisplayName, serviceDescription, dialog.FileName);
+                dlg.ShowDialog();
 
                 ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
 

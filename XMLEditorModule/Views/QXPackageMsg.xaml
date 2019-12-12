@@ -1,0 +1,85 @@
+﻿<Window x:Class="QXEditorModule.Views.QXPackageMsg"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Queue Exchange Executeable Package"
+    Height="340"
+    Width="800"
+    MinHeight="10"
+    MinWidth="300"
+    Background="AliceBlue"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner" >
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel  Grid.Column="0" Grid.Row="0"  HorizontalAlignment="Left" Width="800" Orientation="Vertical">
+
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontWeight="Bold" Margin="5,5" >QX Executable Package</TextBlock>
+            <TextBlock TextWrapping="Wrap" TextAlignment="Left" Margin="5,10" >The runtime executable and the configuration file has been package together</TextBlock>
+
+            <Grid Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="18"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0">Filename:</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0">Service Name:</TextBlock>
+                <TextBlock Grid.Row="2" Grid.Column="0">Service Display Name:</TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="0">Serive Description:</TextBlock>
+
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Mode=OneWay, Path=FileName}" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Mode=OneWay, Path=ServiceName}" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Mode=OneWay, Path=ServiceDisplayName}" />
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Mode=OneWay, Path=ServiceDescription}" />
+            </Grid>
+
+            <TextBlock TextWrapping="Wrap" TextAlignment="Left" Margin="5,10" >Extract the contents of the file to desired location </TextBlock>
+
+            <Grid Margin="5,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="10"/>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="18"/>
+                    <RowDefinition  Height="18"/>
+
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold">To Run as a Console Application:</TextBlock>
+                <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold">To Install and Run as a Service </TextBlock>
+
+
+                <TextBlock Grid.Row="0" Grid.Column="1" >1. Open the Windows Command Prompt and go to the directory the files were extracted to</TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="1" >2. Type: QX.exe</TextBlock>
+
+                <TextBlock Grid.Row="3" Grid.Column="1" >1. As Administrator, open the Windows Command Prompt and go to the directory the files were extracted to</TextBlock>
+                <TextBlock Grid.Row="4" Grid.Column="1" >2. Type: QX.exe install</TextBlock>
+                <TextBlock Grid.Row="5" Grid.Column="1" >3. Use the "Services" app to start the installed service</TextBlock>
+
+            </Grid>
+
+        </StackPanel>
+       
+        <!-- Accept or Cancel -->
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,0,10" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+            <Button  Width="100" Name="okButton" IsDefault="True" Click="clickOK" Margin="5,0,5,0">OK</Button>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -97,6 +97,9 @@
     <Compile Include="Views\FilterCustomEditor.xaml.cs">
       <DependentUpon>FilterCustomEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\QXPackageMsg.xaml.cs">
+      <DependentUpon>QXPackageMsg.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\QXAbout.xaml.cs">
       <DependentUpon>QXAbout.xaml</DependentUpon>
     </Compile>
@@ -119,6 +122,10 @@
     <Page Include="Views\FilterCustomEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\QXPackageMsg.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\QXAbout.xaml">
       <Generator>MSBuild:Compile</Generator>
