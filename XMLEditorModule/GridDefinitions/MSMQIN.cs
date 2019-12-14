@@ -2,6 +2,7 @@
 using QXEditorModule.Common;
 using System.ComponentModel;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using System.Reflection;
 
 namespace QXEditorModule.GridDefinitions {
     [DisplayName("Microsoft MQ Input Node")]
@@ -11,6 +12,14 @@ namespace QXEditorModule.GridDefinitions {
             this._node = dataModel;
             this.view = view;
             this.type = "MSMQ";
+
+            // The "Priority Propery is only for input, so make sure it is set correctly
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["Priority"];
+            BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+            FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            // Set the Descriptor's "Browsable" Attribute
+            isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
         }
 
         [CategoryAttribute("Required"), DisplayName("Node Type"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
