@@ -414,20 +414,6 @@ namespace QXEditorModule.Views {
                 monitorCanvas.ContextMenu.Items.Add(monMenuProvider.ContextMenus[ContextMenuType.Delete]);
             }
 
-            //XmlNodeList loggers = xmlDoc.SelectNodes("//logger");
-            //foreach (XmlNode logger in loggers) {
-            //    Canvas logCanvas = GetLoggerCanvas();
-            //    logCanvas.PreviewMouseDown += Can_MouseDown;
-            //    this.nodeToCanvas.Add(logger, logCanvas);
-            //    this.canvasToNode.Add(logCanvas, logger);
-            //    settingspanel.Children.Add(logCanvas);
-
-            //    logCanvas.ContextMenu = new ContextMenu();
-            //    ContextMenuProvider logMenuProvider = new ContextMenuProvider();
-            //    logMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
-            //    logCanvas.ContextMenu.Items.Add(logMenuProvider.ContextMenus[ContextMenuType.Delete]);
-            //}
-
             XmlNodeList srvs = xmlDoc.SelectNodes("//service");
             foreach (XmlNode ns in srvs) {
                 Canvas srvCanvas = GetServiceCanvas();
@@ -463,10 +449,6 @@ namespace QXEditorModule.Views {
             setMenuProvider.ContextMenus[ContextMenuType.AddMonitor].Command = ViewModel.AddMonitorCommand;
             setMenuProvider.ContextMenus[ContextMenuType.AddMonitor].CommandParameter = XmlNodeType.Element;
             this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddMonitor]);
-
-            //setMenuProvider.ContextMenus[ContextMenuType.AddLogger].Command = ViewModel.AddLoggerCommand;
-            //setMenuProvider.ContextMenus[ContextMenuType.AddLogger].CommandParameter = XmlNodeType.Element;
-            //this.settingspanel.ContextMenu.Items.Add(setMenuProvider.ContextMenus[ContextMenuType.AddLogger]);
 
             setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].Command = ViewModel.AddNamespaceCommand;
             setMenuProvider.ContextMenus[ContextMenuType.AddNamespace].CommandParameter = XmlNodeType.Element;
@@ -727,6 +709,8 @@ namespace QXEditorModule.Views {
             // Add Filter indicator if present
             if (node.HasChildNodes) {
 
+                XmlNode filterNode = node.FirstChild;
+
                 Canvas filterCanvas = new Canvas() {
                     Height = can.Height / 2,
                     Width = can.ActualWidth / 2,
@@ -769,6 +753,39 @@ namespace QXEditorModule.Views {
                 filMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
                 filterCanvas.ContextMenu.Items.Add(filMenuProvider.ContextMenus[ContextMenuType.Delete]);
 
+
+                // Alt Queue node
+
+                XmlNode altqueue = filterNode.SelectNodes("./altqueue").Item(0);
+
+                if (altqueue != null) {
+                    Canvas altCanvas = new Canvas() {
+                        Height = 25,
+                        Width = 25,
+                        Background = transBrush
+                    };
+
+                    if (inNode) {
+                        altCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 20.0);
+                    } else {
+                        altCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 26.0);
+                    }
+                    altCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty) - 15.0);
+
+                    altCanvas.Children.Add(GetResourceCopy<Path>("outputnode"));
+                    canTop.Children.Add(altCanvas);
+                    altCanvas.MouseDown += Can_MouseDown;
+
+                    altCanvas.ContextMenu = new ContextMenu();
+                    ContextMenuProvider altMenuProvider = new ContextMenuProvider();
+
+                    altMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
+                    altCanvas.ContextMenu.Items.Add(altMenuProvider.ContextMenus[ContextMenuType.Delete]);
+
+                    canvasToNode.Add(altCanvas, altqueue);
+                    nodeToCanvas.Add(altqueue, altCanvas);
+
+                }
             }
 
             // Add stylesheet indicator if present
@@ -780,15 +797,32 @@ namespace QXEditorModule.Views {
                 };
 
 
+                XmlNode altqueue = null;
+
+                try {
+                   altqueue = node.FirstChild.SelectNodes("./altqueue").Item(0);
+                } catch (Exception){
+                    altqueue = null;
+                }
+
+
                 if (inNode) {
                     transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0);
                     if (node.HasChildNodes) {
-                        transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 4.0);
+                        if (altqueue == null) {
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 4.0);
+                        } else {
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 24.0 );
+                        }
                     }
                 } else {
                     transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 4.0);
                     if (node.HasChildNodes) {
-                        transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - 2 * can.Width / 2 - 8.0);
+                        if (altqueue == null) {
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - 2 * can.Width / 2 - 8.0);
+                        } else {
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - 2 * can.Width / 2 - 30.0);
+                        }
                     }
                 }
                 transformCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
@@ -847,7 +881,12 @@ namespace QXEditorModule.Views {
                 };
                 path.Fill = brush;
             }
-
+            if (LogicalTreeHelper.FindLogicalNode(sender as Canvas, "outputnode") is Path path2) {
+                SolidColorBrush brush = new SolidColorBrush {
+                    Color = Colors.Red
+                };
+                path2.Fill = brush;
+            }
         }
 
         private void CanCanvas_MouseDown(object sender, XmlNode node) {
