@@ -470,7 +470,7 @@ namespace QXEditorModule.ViewModels {
         }
         private bool CanAddFilter(XmlNodeType newNodeType) {
 
-            if (SelectedElement == null || SelectedElement.DataModel == null) {
+            if (SelectedElement == null || SelectedElement.DataModel == null || SelectedElement.DataModel.HasChildNodes ) {
                 return false;
             }
             if (SelectedElement.DataModel.Name == "input" || SelectedElement.DataModel.Name == "output") {
