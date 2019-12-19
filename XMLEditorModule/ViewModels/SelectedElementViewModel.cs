@@ -5,12 +5,10 @@ using System.Windows.Input;
 using System.Xml;
 
 namespace QXEditorModule.ViewModels {
-    public class SelectedElementViewModel: BaseViewModel
-    {
+    public class SelectedElementViewModel : BaseViewModel {
         private XmlNode currentNode;
         private ObservableCollection<ChildViewModel> children;
-        public SelectedElementViewModel(XmlNode dataModel)
-        {
+        public SelectedElementViewModel(XmlNode dataModel) {
             this.DataModel = dataModel;
             removeChildrenCommand = new RelayCommand((p) => { RemoveChildren(); });
 
@@ -21,70 +19,47 @@ namespace QXEditorModule.ViewModels {
 
         private XmlNode dataModel;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        ///        
         public XmlNode DataModel { get { return dataModel; } private set { dataModel = value; OnPropertyChanged("DataModel"); } }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public XmlNode CurrentNode
-        {
+        public XmlNode CurrentNode {
             get { return currentNode; }
-            set
-            {
+            set {
                 currentNode = value;
                 OnPropertyChanged("CurrentNode");
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public ObservableCollection<ChildViewModel> Children
-        {
+        public ObservableCollection<ChildViewModel> Children {
             get { return children; }
-            set { children = value; 
-            
+            set {
+                children = value;
                 OnPropertyChanged("Children");
             }
         }
 
 
-        /// <summary>
-        /// To get the value from UI
-        /// </summary>
-        public Func<XmlNodeType,XmlNode> AddXmlNode { get; set; }
+        public Func<XmlNodeType, XmlNode> AddXmlNode { get; set; }
 
         #region Commands
 
         private ICommand removeChildrenCommand;
 
-        public ICommand RemoveChildrenCommand
-        {
+        public ICommand RemoveChildrenCommand {
             get { return removeChildrenCommand; }
         }
 
         private ICommand addAttributeCommand;
 
-        public ICommand AddAttributeCommand
-        {
+        public ICommand AddAttributeCommand {
             get { return addAttributeCommand; }
         }
-        
 
-        private void RemoveChildren()
-        {
-            foreach (var childVM in Children)
-            {
-                if (childVM.IsSelected && childVM.DataModel.NodeType == XmlNodeType.Attribute)
-                {
+
+        private void RemoveChildren() {
+            foreach (var childVM in Children) {
+                if (childVM.IsSelected && childVM.DataModel.NodeType == XmlNodeType.Attribute) {
                     this.DataModel.Attributes.Remove(childVM.DataModel as XmlAttribute);
-                }
-                else if (childVM.IsSelected && childVM.DataModel.NodeType == XmlNodeType.Text && this.DataModel.ParentNode != null)
-                {
+                } else if (childVM.IsSelected && childVM.DataModel.NodeType == XmlNodeType.Text && this.DataModel.ParentNode != null) {
                     this.DataModel.ParentNode.RemoveChild(this.DataModel);
                 }
             }
@@ -93,27 +68,18 @@ namespace QXEditorModule.ViewModels {
         }
 
         #endregion
-
-
-        private void UpdateChildren()
-        {          
-            if (this.DataModel == null)
-            {
+        private void UpdateChildren() {
+            if (this.DataModel == null) {
                 return;
             }
             OnPropertyChanged("DataModel");
             this.Children.Clear();
-            if (this.DataModel.NodeType == XmlNodeType.Element && this.DataModel.Attributes != null)
-            {
-                foreach (XmlAttribute item in this.DataModel.Attributes)
-                {
+            if (this.DataModel.NodeType == XmlNodeType.Element && this.DataModel.Attributes != null) {
+                foreach (XmlAttribute item in this.DataModel.Attributes) {
                     var childVM = new ChildViewModel(item);
                     Children.Add(childVM);
                 }
-            }
-
-            else if (this.DataModel.NodeType == XmlNodeType.Text)
-            {
+            } else if (this.DataModel.NodeType == XmlNodeType.Text) {
                 var childVM = new ChildViewModel(this.DataModel);
                 Children.Add(childVM);
             }

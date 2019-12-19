@@ -70,8 +70,6 @@ namespace QXEditorModule.ViewModels {
         public ICommand AboutCommand { get { return aboutCommand; } }
 
         #endregion
-
-
         public TreeEditorViewModel(XmlDocument dataModel, string filePath, string fileName) {
             this.DataModel = dataModel;
             this.path = filePath;
@@ -217,9 +215,7 @@ namespace QXEditorModule.ViewModels {
             } else if (selectedItem.Name == "contextContains") {
                 myGrid = new ContextFilter(selectedItem, this.View);
             }
-            //       else {
-            //              myGrid = null;
-            //          }
+
             OnPropertyChanged("myGrid");
         }
 
@@ -286,7 +282,6 @@ namespace QXEditorModule.ViewModels {
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
-
         }
 
         private XmlNode CreateNodeFromText(string xmlContent) {
@@ -468,7 +463,7 @@ namespace QXEditorModule.ViewModels {
         }
         private bool CanAddFilter(XmlNodeType newNodeType) {
 
-            if (SelectedElement == null || SelectedElement.DataModel == null || SelectedElement.DataModel.HasChildNodes ) {
+            if (SelectedElement == null || SelectedElement.DataModel == null || SelectedElement.DataModel.HasChildNodes) {
                 return false;
             }
             if (SelectedElement.DataModel.Name == "input" || SelectedElement.DataModel.Name == "output") {
@@ -849,7 +844,7 @@ namespace QXEditorModule.ViewModels {
                     // If the service settings are set, then write them into the QX.exe.config file
                     XmlNode serviceSettings = this.DataModel.SelectSingleNode("//service");
 
-                     try {
+                    try {
                         serviceName = serviceSettings.Attributes["serviceName"].Value;
                     } catch (Exception) {
                         serviceName = "Queue Exchange Service";
@@ -867,7 +862,7 @@ namespace QXEditorModule.ViewModels {
                         serviceDescription = "Connects input nodes with output nodes";
                     }
 
-                    
+
                     XmlDocument doc = new XmlDocument();
                     doc.Load("./Executable/QX.exe.config");
 
@@ -898,36 +893,14 @@ namespace QXEditorModule.ViewModels {
 
                 ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
 
-                //ServiceConfig dlg = new ServiceConfig();
-
-                //if (dlg.ShowDialog() == true) {
-
-                //    XmlDocument doc = new XmlDocument();
-                //    doc.Load("./Executable/QX.exe.config");
-
-                //    doc.SelectSingleNode("//add[@key='ServiceName']").Attributes["value"].Value = dlg.ServiceShortName;
-                //    doc.SelectSingleNode("//add[@key='ServiceDisplayName']").Attributes["value"].Value = dlg.ServiceName;
-                //    doc.SelectSingleNode("//add[@key='ServiceDescription']").Attributes["value"].Value = dlg.ServiceDesc;
-
-                //    using (TextWriter sw = new StreamWriter(@"./Executable/QX.exe.config", false, Encoding.UTF8)) {
-                //        doc.Save(sw);
-                //    }
-
-                //    XmlDocument newDoc = this.DataModel.CloneNode(true) as XmlDocument;
-                //    using (TextWriter sw = new StreamWriter(@"./Executable/ExchangeConfig.xml", false, Encoding.UTF8)) {
-                //        newDoc.Save(sw);
-                //    }
-                //    ZipFile.CreateFromDirectory(@"./Executable/", dialog.FileName);
-                //}
             }
         }
 
         private void AboutQX() {
-
             QXAbout dlg = new QXAbout();
             dlg.ShowDialog();
         }
-        #endregion
 
+        #endregion
     }
 }

@@ -15,7 +15,6 @@ namespace QXEditorModule.Views {
             InitializeComponent();
         }
 
-
         void CloseTab_Handler(object sender, RoutedEventArgs e) {
             try {
                 ViewModel.Remove((sender as CloseableTabItem).Content as TreeEditorViewModel);
@@ -23,7 +22,5 @@ namespace QXEditorModule.Views {
                 Console.WriteLine(ex.Message);
             }
         }
-
-
     }
 }

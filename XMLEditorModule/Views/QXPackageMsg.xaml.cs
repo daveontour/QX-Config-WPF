@@ -3,7 +3,7 @@
 namespace QXEditorModule.Views {
     public partial class QXPackageMsg : Window {
 
-         public QXPackageMsg(string serviceName, string serviceDisplayName, string serviceDescription, string fileName) {
+        public QXPackageMsg(string serviceName, string serviceDisplayName, string serviceDescription, string fileName) {
             InitializeComponent();
             this.DataContext = this;
 
@@ -17,13 +17,9 @@ namespace QXEditorModule.Views {
             DialogResult = true;
         }
 
-        public string  FileName { get; set; }
+        public string FileName { get; set; }
         public string ServiceName { get; set; }
         public string ServiceDisplayName { get; set; }
         public string ServiceDescription { get; set; }
-
-
-
-
     }
 }

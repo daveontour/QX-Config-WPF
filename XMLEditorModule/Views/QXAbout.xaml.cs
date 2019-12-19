@@ -3,7 +3,6 @@
 namespace QXEditorModule.Views {
     public partial class QXAbout : Window {
 
-        
         public QXAbout() {
             InitializeComponent();
             this.DataContext = this;
@@ -12,7 +11,5 @@ namespace QXEditorModule.Views {
         private void clickOK(object sender, RoutedEventArgs e) {
             DialogResult = true;
         }
-
-
     }
 }

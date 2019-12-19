@@ -16,7 +16,6 @@ using System.Xml;
 using Path = System.Windows.Shapes.Path;
 
 namespace QXEditorModule.Views {
-
     public partial class TreeEditorView : UserControl, INotifyPropertyChanged, IView {
 
         private const int arrowHeadWidth = 5;
