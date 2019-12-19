@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using QXEditorModule.Views;
+using System;
 using System.Collections.ObjectModel;
-using QXEditorModule.Views;
 
-namespace QXEditorModule.ViewModels
-{
+namespace QXEditorModule.ViewModels {
     public class TreeEditorsViewModel : BaseViewModel
     {
         private int activeTabIndex;

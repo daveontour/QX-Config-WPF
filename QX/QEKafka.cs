@@ -1,6 +1,5 @@
 ﻿using Confluent.Kafka;
 using System;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -140,7 +139,7 @@ namespace QueueExchange {
             using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build()) {
 
                 consumer.Subscribe(topic);
-           
+
                 try {
                     while (OK_TO_RUN) {
                         try {

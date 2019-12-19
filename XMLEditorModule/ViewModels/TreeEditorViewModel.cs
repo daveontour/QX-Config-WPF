@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-
-using System.Windows.Input;
+﻿using Microsoft.Win32;
 using QXEditorModule.Common;
-using Xceed.Wpf.Toolkit;
-using System.IO;
-using Microsoft.Win32;
 using QXEditorModule.GridDefinitions;
-using System.Diagnostics;
-using System.IO.Compression;
 using QXEditorModule.Views;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
+using System.Windows.Input;
+using System.Xml;
+using Xceed.Wpf.Toolkit;
 
 namespace QXEditorModule.ViewModels {
 

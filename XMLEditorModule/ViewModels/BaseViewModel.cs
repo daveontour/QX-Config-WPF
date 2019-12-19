@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace QXEditorModule.ViewModels
-{
-   public class BaseViewModel :INotifyPropertyChanged
+namespace QXEditorModule.ViewModels {
+    public class BaseViewModel :INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -20,12 +20,5 @@
             <RowDefinition Height="20"/>         
         </Grid.RowDefinitions>
         <Menu Name="MenuBar" Grid.Row="0"></Menu>    
-        <!--<StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="xPath:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="LightGray" >
-             </TextBlock>
-            <TextBox x:Name="searchTextBox" Text="{Binding Path=xPath, ElementName= cmdBar}" Background="LightGray" Width="500" Height="25" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="3,0,0,0"></TextBox>
-            <Button x:Name="searchButton" Content="Search" Height="30" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,0,0" Click="searchButton_Click"></Button>
-        </StackPanel>-->
-   
     </Grid>
 </UserControl>

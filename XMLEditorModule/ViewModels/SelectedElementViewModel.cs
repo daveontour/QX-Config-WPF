@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
+﻿using QXEditorModule.Common;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using QXEditorModule.Common;
+using System.Xml;
 
-namespace QXEditorModule.ViewModels
-{
+namespace QXEditorModule.ViewModels {
     public class SelectedElementViewModel: BaseViewModel
     {
         private XmlNode currentNode;

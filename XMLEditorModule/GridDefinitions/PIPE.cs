@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-
-using System.Windows.Input;
-using QXEditorModule.Common;
+﻿using QXEditorModule.Common;
 using System.ComponentModel;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using System.Globalization;
 using System.Reflection;
+using System.Xml;
 using Xceed.Wpf.Toolkit;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace QXEditorModule.GridDefinitions {
     [DisplayName("Pipe Connecting Input and Output")]

@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Win32;
+using QXEditorModule.Common;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using QXEditorModule.Common;
-using System.Xml;
-using System.Diagnostics;
-using Microsoft.Win32;
-using System.IO;
 using System.Windows.Markup;
-
+using System.Xml;
 using Path = System.Windows.Shapes.Path;
 
 namespace QXEditorModule.Views {
@@ -80,8 +69,6 @@ namespace QXEditorModule.Views {
             fileMenuItem.Items.Add(aboutMenuItem);
 
             this.MenuBar.Items.Add(fileMenuItem);
-            
-
 
             executeMenuItem = new MenuItem { Header = "_Execute" };
             executeMenuItem.IsEnabled = false;
@@ -146,31 +133,24 @@ namespace QXEditorModule.Views {
             dialog.Filter = "XML Files (*.xml)|*.xml";
             if (dialog.ShowDialog() == true) {
                 SaveAsEventArgs args = new SaveAsEventArgs { FileName = dialog.SafeFileName, Path = dialog.FileName };
-                if (SaveAsRequested != null) {
-                    SaveAsRequested(this, args);
-                }
+                SaveAsRequested?.Invoke(this, args);
             }
         }
 
         void saveMenuItem_Click(object sender, RoutedEventArgs e) {
-
             SaveRequested?.Invoke(this, e);
         }
 
         void exportMenuItem_Click(object sender, RoutedEventArgs e) {
-            if (PackageRequested != null) {
-                PackageRequested(this, e);
-            }
+            PackageRequested?.Invoke(this, e);
         }
 
         void aboutMenuItem_Click(object sender, RoutedEventArgs e) {
-                AboutRequested(this, e);
+            AboutRequested(this, e);
         }
 
         void executeMenuItem_Click(object sender, RoutedEventArgs e) {
-            if (SaveAsAndExecuteRequested != null) {
-                SaveAsAndExecuteRequested(this, e);
-            }
+            SaveAsAndExecuteRequested?.Invoke(this, e);
         }
         #endregion
 

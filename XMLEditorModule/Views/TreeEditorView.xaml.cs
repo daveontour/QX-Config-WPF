@@ -1,21 +1,19 @@
-﻿using System;
+﻿using QXEditorModule.Common;
+using QXEditorModule.GridDefinitions;
+using QXEditorModule.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml;
-
-using QXEditorModule.ViewModels;
-using QXEditorModule.Common;
-using System.ComponentModel;
-using System.IO;
-
 using Path = System.Windows.Shapes.Path;
-using System.Windows.Markup;
-using QXEditorModule.GridDefinitions;
 
 namespace QXEditorModule.Views {
 
@@ -802,8 +800,8 @@ namespace QXEditorModule.Views {
                 XmlNode altqueue = null;
 
                 try {
-                   altqueue = node.FirstChild.SelectNodes("./altqueue").Item(0);
-                } catch (Exception){
+                    altqueue = node.FirstChild.SelectNodes("./altqueue").Item(0);
+                } catch (Exception) {
                     altqueue = null;
                 }
 
@@ -814,7 +812,7 @@ namespace QXEditorModule.Views {
                         if (altqueue == null) {
                             transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 4.0);
                         } else {
-                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 24.0 );
+                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 24.0);
                         }
                     }
                 } else {

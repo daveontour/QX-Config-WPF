@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 
-namespace QXEditorModule.ViewModels
-{
-   public  class ChildViewModel :BaseViewModel
+namespace QXEditorModule.ViewModels {
+    public  class ChildViewModel :BaseViewModel
     {
         public XmlNode DataModel { get; private set; }
         public ChildViewModel(XmlNode childNode)

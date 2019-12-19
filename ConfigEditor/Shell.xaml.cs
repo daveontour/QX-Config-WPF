@@ -1,31 +1,26 @@
 ﻿using QXEditorModule.Common;
 using QXEditorModule.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Xml;
 
-namespace QueueExchange.ConfigEditor
-{
+namespace QueueExchange.ConfigEditor {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
         TreeEditorsViewModel editorsVM;
-        public MainWindow()
-        {
-            InitializeComponent();     
+        public MainWindow() {
+            InitializeComponent();
             this.commandBarView.DocumentLoaded += new EventHandler<DocumentLoadedEventArgs>(commandBarView_DocumentLoaded);
-           
+
             this.commandBarView.SaveRequested += new EventHandler(commandBarView_SaveRequested);
             this.commandBarView.SaveAsAndExecuteRequested += new EventHandler(commandBarView_SaveAsAndExecuteRequested);
             this.commandBarView.PackageRequested += new EventHandler(commandBarView_PackageRequested);
             this.commandBarView.AboutRequested += new EventHandler(commandBarView_AboutRequested);
             this.commandBarView.SaveAsRequested += new EventHandler<SaveAsEventArgs>(commandBarView_SaveAsRequested);
             editorsVM = new TreeEditorsViewModel();
-           
+
             this.editorsView.ViewModel = editorsVM;
 
             this.startUp();
@@ -42,10 +37,10 @@ namespace QueueExchange.ConfigEditor
         //   this.editorsVM.ActiveEditor.FindElementCommand.Execute(e.XPath);
         //}
 
-      
-        void commandBarView_DocumentLoaded(object sender, DocumentLoadedEventArgs e){
-            var xmlTreeViewModel = new TreeEditorViewModel(e.Document, e.Path, e.FileName);            
-            editorsVM.Add(xmlTreeViewModel);            
+
+        void commandBarView_DocumentLoaded(object sender, DocumentLoadedEventArgs e) {
+            var xmlTreeViewModel = new TreeEditorViewModel(e.Document, e.Path, e.FileName);
+            editorsVM.Add(xmlTreeViewModel);
         }
 
         void commandBarView_SaveAsRequested(object sender, SaveAsEventArgs e) {

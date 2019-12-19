@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-
-using System.Windows.Input;
-using QXEditorModule.Common;
+﻿using QXEditorModule.Common;
 using System.ComponentModel;
+using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace QXEditorModule.GridDefinitions {
