@@ -15,31 +15,31 @@ namespace QXEditorModule.ViewModels {
 
     public class TreeEditorViewModel : BaseViewModel {
 
-        private ICommand viewAttributesCommand;
-        private ICommand addPipeCommand;
-        private ICommand addMonitorCommand;
-        private ICommand addNamespaceCommand;
-        private ICommand addServiceSettingsCommand;
-        private ICommand addInputCommand;
-        private ICommand addTypeInputCommand;
-        private ICommand addTypeOutputCommand;
-        private ICommand addOutputCommand;
-        private ICommand addFilterCommand;
-        private ICommand addExpressionCommand;
-        private ICommand addAltQueueCommand;
-        private ICommand addDataFilterCommand;
-        private ICommand deleteElementCommand;
-        private ICommand saveDocumentCommand;
-        private ICommand saveAsDocumentCommand;
-        private ICommand executeDocumentCommand;
-        private ICommand packageCommand;
-        private ICommand aboutCommand;
+        private readonly ICommand viewAttributesCommand;
+        private readonly ICommand addPipeCommand;
+        private readonly ICommand addMonitorCommand;
+        private readonly ICommand addNamespaceCommand;
+        private readonly ICommand addServiceSettingsCommand;
+        private readonly ICommand addInputCommand;
+        private readonly ICommand addTypeInputCommand;
+        private readonly ICommand addTypeOutputCommand;
+        private readonly ICommand addOutputCommand;
+        private readonly ICommand addFilterCommand;
+        private readonly ICommand addExpressionCommand;
+        private readonly ICommand addAltQueueCommand;
+        private readonly ICommand addDataFilterCommand;
+        private readonly ICommand deleteElementCommand;
+        private readonly ICommand saveDocumentCommand;
+        private readonly ICommand saveAsDocumentCommand;
+        private readonly ICommand executeDocumentCommand;
+        private readonly ICommand packageCommand;
+        private readonly ICommand aboutCommand;
 
         private string path;
         private string fileName;
         private SelectedElementViewModel selectedElement = new SelectedElementViewModel(null);
 
-        public MyPropertyGrid myGrid { get; set; }
+        public MyPropertyGrid MyGrid { get; set; }
         public XmlDocument DataModel { get; private set; }
         public IView View { get; set; }
         public string Path { get { return path; } }
@@ -116,8 +116,9 @@ namespace QXEditorModule.ViewModels {
             get {
                 StringBuilder sb = new StringBuilder();
                 System.IO.TextWriter tr = new System.IO.StringWriter(sb);
-                XmlTextWriter wr = new XmlTextWriter(tr);
-                wr.Formatting = Formatting.Indented;
+                XmlTextWriter wr = new XmlTextWriter(tr) {
+                    Formatting = Formatting.Indented
+                };
                 DataModel.Save(wr);
                 wr.Close();
                 return sb.ToString();
@@ -138,85 +139,85 @@ namespace QXEditorModule.ViewModels {
             if (selectedItem.Name == "input") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        myGrid = new MSMQIN(selectedItem, this.View);
+                        MyGrid = new MSMQIN(selectedItem, this.View);
                         break;
                     case "MQ":
-                        myGrid = new MQIN(selectedItem, this.View);
+                        MyGrid = new MQIN(selectedItem, this.View);
                         break;
                     case "FILE":
-                        myGrid = new FILEIN(selectedItem, this.View);
+                        MyGrid = new FILEIN(selectedItem, this.View);
                         break;
                     case "KAFKA":
-                        myGrid = new KAFKAIN(selectedItem, this.View);
+                        MyGrid = new KAFKAIN(selectedItem, this.View);
                         break;
                     case "HTTP":
-                        myGrid = new HTTPIN(selectedItem, this.View);
+                        MyGrid = new HTTPIN(selectedItem, this.View);
                         break;
                     case "RABBITDEFEX":
-                        myGrid = new RABBITIN(selectedItem, this.View);
+                        MyGrid = new RABBITIN(selectedItem, this.View);
                         break;
                     case "TESTSOURCE":
-                        myGrid = new TESTSOURCE(selectedItem, this.View);
+                        MyGrid = new TESTSOURCE(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "output" || selectedItem.Name == "monitor" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
-                        myGrid = new MSMQOUT(selectedItem, this.View);
+                        MyGrid = new MSMQOUT(selectedItem, this.View);
                         break;
                     case "MQ":
-                        myGrid = new MQOUT(selectedItem, this.View);
+                        MyGrid = new MQOUT(selectedItem, this.View);
                         break;
                     case "FILE":
-                        myGrid = new FILEOUT(selectedItem, this.View);
+                        MyGrid = new FILEOUT(selectedItem, this.View);
                         break;
                     case "KAFKA":
-                        myGrid = new KAFKAOUT(selectedItem, this.View);
+                        MyGrid = new KAFKAOUT(selectedItem, this.View);
                         break;
                     case "REST":
-                        myGrid = new RESTOUT(selectedItem, this.View);
+                        MyGrid = new RESTOUT(selectedItem, this.View);
                         break;
                     case "HTTP":
-                        myGrid = new HTTPOUT(selectedItem, this.View);
+                        MyGrid = new HTTPOUT(selectedItem, this.View);
                         break;
                     case "RABBITDEFEX":
-                        myGrid = new RABBITOUT(selectedItem, this.View);
+                        MyGrid = new RABBITOUT(selectedItem, this.View);
                         break;
                     case "SINK":
-                        myGrid = new SINK(selectedItem, this.View);
+                        MyGrid = new SINK(selectedItem, this.View);
                         break;
                 }
             } else if (selectedItem.Name == "filter") {
-                myGrid = new Filter(selectedItem, this.View);
+                MyGrid = new Filter(selectedItem, this.View);
             } else if (selectedItem.Name == "pipe") {
-                myGrid = new PIPE(selectedItem, this.View);
+                MyGrid = new PIPE(selectedItem, this.View);
             } else if (selectedItem.Name == "namespace") {
-                myGrid = new NameSpaceGrid(selectedItem, this.View);
+                MyGrid = new NameSpaceGrid(selectedItem, this.View);
             } else if (selectedItem.Name == "service") {
-                myGrid = new ServiceSetting(selectedItem, this.View);
+                MyGrid = new ServiceSetting(selectedItem, this.View);
             } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not") {
-                myGrid = new BooleanExpression(selectedItem, this.View);
+                MyGrid = new BooleanExpression(selectedItem, this.View);
             } else if (selectedItem.Name == "contains") {
-                myGrid = new ContainsFilter(selectedItem, this.View);
+                MyGrid = new ContainsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "equals") {
-                myGrid = new EqualsFilter(selectedItem, this.View);
+                MyGrid = new EqualsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "matches") {
-                myGrid = new MatchesFilter(selectedItem, this.View);
+                MyGrid = new MatchesFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "length") {
-                myGrid = new LengthFilter(selectedItem, this.View);
+                MyGrid = new LengthFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpexists") {
-                myGrid = new XPExistsFilter(selectedItem, this.View);
+                MyGrid = new XPExistsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpmatches") {
-                myGrid = new XPMatchesFilter(selectedItem, this.View);
+                MyGrid = new XPMatchesFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "xpequals") {
-                myGrid = new XPEqualsFilter(selectedItem, this.View);
+                MyGrid = new XPEqualsFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "dateRange") {
-                myGrid = new DateRangeFilter(selectedItem, this.View);
+                MyGrid = new DateRangeFilter(selectedItem, this.View);
             } else if (selectedItem.Name == "contextContains") {
-                myGrid = new ContextFilter(selectedItem, this.View);
+                MyGrid = new ContextFilter(selectedItem, this.View);
             }
 
-            OnPropertyChanged("myGrid");
+            OnPropertyChanged("MyGrid");
         }
 
 
@@ -739,8 +740,8 @@ namespace QXEditorModule.ViewModels {
         internal bool CanChangeElementType(string value) {
             if (value == "not" && SelectedElement.DataModel.ChildNodes.Count > 1) {
                 MessageBox.Show("Cannot change to 'not' beacause a 'not' can only have one direct child", "QueueExchange Configuration");
-                myGrid = new BooleanExpression(SelectedElement.DataModel, this.View);
-                OnPropertyChanged("myGrid");
+                MyGrid = new BooleanExpression(SelectedElement.DataModel, this.View);
+                OnPropertyChanged("MyGrid");
                 return false;
             } else {
                 return true;
@@ -775,8 +776,9 @@ namespace QXEditorModule.ViewModels {
 
 
             if (Path == null) {
-                SaveFileDialog dialog = new SaveFileDialog();
-                dialog.Filter = "XML Files (*.xml)|*.xml";
+                SaveFileDialog dialog = new SaveFileDialog {
+                    Filter = "XML Files (*.xml)|*.xml"
+                };
                 if (dialog.ShowDialog() == true) {
                     using (TextWriter sw = new StreamWriter(dialog.FileName, false, Encoding.UTF8)) {
                         this.DataModel.Save(sw);
@@ -820,10 +822,11 @@ namespace QXEditorModule.ViewModels {
                 newDoc.Save(sw);
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = false;
-            startInfo.UseShellExecute = false;
-            startInfo.FileName = @"./Executable/QX.exe";
+            ProcessStartInfo startInfo = new ProcessStartInfo {
+                CreateNoWindow = false,
+                UseShellExecute = false,
+                FileName = @"./Executable/QX.exe"
+            };
 
             System.Diagnostics.Process.Start(startInfo);
         }
@@ -835,8 +838,9 @@ namespace QXEditorModule.ViewModels {
             string serviceDescription = "Connects input nodes with output nodes";
 
 
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "Zip Files (*.zip)|*.zip";
+            SaveFileDialog dialog = new SaveFileDialog {
+                Filter = "Zip Files (*.zip)|*.zip"
+            };
             if (dialog.ShowDialog() == true) {
 
                 try {

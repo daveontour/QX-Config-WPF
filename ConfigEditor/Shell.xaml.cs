@@ -62,5 +62,9 @@ namespace QueueExchange.ConfigEditor {
         void commandBarView_AboutRequested(object sender, EventArgs e) {
             editorsVM.ActiveEditor.AboutCommand.Execute(null);
         }
+
+        private void editorsView_Loaded(object sender, RoutedEventArgs e) {
+
+        }
     }
 }

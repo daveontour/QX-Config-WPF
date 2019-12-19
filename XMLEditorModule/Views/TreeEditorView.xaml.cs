@@ -266,11 +266,11 @@ namespace QXEditorModule.Views {
             double tY = h;
             double tX = 2;
 
-            Canvas imcanvas = GetResourceCopy<Canvas>("output");
+            Canvas imcanvas = GetResourceCopy<Canvas>("input");
             imcanvas.Height = h;
             imcanvas.Width = w;
 
-            Path path = LogicalTreeHelper.FindLogicalNode(imcanvas, "path2") as Path;
+            Path path = LogicalTreeHelper.FindLogicalNode(imcanvas, "path") as Path;
             path.Height = h;
             path.Width = w;
 
@@ -1221,73 +1221,73 @@ namespace QXEditorModule.Views {
         #region updatePropertyGrid
 
         public void MSMQIn(XmlNode node) {
-            viewModel.myGrid = new MSMQIN(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new MSMQIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void MSMQOut(XmlNode node) {
-            viewModel.myGrid = new MSMQOUT(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new MSMQOUT(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void MQInSource(XmlNode node) {
-            viewModel.myGrid = new MQIN(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new MQIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void MQOutSource(XmlNode node) {
-            viewModel.myGrid = new MQOUT(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new MQOUT(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void FileInSource(XmlNode node) {
-            viewModel.myGrid = new FILEIN(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new FILEIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
         public void FileOutSource(XmlNode node) {
-            viewModel.myGrid = new FILEOUT(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new FILEOUT(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
         public void KafkaIn(XmlNode node) {
-            viewModel.myGrid = new KAFKAIN(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new KAFKAIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
         public void KafkaOut(XmlNode node) {
-            viewModel.myGrid = new KAFKAOUT(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new KAFKAOUT(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void RestOut(XmlNode node) {
-            viewModel.myGrid = new RESTOUT(node, this);
+            viewModel.MyGrid = new RESTOUT(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
         public void HTTPOut(XmlNode node) {
-            viewModel.myGrid = new HTTPOUT(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new HTTPOUT(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
         public void HTTPIn(XmlNode node) {
-            viewModel.myGrid = new HTTPIN(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new HTTPIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
         public void RabbitOut(XmlNode node) {
-            viewModel.myGrid = new RABBITOUT(node, this);
+            viewModel.MyGrid = new RABBITOUT(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
         public void RabbitIn(XmlNode node) {
-            viewModel.myGrid = new RABBITIN(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new RABBITIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void SinkOut(XmlNode node) {
-            viewModel.myGrid = new SINK(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new SINK(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         public void TestSource(XmlNode node) {
-            viewModel.myGrid = new TESTSOURCE(node, this);
-            viewModel.OnPropertyChanged("myGrid");
+            viewModel.MyGrid = new TESTSOURCE(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
         }
 
         #endregion

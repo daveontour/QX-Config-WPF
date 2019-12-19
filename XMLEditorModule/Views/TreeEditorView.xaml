@@ -13,7 +13,7 @@
 
     <UserControl.Resources>
 
-         <local1:TaskListDataTemplateSelector x:Key="myDataTemplateSelector"/>
+        <local1:TaskListDataTemplateSelector x:Key="myDataTemplateSelector"/>
         <local:AddChildVisibilityConverter x:Key="AddChildVisibilityConverter"/>
         <local:RemoveChildVisibilityConverter x:Key="RemoveChildVisibilityConverter"/>
         <local:XmlAttributesToLableConverter x:Key="XmlAttributesToLableConverter"/>
@@ -251,7 +251,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="25" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="0,0,0,0">
 
@@ -354,16 +354,16 @@
                     <TextBlock TextWrapping="NoWrap" Text="{Binding Path=XMLText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="White"  HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" />
                 </ScrollViewer>
 
-                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="440" SelectedObject="{Binding myGrid}" HorizontalAlignment="Stretch" AutoGenerateProperties="true" />
+                <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="440" SelectedObject="{Binding MyGrid}" HorizontalAlignment="Stretch" AutoGenerateProperties="true" />
 
             </Grid>
 
         </Grid>
 
         <Grid Grid.Row="1">
-            <StatusBar Height="25" Background="Black" VerticalAlignment="Top">
+            <StatusBar Height="25" Background="AliceBlue" VerticalAlignment="Top">
                 <StatusBarItem>
-                    <TextBlock Text="{Binding Path=Path}" Foreground="LightGray" ></TextBlock>
+                    <TextBlock Text="{Binding Path=Path}" Foreground="Gray" ></TextBlock>
                 </StatusBarItem>
             </StatusBar>
         </Grid>
