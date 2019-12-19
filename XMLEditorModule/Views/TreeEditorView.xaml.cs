@@ -759,6 +759,7 @@ namespace QXEditorModule.Views {
                 XmlNode altqueue = filterNode.SelectNodes("./altqueue").Item(0);
 
                 if (altqueue != null) {
+
                     Canvas altCanvas = new Canvas() {
                         Height = 25,
                         Width = 25,
@@ -772,16 +773,17 @@ namespace QXEditorModule.Views {
                     }
                     altCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty) - 15.0);
 
-                    altCanvas.Children.Add(GetResourceCopy<Path>("outputnode"));
+                    altCanvas.Children.Add(GetResourceCopy<Path>("altqueue"));
                     canTop.Children.Add(altCanvas);
                     altCanvas.MouseDown += Can_MouseDown;
 
+                    // Context Menu to provide "Delete" selection
                     altCanvas.ContextMenu = new ContextMenu();
                     ContextMenuProvider altMenuProvider = new ContextMenuProvider();
-
                     altMenuProvider.ContextMenus[ContextMenuType.Delete].Command = ViewModel.DeleteElementCommand;
                     altCanvas.ContextMenu.Items.Add(altMenuProvider.ContextMenus[ContextMenuType.Delete]);
 
+                    // Enable it to be highlighted/selected
                     canvasToNode.Add(altCanvas, altqueue);
                     nodeToCanvas.Add(altqueue, altCanvas);
 

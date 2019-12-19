@@ -89,8 +89,6 @@ namespace QXEditorModule.Common {
     [CategoryOrder("Optional - Temporal Context Awareness", 7)]
     [RefreshProperties(RefreshProperties.All)]
     public class MyPropertyGrid  {
- //       public int maxMsgPerMinute = -1;
-//        public int maxMsg = -1;
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
@@ -397,14 +395,9 @@ namespace QXEditorModule.Common {
                 SetAttribute("priority", value);
             }
         }
-
-        //[CategoryAttribute("Required"), DisplayName("XML Data"), PropertyOrder(10), DescriptionAttribute("True if the message in the data will be XML")]
-        //public bool IsXML {
-        //    get { return GetBoolDefaultTrueAttribute("isXML"); }
-        //    set { SetAbsoluteAttribute("isXML", value); }
-        //}
     }
 
+    [DisplayName("Name Space Definition")]
     public class NameSpaceGrid : MyPropertyGrid {
         public NameSpaceGrid(XmlNode dataModel, IView view) {
             this._node = dataModel;
@@ -421,6 +414,12 @@ namespace QXEditorModule.Common {
         public string URI {
             get { return GetAttribute("uri"); }
             set { SetAttribute("uri", value); }
+        }
+
+        [CategoryAttribute("Required"), DisplayName("URI"), Browsable(false), PropertyOrder(2), DescriptionAttribute("Namespace URI")]
+        public string Name {
+            get { return "Name Spaces can be used in filter definitions, destination routing and context key definitions"; }
+            set { } 
         }
     }
 

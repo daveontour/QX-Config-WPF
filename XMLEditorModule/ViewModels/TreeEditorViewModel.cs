@@ -528,22 +528,18 @@ namespace QXEditorModule.ViewModels {
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
-            newAttribute2.Value = "descriptive queue name";
+            newAttribute2.Value = "Monitoring messages queue";
             XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            newAttribute3.Value = @".\private$\QUEUENAME";
+            newAttribute3.Value = @".\private$\qxmonitorqueue";
+            XmlAttribute newAttribute4 = this.DataModel.CreateAttribute("createQueue");
+            newAttribute4.Value = "True";
 
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
             newNode.Attributes.Append(newAttribute3);
+            newNode.Attributes.Append(newAttribute4);
 
-            if (newNode == null)
-                return;
-            if (newNode.NodeType == XmlNodeType.Attribute) {
-                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                TreeLeafSelected(SelectedElement.DataModel);
-            } else {
-                SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
-            }
+            SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
@@ -580,15 +576,7 @@ namespace QXEditorModule.ViewModels {
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
 
-
-            if (newNode == null)
-                return;
-            if (newNode.NodeType == XmlNodeType.Attribute) {
-                SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
-                TreeLeafSelected(SelectedElement.DataModel);
-            } else {
-                SelectedElement.DataModel.AppendChild(newNode);
-            }
+            SelectedElement.DataModel.AppendChild(newNode);
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
@@ -619,6 +607,17 @@ namespace QXEditorModule.ViewModels {
             newNode.Attributes.Append(newAttribute);
             newNode.Attributes.Append(newAttribute2);
             newNode.Attributes.Append(newAttribute3);
+
+            if (!SelectedElement.DataModel.HasChildNodes) {
+                SelectedElement.DataModel.AppendChild(newNode);
+            } else {
+                if (SelectedElement.DataModel.FirstChild.Name == "monitor") {
+                    SelectedElement.DataModel.InsertAfter(newNode, SelectedElement.DataModel.FirstChild);
+                } else {
+                    SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
+                }
+            }
+
 
             SelectedElement.DataModel.AppendChild(newNode);
 
