@@ -67,7 +67,7 @@ namespace QueueExchange {
                 //
             }
         }
-        public override bool SetUp() {
+        public new bool SetUp() {
 
             try {
                 fullPath = definition.Attribute("path").Value;

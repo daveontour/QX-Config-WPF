@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace QXEditorModule.ViewModels {
     public class TreeEditorsViewModel : BaseViewModel {
-        private int activeTabIndex;
+        // private int activeTabIndex;
         private ObservableCollection<TreeEditorViewModel> treeEditors = new ObservableCollection<TreeEditorViewModel>();
 
         private TreeEditorViewModel activeEditor;

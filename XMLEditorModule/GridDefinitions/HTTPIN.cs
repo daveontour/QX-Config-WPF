@@ -31,8 +31,8 @@ namespace QXEditorModule.GridDefinitions {
 
         [CategoryAttribute("Required"), DisplayName("HTTP Post URL"), PropertyOrder(2), Browsable(true), DescriptionAttribute("The URL on the local server for messgaes to be posted to. Messages will be consumed by the pipe when posted. The form of the URL is 'http://localhost:8080/endpoint/'. Important! - it must include the '/' at the end")]
         public string URL {
-            get {return GetAttribute("postURL"); }
-            set {SetAttribute("postURL", value); }
+            get { return GetAttribute("postURL"); }
+            set { SetAttribute("postURL", value); }
         }
 
         [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(3), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]

@@ -85,20 +85,19 @@ namespace QXEditorModule.Views {
         public event EventHandler SaveAsAndExecuteRequested;
         public event EventHandler PackageRequested;
         public event EventHandler AboutRequested;
-        public event EventHandler<SaveAsEventArgs> SaveAs;
+        //public event EventHandler<SaveAsEventArgs> SaveAs;
         public event EventHandler<SaveAsEventArgs> SaveAsRequested;
 
         private void OnDocumentLoaded(object sender, DocumentLoadedEventArgs e) {
-            if (DocumentLoaded != null) {
-                DocumentLoaded(sender, e);
-            }
+            DocumentLoaded?.Invoke(sender, e);
         }
 
         #region Menu Click Handlers
 
         void openMenuItem_Click(object sender, RoutedEventArgs e) {
-            OpenFileDialog open = new OpenFileDialog();
-            open.Filter = "XML Files (*.xml)|*.xml";
+            OpenFileDialog open = new OpenFileDialog {
+                Filter = "XML Files (*.xml)|*.xml"
+            };
             if (open.ShowDialog() == true) {
                 XmlDocument document = new XmlDocument();
                 try {

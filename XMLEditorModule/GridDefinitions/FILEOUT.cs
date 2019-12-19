@@ -21,10 +21,10 @@ namespace QXEditorModule.GridDefinitions {
             set { SetType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("Output File"), Browsable(true), PropertyOrder(3),  DescriptionAttribute("The path including filename of the file to output to. Successive files have a numeric suffix.")]
+        [CategoryAttribute("Required"), DisplayName("Output File"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The path including filename of the file to output to. Successive files have a numeric suffix.")]
         public string Path {
-            get {return GetAttribute("path"); }
-            set {SetAttribute("path", value); }
+            get { return GetAttribute("path"); }
+            set { SetAttribute("path", value); }
         }
     }
 }

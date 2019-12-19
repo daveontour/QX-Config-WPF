@@ -46,7 +46,9 @@ namespace QueueExchange {
 
         // Set up the queue. This is called by the Constructor, after the definition XElement has bee
         // stored and the filtering and transformation has been set up. 
-        public abstract bool SetUp();
+        public bool SetUp() {
+            return false;
+        }
 
         // Just send the message 
         public abstract Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message);

@@ -42,18 +42,11 @@ namespace QXEditorModule.ViewModels {
 
         #region Commands
 
-        private ICommand removeChildrenCommand;
+        private readonly ICommand removeChildrenCommand;
 
         public ICommand RemoveChildrenCommand {
             get { return removeChildrenCommand; }
         }
-
-        private ICommand addAttributeCommand;
-
-        public ICommand AddAttributeCommand {
-            get { return addAttributeCommand; }
-        }
-
 
         private void RemoveChildren() {
             foreach (var childVM in Children) {

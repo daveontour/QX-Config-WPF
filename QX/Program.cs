@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Configuration;
-using System.Xml;
 using Topshelf;
 
 namespace QueueExchange {

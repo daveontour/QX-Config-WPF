@@ -26,7 +26,7 @@ namespace QXEditorModule.GridDefinitions {
             set { SetAttribute("connection", value); }
         }
 
-         [CategoryAttribute("Optional"), DisplayName("Key"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Key for routing to a particuular Kafka partitiion")]
+        [CategoryAttribute("Optional"), DisplayName("Key"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Key for routing to a particuular Kafka partitiion")]
         public string Key {
             get { return GetAttribute("key"); }
             set { SetAttribute("key", value); }

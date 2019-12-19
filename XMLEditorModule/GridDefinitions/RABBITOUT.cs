@@ -26,8 +26,8 @@ namespace QXEditorModule.GridDefinitions {
             set { SetAttribute("connection", value); }
         }
 
- 
-        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), Browsable(true), PropertyOrder(6),  DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
+
+        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), Browsable(true), PropertyOrder(6), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
         public string Buffer {
             get { return GetAttribute("bufferQueueName"); }
             set { SetAttribute("bufferQueueName", value); }
@@ -44,7 +44,7 @@ namespace QXEditorModule.GridDefinitions {
             set { SetAttribute("xpathDestination", value); }
         }
 
-        [CategoryAttribute("Required - Set One of the Below to Route the Message"), Browsable(true), DisplayName("XPath Content Destination"),  PropertyOrder(3), DescriptionAttribute("The XPath for the Routing Key Data")]
+        [CategoryAttribute("Required - Set One of the Below to Route the Message"), Browsable(true), DisplayName("XPath Content Destination"), PropertyOrder(3), DescriptionAttribute("The XPath for the Routing Key Data")]
         public string XpathContentDestination {
             get { return GetAttribute("xpathContentDestination"); }
             set { SetAttribute("xpathContentDestination", value); }

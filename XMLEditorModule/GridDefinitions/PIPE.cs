@@ -9,7 +9,7 @@ namespace QXEditorModule.GridDefinitions {
     [DisplayName("Pipe Connecting Input and Output")]
     public class PIPE : MyPropertyGrid {
 
-       
+
         public PIPE(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
@@ -37,10 +37,10 @@ namespace QXEditorModule.GridDefinitions {
 
         [CategoryAttribute("Optional"), DisplayName("Max Msgs/Min"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
         public int MessPerMinute {
-            get { 
+            get {
                 int value = GetIntAttribute("maxMsgPerMinute");
-                return value; 
-                }
+                return value;
+            }
             set {
                 if (value < -1) {
                     SetAttribute("maxMsgPerMinute", -1);
@@ -87,13 +87,13 @@ namespace QXEditorModule.GridDefinitions {
             get {
 
                 bool value = GetBoolAttribute("contextAware");
-                
-                
+
+
                 if (!value) {
                     SetAttribute("useMessageAsKey", "");
                     SetAttribute("contextCacheKeyXPath", "");
                     SetAttribute("contextCacheExpiry", "");
-               //     SetAttribute("maxMsgPerMinute", "");
+                    //     SetAttribute("maxMsgPerMinute", "");
                     SetAttribute("discardInCache", "");
                 }
 
@@ -127,11 +127,11 @@ namespace QXEditorModule.GridDefinitions {
             }
             set {
 
-                    SetAttribute("useMessageAsKey", "");
-                    SetAttribute("contextCacheKeyXPath", "");
-                    SetAttribute("contextCacheExpiry", "");
-               //     SetAttribute("maxMsgPerMinute", "");
-                    SetAttribute("discardInCache", "");
+                SetAttribute("useMessageAsKey", "");
+                SetAttribute("contextCacheKeyXPath", "");
+                SetAttribute("contextCacheExpiry", "");
+                //     SetAttribute("maxMsgPerMinute", "");
+                SetAttribute("discardInCache", "");
 
                 PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextKey"];
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];

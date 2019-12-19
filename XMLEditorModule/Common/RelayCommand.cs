@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
 using System.Diagnostics;
+using System.Windows.Input;
 
-namespace QXEditorModule.Common
-{
-    public class RelayCommand<T> : ICommand
-    {
+namespace QXEditorModule.Common {
+    public class RelayCommand<T> : ICommand {
         #region Fields
 
         readonly Action<T> _execute;
@@ -20,14 +15,11 @@ namespace QXEditorModule.Common
         #region Constructors
 
         public RelayCommand(Action<T> action)
-            : this(action, null)
-        {
+            : this(action, null) {
         }
 
-        public RelayCommand(Action<T> execute, Predicate<T> canExecute)
-        {
-            if (execute == null)
-            {
+        public RelayCommand(Action<T> execute, Predicate<T> canExecute) {
+            if (execute == null) {
                 throw new ArgumentNullException("execute");
             }
 
@@ -47,23 +39,18 @@ namespace QXEditorModule.Common
         #region ICommand Members
 
         [DebuggerStepThrough]
-        public bool CanExecute(object parameter)
-        {
+        public bool CanExecute(object parameter) {
             //return _canExecute == null ? true : _canExecute((T)parameter);
 
-            if (_canExecute == null)
-            {
+            if (_canExecute == null) {
                 return true;
             }
-            if (_canExecute != null)
-            {
-                if (parameter is T)
-                {
+            if (_canExecute != null) {
+                if (parameter is T) {
                     return _canExecute((T)parameter);
                 }
                 //For triggerng even user passes null parameter.
-                else if (parameter == null)
-                {
+                else if (parameter == null) {
                     return _canExecute(default(T));
                 }
             }
@@ -72,14 +59,12 @@ namespace QXEditorModule.Common
 
         }
 
-        public event EventHandler CanExecuteChanged
-        {
+        public event EventHandler CanExecuteChanged {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public void Execute(object parameter)
-        {
+        public void Execute(object parameter) {
 
             _execute((T)parameter);
         }
@@ -87,15 +72,12 @@ namespace QXEditorModule.Common
         #endregion // ICommand Members
     }
 
-    public class RelayCommand : RelayCommand<object>
-    {
+    public class RelayCommand : RelayCommand<object> {
         public RelayCommand(Action<object> action)
-            : base(action)
-        {
+            : base(action) {
         }
 
         public RelayCommand(Action<object> execute, Predicate<object> canExecute)
-            : base(execute, canExecute)
-        { }
+            : base(execute, canExecute) { }
     }
 }

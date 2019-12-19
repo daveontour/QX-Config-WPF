@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-
-using System.Windows.Input;
-using QXEditorModule.Common;
 using System.ComponentModel;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using System.Globalization;
 using System.Reflection;
-using QXEditorModule.Views;
+using System.Xml;
 using Xceed.Wpf.Toolkit;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace QXEditorModule.Common {
 
@@ -81,14 +74,14 @@ namespace QXEditorModule.Common {
 
     [CategoryOrder("Required", 1)]
     [CategoryOrder("Required - Connection", 2)]
-    [CategoryOrder("Required - Set One of the Below to Route the Message",3)]
+    [CategoryOrder("Required - Set One of the Below to Route the Message", 3)]
     [CategoryOrder("Required - One of the below for Kafka Topic", 3)]
     [CategoryOrder("Optional - Connection", 4)]
     [CategoryOrder("Optional", 5)]
     [CategoryOrder("Optional - Transformation", 6)]
     [CategoryOrder("Optional - Temporal Context Awareness", 7)]
     [RefreshProperties(RefreshProperties.All)]
-    public class MyPropertyGrid  {
+    public class MyPropertyGrid {
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
@@ -137,8 +130,8 @@ namespace QXEditorModule.Common {
                 } catch (Exception e) {
                     Console.WriteLine(e.Message);
                     value = -1;
-                } 
-               
+                }
+
                 return value;
             } else {
                 return -1;
@@ -175,7 +168,7 @@ namespace QXEditorModule.Common {
         }
 
         protected void SetAbsoluteAttribute(string attribName, bool value) {
-            if ( _node.Attributes[attribName] != null) {
+            if (_node.Attributes[attribName] != null) {
                 _node.Attributes[attribName].Value = value.ToString();
             } else {
 
@@ -231,7 +224,7 @@ namespace QXEditorModule.Common {
                         SetAttribute("type", "MQ");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "input") view.MQInSource(_node);
-                        if (_node.Name == "output"  || _node.Name == "altqueue" || _node.Name == "monitor") view.MQOutSource(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.MQOutSource(_node);
                         break;
                     case "Microsoft MQ":
                         SetAttribute("type", "MSMQ");
@@ -313,11 +306,12 @@ namespace QXEditorModule.Common {
                 } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
-                return GetAttribute("name"); }
+                return GetAttribute("name");
+            }
             set { SetAttribute("name", value); }
         }
 
-       
+
         [RefreshProperties(RefreshProperties.All)]
         [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), ReadOnly(false), Browsable(true), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
         public string StyleSheet {
@@ -372,9 +366,9 @@ namespace QXEditorModule.Common {
                 } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
-                return value; 
-                
-                }
+                return value;
+
+            }
             set { SetAttribute("json", value); ; }
         }
     }
@@ -419,7 +413,7 @@ namespace QXEditorModule.Common {
         [CategoryAttribute("Required"), DisplayName("URI"), Browsable(false), PropertyOrder(2), DescriptionAttribute("Namespace URI")]
         public string Name {
             get { return "Name Spaces can be used in filter definitions, destination routing and context key definitions"; }
-            set { } 
+            set { }
         }
     }
 
@@ -464,7 +458,7 @@ namespace QXEditorModule.Common {
     [DisplayName("Boolean Expression of Child Nodes")]
     public class BooleanExpression : MyPropertyGrid {
 
-       
+
         public BooleanExpression(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
@@ -518,7 +512,7 @@ namespace QXEditorModule.Common {
             this.type = dataModel.Name;
         }
 
-        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true),PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Data Filter Type"), Browsable(true), PropertyOrder(1), DescriptionAttribute("The type of data filter"), ItemsSource(typeof(FilterTypeList))]
         public string Type {
             get { return "Data Equals Value"; }
             set { this.view.ChangeFilterType(value); }

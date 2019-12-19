@@ -17,7 +17,7 @@ namespace QueueExchange {
 
         }
 
-        public override bool SetUp() {
+        public new bool SetUp() {
 
             OK_TO_RUN = false;
 
@@ -166,7 +166,7 @@ namespace QueueExchange {
                         }
                     }
                 } catch (OperationCanceledException) {
-                    consumer.Close();
+                    // consumer.Close();
                 }
             }
         }

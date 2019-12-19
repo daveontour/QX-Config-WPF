@@ -13,7 +13,7 @@ namespace QueueExchange {
     /*
      * The class that links inputs to outputs
      */
-    public class Pipeline: IDisposable {
+    public class Pipeline : IDisposable {
 
         protected readonly List<QueueAbstract> output = new List<QueueAbstract>();
         protected readonly List<QueueAbstract> input = new List<QueueAbstract>();
@@ -33,7 +33,7 @@ namespace QueueExchange {
         protected readonly string contextCacheKeyXPath;
         protected readonly double contextCacheExpiry = 10.0;
         protected readonly MemoryCache _contextCache;
-        protected readonly MemoryCache _fistProcessed; 
+        protected readonly MemoryCache _fistProcessed;
         protected readonly bool discardInCache = false;
         protected readonly Dictionary<String, Queue<ExchangeMessage>> _bufferMemoryQueueDict = new Dictionary<String, Queue<ExchangeMessage>>();
         protected readonly Dictionary<String, System.Timers.Timer> _bufferTimerDict = new Dictionary<String, System.Timers.Timer>();
@@ -304,7 +304,7 @@ namespace QueueExchange {
 
                         logger.Trace($"\n\n KEY = {nodeValue}\n\n");
                     } catch {
-                        _ =  InjectMessage(xm);
+                        _ = InjectMessage(xm);
                         return;
                     }
                 }
@@ -483,7 +483,7 @@ namespace QueueExchange {
 
                         foreach (QueueAbstract q in output) {
                             logger.Info($"  Sending message {xm.uuid } to {q.name}");
-                             _ = await SendAndLog(q, xm);
+                            _ = await SendAndLog(q, xm);
 
                             if (xm.sent) {
                                 if (q.queueName != null) {
@@ -494,9 +494,9 @@ namespace QueueExchange {
                                     logger.Trace($"{q.name} = {msgCount[q.name]}");
                                 }
                             }
-                           
+
                         }
- 
+
                         QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, null, this.name, "SYNCHRONOUS OUTPUT NODE END", "Normal Distribution"));
                     }
                 }

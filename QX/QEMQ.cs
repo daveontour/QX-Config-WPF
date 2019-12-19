@@ -17,7 +17,7 @@ namespace QueueExchange {
         public object sendLock = new object();
 
         public QEMQ(XElement defn) : base(defn) { }
-        public override bool SetUp() {
+        public new bool SetUp() {
 
             OK_TO_RUN = false;
 
@@ -140,7 +140,7 @@ namespace QueueExchange {
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess) {
 
             if (maxMessages != -1) {
-                 MaintainQueueInline();
+                MaintainQueueInline();
             }
 
             try {
@@ -223,25 +223,25 @@ namespace QueueExchange {
         public void MaintainQueueInline() {
 
 
-                try {
-                    using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams)) {
+            try {
+                using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams)) {
 
-                        int openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_OUTPUT + MQC.MQOO_FAIL_IF_QUIESCING + MQC.MQOO_INQUIRE;
-                        MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
-                        MQGetMessageOptions getOptions = new MQGetMessageOptions { WaitInterval = 5, Options = MQC.MQGMO_WAIT };
-                        MQMessage msg = new MQMessage { Format = MQC.MQFMT_STRING };
+                    int openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_OUTPUT + MQC.MQOO_FAIL_IF_QUIESCING + MQC.MQOO_INQUIRE;
+                    MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
+                    MQGetMessageOptions getOptions = new MQGetMessageOptions { WaitInterval = 5, Options = MQC.MQGMO_WAIT };
+                    MQMessage msg = new MQMessage { Format = MQC.MQFMT_STRING };
 
-                        while (queue.CurrentDepth > this.maxMessages) {
-                             GetMessage();
-                        }
-                        queue.Close();
+                    while (queue.CurrentDepth > this.maxMessages) {
+                        GetMessage();
                     }
-                } catch (Exception ex) {
-                    if (!isLogger) {
-                        logger.Error($"Unable to maintain queue: {queueName}: {ex.Message}");
-                    }
-
+                    queue.Close();
                 }
+            } catch (Exception ex) {
+                if (!isLogger) {
+                    logger.Error($"Unable to maintain queue: {queueName}: {ex.Message}");
+                }
+
+            }
         }
 
 

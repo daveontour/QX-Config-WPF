@@ -1,8 +1,8 @@
-﻿using System.Xml;
-using QXEditorModule.Common;
+﻿using QXEditorModule.Common;
 using System.ComponentModel;
-using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using System.Reflection;
+using System.Xml;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace QXEditorModule.GridDefinitions {
     [DisplayName("Microsoft MQ Input Node")]

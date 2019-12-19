@@ -2,15 +2,15 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace QXEditorModule.Views {
-    public class CloseableTabItem : TabItem  {
-        static CloseableTabItem()        {
+    public class CloseableTabItem : TabItem {
+        static CloseableTabItem() {
             //This OverrideMetadata call tells the system that this element wants to provide a style that is different than its base class.
             //This style is defined in themes\generic.xaml
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CloseableTabItem),
                new FrameworkPropertyMetadata(typeof(CloseableTabItem)));
         }
 
-     
+
         public static readonly RoutedEvent CloseTabEvent =
             EventManager.RegisterRoutedEvent("CloseTab", RoutingStrategy.Bubble,
                 typeof(RoutedEventHandler), typeof(CloseableTabItem));
@@ -34,7 +34,7 @@ namespace QXEditorModule.Views {
     }
 
     public class CloseableTabControl : TabControl {
-	
+
         protected override DependencyObject GetContainerForItemOverride() {
             return new CloseableTabItem();
         }

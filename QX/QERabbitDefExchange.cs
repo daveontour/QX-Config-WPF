@@ -11,7 +11,7 @@ namespace QueueExchange {
         public QEMSMQ serviceQueue;
         public QERabbitDefExchange(XElement defn) : base(defn) { }
 
-        public override bool SetUp() {
+        public new bool SetUp() {
             OK_TO_RUN = false;
 
             try {

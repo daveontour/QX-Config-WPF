@@ -23,8 +23,8 @@ namespace QXEditorModule.GridDefinitions {
 
         [CategoryAttribute("Required"), DisplayName("HTTP Post URL"), PropertyOrder(2), Browsable(true), DescriptionAttribute("The URL to HTTP Post the message to.")]
         public string URL {
-            get {return GetAttribute("postURL"); }
-            set {SetAttribute("postURL", value); }
+            get { return GetAttribute("postURL"); }
+            set { SetAttribute("postURL", value); }
         }
     }
 }

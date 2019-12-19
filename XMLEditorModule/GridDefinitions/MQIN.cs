@@ -32,27 +32,27 @@ namespace QXEditorModule.GridDefinitions {
             set { SetType(value); }
         }
 
-        [CategoryAttribute("Required - Connection"), DisplayName("Queue Manager"), ReadOnly(false), Browsable(true), PropertyOrder(1),  DescriptionAttribute("IBM MQ Queue Manager Name")]
+        [CategoryAttribute("Required - Connection"), DisplayName("Queue Manager"), ReadOnly(false), Browsable(true), PropertyOrder(1), DescriptionAttribute("IBM MQ Queue Manager Name")]
         public string QManager {
-            get {return GetAttribute("queueMgr"); }
+            get { return GetAttribute("queueMgr"); }
             set { SetAttribute("queueMgr", value); }
         }
         [CategoryAttribute("Required - Connection"), DisplayName("Queue"), ReadOnly(false), Browsable(true), PropertyOrder(2), DescriptionAttribute("MQ Queue Name")]
         public string Queue {
-            get {return GetAttribute("queue");}
-            set { SetAttribute("queue", value);}
+            get { return GetAttribute("queue"); }
+            set { SetAttribute("queue", value); }
         }
 
         [CategoryAttribute("Required - Connection"), DisplayName("Channel"), ReadOnly(false), Browsable(true), PropertyOrder(3), DescriptionAttribute("Descriptive name of the queue")]
         public string Channel {
-            get {return GetAttribute("channel");}
-            set { SetAttribute("channel", value);}
+            get { return GetAttribute("channel"); }
+            set { SetAttribute("channel", value); }
         }
 
-        [CategoryAttribute("Required - Connection"),  DisplayName("Host"), ReadOnly(false), Browsable(true), PropertyOrder(4),    DescriptionAttribute("Host name")]
+        [CategoryAttribute("Required - Connection"), DisplayName("Host"), ReadOnly(false), Browsable(true), PropertyOrder(4), DescriptionAttribute("Host name")]
         public string HostName {
-            get {return GetAttribute("host"); }
-            set {SetAttribute("host", value); }
+            get { return GetAttribute("host"); }
+            set { SetAttribute("host", value); }
         }
 
         [CategoryAttribute("Required - Connection"), DisplayName("Port"), ReadOnly(false), Browsable(true), PropertyOrder(5), DescriptionAttribute("TCP Port Number of Queue Manager")]
@@ -69,7 +69,7 @@ namespace QXEditorModule.GridDefinitions {
         [CategoryAttribute("Optional - Connection"), DisplayName("User Password"), ReadOnly(false), Browsable(true), PropertyOrder(2), DescriptionAttribute("Connection password for this user")]
         public string UserPass {
             get { return GetAttribute("password"); }
-            set {SetAttribute("password", value);  }
+            set { SetAttribute("password", value); }
         }
     }
 }

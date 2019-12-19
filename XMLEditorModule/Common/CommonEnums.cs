@@ -1,11 +1,9 @@
-﻿using System.Windows.Controls;
-using System.Xml;
+﻿using System.Xml;
 
 namespace QXEditorModule.Common {
 
 
-    public enum ContextMenuType
-    {
+    public enum ContextMenuType {
         Cut,
         Copy,
         Paste,
@@ -23,7 +21,7 @@ namespace QXEditorModule.Common {
         AddDataFilter,
         AddXPathExists,
         AddServiceSettings,
-        AddMSMQInput, 
+        AddMSMQInput,
         AddMQInput,
         AddFileInput,
         AddHTTPInput,
@@ -41,7 +39,7 @@ namespace QXEditorModule.Common {
     }
 
     public interface IView {
-        Canvas selectedCanvas { get; set; }
+        //  Canvas selectedCanvas { get; set; }
 
         void DrawQXConfig();
         void HightLightCanvas(XmlNode node);

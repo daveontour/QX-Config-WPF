@@ -18,7 +18,7 @@ namespace QueueExchange {
 
         public QERest(XElement defn) : base(defn) { }
 
-        public override bool SetUp() {
+        public new bool SetUp() {
 
             OK_TO_RUN = false;
 

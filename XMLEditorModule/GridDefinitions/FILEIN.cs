@@ -27,18 +27,18 @@ namespace QXEditorModule.GridDefinitions {
         }
         [CategoryAttribute("Required"), DisplayName("File Filter"), PropertyOrder(4), Browsable(true), DescriptionAttribute("File Pattern to Match. (e.g. *.xml)")]
         public string FileFilter {
-            get {return GetAttribute("fileFilter"); }
+            get { return GetAttribute("fileFilter"); }
             set { SetAttribute("fileFilter", value); }
         }
         [CategoryAttribute("Required"), DisplayName("Delete After Send"), PropertyOrder(5), Browsable(true), DescriptionAttribute("Delete the source file after the pipeline picks it up")]
         public bool Delete {
-            get {return GetBoolAttribute("deleteAfterSend");}
-            set {SetAttribute("deleteAfterSend", value); }
+            get { return GetBoolAttribute("deleteAfterSend"); }
+            set { SetAttribute("deleteAfterSend", value); }
         }
         [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(6), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
         public string Buffer {
-            get { return GetAttribute("bufferQueueName");}
-            set { SetAttribute("bufferQueueName", value);}
+            get { return GetAttribute("bufferQueueName"); }
+            set { SetAttribute("bufferQueueName", value); }
         }
     }
 }

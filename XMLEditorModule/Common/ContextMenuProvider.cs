@@ -1,27 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows;
-using System.Xml;
 
-namespace QXEditorModule.Common
-{
-   
-    public class ContextMenuProvider
-    {
+namespace QXEditorModule.Common {
+
+    public class ContextMenuProvider {
         public readonly Dictionary<ContextMenuType, MenuItem> ContextMenus = new Dictionary<ContextMenuType, MenuItem>();
 
-        public ContextMenuProvider()
-        {
-            ContextMenus.Add(ContextMenuType.Copy, new MenuItem { Header = "Copy"});
+        public ContextMenuProvider() {
+            ContextMenus.Add(ContextMenuType.Copy, new MenuItem { Header = "Copy" });
             ContextMenus.Add(ContextMenuType.Paste, new MenuItem { Header = "Paste" });
             ContextMenus.Add(ContextMenuType.Delete, new MenuItem { Header = "Delete" });
             ContextMenus.Add(ContextMenuType.AddPipe, new MenuItem { Header = "Add Pipe" });
             ContextMenus.Add(ContextMenuType.Add, new MenuItem { Header = "Add" });
-            
+
             ContextMenus.Add(ContextMenuType.AddMSMQInput, new MenuItem { Header = "MS MQ Input Node" });
             ContextMenus.Add(ContextMenuType.AddMQInput, new MenuItem { Header = "IBM MQ Input Node" });
             ContextMenus.Add(ContextMenuType.AddFileInput, new MenuItem { Header = "File Input Node" });
@@ -50,7 +41,7 @@ namespace QXEditorModule.Common
             ContextMenus.Add(ContextMenuType.AddServiceSettings, new MenuItem { Header = "Add Service Settings" });
             ContextMenus.Add(ContextMenuType.AddAltQueue, new MenuItem { Header = "Add Alternative Queue" });
             ContextMenus.Add(ContextMenuType.AddDataFilter, new MenuItem { Header = "Add Data Filter" });
-            ContextMenus.Add(ContextMenuType.AddXPathExists , new MenuItem { Header = "Add XPath Exists Filter" });
+            ContextMenus.Add(ContextMenuType.AddXPathExists, new MenuItem { Header = "Add XPath Exists Filter" });
 
         }
     }

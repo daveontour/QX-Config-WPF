@@ -34,7 +34,7 @@ namespace QueueExchange {
             }
         }
 
-        public override bool SetUp() {
+        public new bool SetUp() {
             logger.Info(queueName);
 
             // On output queues, if the maxMessages parameter is set, then set up a task to maitain the queue size at or below the value set
@@ -214,27 +214,27 @@ namespace QueueExchange {
 
             // Keeps the queue to a maximum size by reading of the oldest messages.
 
- 
-                ResetWrtiteConnect();
-                try {
-                    lock (sendLock) {
-                        long count = 0;
-                        try {
-                            count = GetMessaegCount(queueName);
-                        } catch (Exception) {
-                            count = msgQueue.GetAllMessages().Length;
-                        }
 
-                        logger.Trace($"Maintenance for Queue {queueName}. Length = {count}");
-                        for (int i = 0; i <= count - this.maxMessages; i++) {
-                            msgQueue.Receive();
-                        }
+            ResetWrtiteConnect();
+            try {
+                lock (sendLock) {
+                    long count = 0;
+                    try {
+                        count = GetMessaegCount(queueName);
+                    } catch (Exception) {
+                        count = msgQueue.GetAllMessages().Length;
                     }
 
-                } catch (Exception ex) {
-                    logger.Error(ex, $"Error Maininting the Queue Size {queueName}");
+                    logger.Trace($"Maintenance for Queue {queueName}. Length = {count}");
+                    for (int i = 0; i <= count - this.maxMessages; i++) {
+                        msgQueue.Receive();
+                    }
                 }
-            
+
+            } catch (Exception ex) {
+                logger.Error(ex, $"Error Maininting the Queue Size {queueName}");
+            }
+
         }
 
         private static long GetMessaegCount(String msmqName) {

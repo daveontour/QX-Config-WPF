@@ -1040,10 +1040,10 @@ namespace QXEditorModule.Views {
             }
         }
 
-        Canvas IView.selectedCanvas { get { return this.selectedCanvas; } set => throw new NotImplementedException(); }
+        // Canvas IView.selectedCanvas { get { return this.selectedCanvas; } set => throw new NotImplementedException(); }
 
         #region Selection Handling
-        private void xmlTreeView_Selected(object sender, RoutedEventArgs e) {
+        private void XmlTreeView_Selected(object sender, RoutedEventArgs e) {
             XmlNode selectedItem = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
         }
