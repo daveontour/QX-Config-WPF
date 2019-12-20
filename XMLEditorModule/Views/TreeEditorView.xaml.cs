@@ -703,8 +703,35 @@ namespace QXEditorModule.Views {
             can.PreviewMouseDown += Can_MouseDown;
             can.Background = transBrush;
 
+            bool hasFilter = node.HasChildNodes;
+            bool hasAltQueue = false;
+            if (hasFilter) {
+                hasAltQueue = node.FirstChild.SelectNodes("./altqueue").Item(0) != null ? true : false;
+            }
+            bool hasStyle = node.Attributes["stylesheet"] != null ? true : false;
+
+            double filterCanvasOffset = 0.0;
+
             // Add Filter indicator if present
-            if (node.HasChildNodes) {
+            if (hasFilter) {
+
+                // Calculate it's position
+                if (inNode) {
+                    filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0;
+                }
+
+                if (!inNode) {
+                    if (hasStyle) {
+                        filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 24.0;
+                    } else {
+                        filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 4.0;
+                    }
+
+                    if (hasAltQueue) {
+                        filterCanvasOffset = filterCanvasOffset - 20.0;
+                    }
+                }
+                double altCanvasOffset = filterCanvasOffset + 20.0;
 
                 XmlNode filterNode = node.FirstChild;
 
@@ -714,12 +741,8 @@ namespace QXEditorModule.Views {
                     Background = blackBrush
                 };
 
-                if (inNode) {
-                    filterCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0);
-                } else {
-                    filterCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 4.0);
-                }
                 filterCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
+                filterCanvas.SetValue(Canvas.LeftProperty, filterCanvasOffset);
 
                 filterCanvas.Children.Add(GetResourceCopy<Path>("filter"));
                 canTop.Children.Add(filterCanvas);
@@ -755,7 +778,7 @@ namespace QXEditorModule.Views {
 
                 XmlNode altqueue = filterNode.SelectNodes("./altqueue").Item(0);
 
-                if (altqueue != null) {
+                if (hasAltQueue) {
 
                     Canvas altCanvas = new Canvas() {
                         Height = 25,
@@ -763,11 +786,7 @@ namespace QXEditorModule.Views {
                         Background = transBrush
                     };
 
-                    if (inNode) {
-                        altCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 20.0);
-                    } else {
-                        altCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 26.0);
-                    }
+                    altCanvas.SetValue(Canvas.LeftProperty, altCanvasOffset);
                     altCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty) - 15.0);
 
                     altCanvas.Children.Add(GetResourceCopy<Path>("altqueue"));
@@ -788,46 +807,39 @@ namespace QXEditorModule.Views {
             }
 
             // Add stylesheet indicator if present
-            if (node.Attributes["stylesheet"] != null) {
+            if (hasStyle) {
+
+                double styleCanvasOffset = 0.0;
+
+                // Calculate it's position
+                if (inNode) {
+                    if (hasFilter) {
+                        styleCanvasOffset = filterCanvasOffset + 24.0;
+                        if (hasAltQueue) {
+                            styleCanvasOffset += 20.0;
+                        }
+                    } else {
+                        styleCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0;
+                    }
+                }
+
+                if (!inNode) {
+                    styleCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - 20.0;
+                }
+
+
                 Canvas transformCanvas = new Canvas() {
                     Height = can.Height / 2,
                     Width = can.ActualWidth / 2,
                     Background = blackBrush
                 };
 
-
-                XmlNode altqueue = null;
-
-                try {
-                    altqueue = node.FirstChild.SelectNodes("./altqueue").Item(0);
-                } catch (Exception) {
-                    altqueue = null;
-                }
-
-
-                if (inNode) {
-                    transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0);
-                    if (node.HasChildNodes) {
-                        if (altqueue == null) {
-                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 4.0);
-                        } else {
-                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) + 1.6 * can.Width + 24.0);
-                        }
-                    }
-                } else {
-                    transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 4.0);
-                    if (node.HasChildNodes) {
-                        if (altqueue == null) {
-                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - 2 * can.Width / 2 - 8.0);
-                        } else {
-                            transformCanvas.SetValue(Canvas.LeftProperty, (double)can.GetValue(Canvas.LeftProperty) - 2 * can.Width / 2 - 30.0);
-                        }
-                    }
-                }
                 transformCanvas.SetValue(Canvas.TopProperty, (double)can.GetValue(Canvas.TopProperty));
-                Path transformpath = GetResourceCopy<Path>("transform");
+                transformCanvas.SetValue(Canvas.LeftProperty, styleCanvasOffset);
 
+                Path transformpath = GetResourceCopy<Path>("transform");
                 transformCanvas.Children.Add(transformpath);
+
                 canTop.Children.Add(transformCanvas);
             }
 
