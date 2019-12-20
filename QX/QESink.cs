@@ -140,7 +140,7 @@ namespace QueueExchange {
             return null;
         }
 
-        public new bool SetUp() {
+        public override bool SetUp() {
             return true;
         }
     }

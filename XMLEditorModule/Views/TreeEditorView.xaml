@@ -351,7 +351,7 @@
 
                 <!-- Raw XML -->
                 <ScrollViewer Grid.Row="2"  Grid.ColumnSpan ="3" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" >
-                    <TextBlock TextWrapping="NoWrap" Text="{Binding Path=XMLText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="White"  HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" />
+                    <TextBox TextWrapping="NoWrap" Text="{Binding Path=XMLText, Mode=OneWay}" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible" Background="White"  HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" />
                 </ScrollViewer>
 
                 <xctk:PropertyGrid Grid.Row="0" Grid.Column="2"  x:Name="_propertyGrid" Width="440" SelectedObject="{Binding MyGrid}" HorizontalAlignment="Stretch" AutoGenerateProperties="true" />
@@ -363,7 +363,7 @@
         <Grid Grid.Row="1">
             <StatusBar Height="25" Background="AliceBlue" VerticalAlignment="Top">
                 <StatusBarItem>
-                    <TextBlock Text="{Binding Path=Path}" Foreground="Gray" ></TextBlock>
+                    <TextBox Text="{Binding Path=Path, Mode=OneWay}" Foreground="Gray" IsReadOnly="True" ></TextBox>
                 </StatusBarItem>
             </StatusBar>
         </Grid>

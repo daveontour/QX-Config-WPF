@@ -19,7 +19,7 @@ namespace QueueExchange {
 
         public QEHTTP(XElement defn) : base(defn) { }
 
-        public new bool SetUp() {
+        public override bool SetUp() {
 
             OK_TO_RUN = false;
 

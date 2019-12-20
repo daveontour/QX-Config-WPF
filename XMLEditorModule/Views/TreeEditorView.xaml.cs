@@ -728,7 +728,7 @@ namespace QXEditorModule.Views {
                     }
 
                     if (hasAltQueue) {
-                        filterCanvasOffset = filterCanvasOffset - 20.0;
+                        filterCanvasOffset -= 20.0;
                     }
                 }
                 double altCanvasOffset = filterCanvasOffset + 20.0;

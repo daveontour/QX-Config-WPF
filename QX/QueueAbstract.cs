@@ -41,13 +41,19 @@ namespace QueueExchange {
         protected static object undevlLock = new object();
         protected string xpathDestination = null;
         protected string xpathContentDestination;
+        public string id;
+        public QXMonitor qMon;
+        private Pipeline pipeParent;
 
         // Instances have to implement these three methods to be used in the pipeline
 
         // Set up the queue. This is called by the Constructor, after the definition XElement has bee
         // stored and the filtering and transformation has been set up. 
-        public bool SetUp() {
-            return false;
+        public abstract bool SetUp();
+
+        public void SetMonitor(QXMonitor mon, Pipeline pipeline) {
+            this.qMon = mon;
+            this.pipeParent = pipeline;
         }
 
         // Just send the message 
@@ -66,9 +72,8 @@ namespace QueueExchange {
         // Constructor to extract the common defintion and setup the transformation and filters
         // Calls the instance specific SetUp method at the end to allow instanc e specific configuration.
         public QueueAbstract(XElement defn) {
+
             this.definition = defn;
-
-
 
             try {
                 var stylesheet = definition.Attribute("stylesheet").Value;
@@ -83,6 +88,12 @@ namespace QueueExchange {
                 this.queueName = definition.Attribute("queue").Value;
             } catch (Exception) {
                 this.queueName = "undefined";
+            }
+
+            try {
+                this.id = definition.Attribute("id").Value;
+            } catch (Exception) {
+                this.id = Guid.NewGuid().ToString();
             }
 
             try {
@@ -214,15 +225,24 @@ namespace QueueExchange {
 
         public async Task<ExchangeMessage> Send(ExchangeMessage xm) {
 
+            qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, pipeParent.id, pipeParent.name, "Output Node: Message Recieved From Pipe", ""));
+
+
             //Do any filtering or transformation first.
             xm = PreAndPostProcess(xm);
+
+            qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, pipeParent.id, pipeParent.name, "Output Node: Post Processing Complete", ""));
+
 
             // Check the result of the filtering and transformations
             if (!xm.pass || xm.payload == null) {
                 xm.status = $"Message blocked by filter to {queueName}";
                 xm.pass = false;
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, pipeParent.id, pipeParent.name, "Output Node: Post Processing", "Messages did not pass filter"));
                 return xm;
             } else {
+
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, pipeParent.id, pipeParent.name, "Output Node: Sending Message", "Start"));
 
                 // Send it to the destination. 
                 // The state of the message should be updated by the particuar output
@@ -246,9 +266,14 @@ namespace QueueExchange {
                 return null;
             }
 
+            qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, pipeParent.id, pipeParent.name, "Input Node: Message Recieved", ""));
             // If the message is not null, then perform any filtering or transformation 
             // before returning it
-            return PreAndPostProcess(xm);
+
+            xm = PreAndPostProcess(xm);
+            qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, pipeParent.id, pipeParent.name, "Input Node: Message Recieved", "PreProcessing Complete, Passing to Pipe"));
+
+            return xm;
         }
 
         public ExchangeMessage PreAndPostProcess(ExchangeMessage xm) {
@@ -277,11 +302,11 @@ namespace QueueExchange {
                         Task.Run(() =>
                         {
                             logger.Info($"Sending to Alt Queue {altQueue.name}");
-                            QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "FAILED FILTER", "Sending to Alt Queue"));
+                            //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue"));
                             _ = altQueue.Send(xm);
                         });
                     } else {
-                        QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "FAILED FILTER", "No Alt Queue Configured"));
+                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured"));
                         logger.Info("ALT QUEUE IS NULL??");
                     }
                     xm.pass = false;
@@ -299,10 +324,10 @@ namespace QueueExchange {
                 if (!pass) {
                     if (altQueue != null) {
                         logger.Info($"Sending to Alt Queue {altQueue.name}");
-                        QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "FAILED FILTER", "Sending to Alt Queue"));
+                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue"));
                         _ = altQueue.Send(xm);
                     } else {
-                        QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "FAILED FILTER", "No Alt Queue Configured"));
+                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured"));
                         logger.Info("ALT QUEUE IS NULL??");
                     }
                     xm.pass = false;
@@ -315,9 +340,9 @@ namespace QueueExchange {
 
             // If a XSLT transform has been specified
             if (bTransform) {
-                QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "STARTING TRANSFORMATION", ""));
+                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Starting Message Transformation", ""));
                 message = Transform(message, xslVersion);
-                QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "COMPLETED TRANSFORMATION", ""));
+                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message Transformation Complete", ""));
                 xm.transformed = true;
             } else {
                 xm.transformed = false;
@@ -327,7 +352,7 @@ namespace QueueExchange {
                 logger.Info("Message blocked by XSL Transform of Zero Length");
                 xm.payload = null;
                 xm.status = "Message blocked by XSL Transform. Null or Zero Length";
-                QXMonitor.Log(new ExchangeMonitorMessage(xm.uuid, this.name, null, "TRANSFORMATION NULL", "Transformation resulted in a message of zero length"));
+                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Messaage Transformation", "Transformation resulted in a message of zero length"));
 
                 return xm;
             }
@@ -468,7 +493,7 @@ namespace QueueExchange {
             return topic;
         }
 
-        public void SendToUndeliverableQueue(ExchangeMessage message) {
+        public void SendToUndeliverableQueue(ExchangeMessage xm) {
 
             // If messages cant be delivered, they can be sent to a local undeliverable queue
             // defined on a per queue basis. No reason why the one undeliverable queue cant be used
@@ -481,18 +506,26 @@ namespace QueueExchange {
                 return;
             }
 
+            //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Output Node Send Failure", "Message Could Not Be Delivered to the Output Node"));
+
+
             if (undeliverableQueue == null) {
                 logger.Debug($"No Undeliverable Message Queue has been defined for {queueName}");
+                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Output Node Send Failure", "No Undeliverable Queue Defined"));
+
                 return;
             }
 
             lock (undevlLock) {
                 try {
                     using (MessageQueue er = new MessageQueue(undeliverableQueue)) {
-                        er.Send(message);
+                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Output Node Send Failure", "Sending Message to Undeliverable Queue"));
+                        er.Send(xm);
+                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Output Node Send Failure", "Message Sent to Undeliverable Queue"));
                         logger.Info("Message Sent to Undeliverble Queue");
                     }
                 } catch (Exception ex) {
+                    //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Output Node Send Failure", "Message Could Not Be Sent To Undeliverable Queue"));
                     logger.Error("Unable to Send to Undeliverble Queue");
                     logger.Error(ex.StackTrace);
                 }

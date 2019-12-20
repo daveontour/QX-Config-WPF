@@ -18,12 +18,9 @@ namespace QueueExchange {
 
         public QERest(XElement defn) : base(defn) { }
 
-        public new bool SetUp() {
+        public override bool SetUp() {
 
             OK_TO_RUN = false;
-
-
-
 
             try {
                 requestURL = definition.Attribute("requestURL").Value;

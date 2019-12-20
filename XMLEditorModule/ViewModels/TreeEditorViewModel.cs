@@ -228,7 +228,11 @@ namespace QXEditorModule.ViewModels {
             XmlNode newNode = this.DataModel.CreateElement("pipe");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("name");
             newAttribute.Value = "Descriptive Name of Pipe";
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString(); ;
+
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
 
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("numInstances");
             newAttribute2.Value = "1";
@@ -254,6 +258,9 @@ namespace QXEditorModule.ViewModels {
 
         private void AddInput(XmlNodeType newNodeType) {
 
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString();
+
             XmlNode newNode = this.DataModel.CreateElement("input");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
@@ -261,6 +268,7 @@ namespace QXEditorModule.ViewModels {
             newAttribute2.Value = "Description of the Node";
 
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
             newNode.Attributes.Append(newAttribute2);
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
@@ -301,7 +309,11 @@ namespace QXEditorModule.ViewModels {
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
             newAttribute2.Value = "Description of the Node";
 
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString();
+
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
             newNode.Attributes.Append(newAttribute2);
 
             switch (type) {
@@ -344,6 +356,11 @@ namespace QXEditorModule.ViewModels {
 
         private void AddTypeOutput(String type) {
 
+            Guid.NewGuid().ToString();
+
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString();
+
             XmlNode newNode = this.DataModel.CreateElement("output");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = type;
@@ -351,6 +368,7 @@ namespace QXEditorModule.ViewModels {
             newAttribute2.Value = "Description of the Node";
 
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
             newNode.Attributes.Append(newAttribute2);
 
             switch (type) {
@@ -429,6 +447,10 @@ namespace QXEditorModule.ViewModels {
 
 
         private void AddOutput(XmlNodeType newNodeType) {
+
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString();
+
             XmlNode newNode = this.DataModel.CreateElement("output");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
@@ -436,6 +458,7 @@ namespace QXEditorModule.ViewModels {
             newAttribute2.Value = "Description of the Node";
 
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
             newNode.Attributes.Append(newAttribute2);
 
             SelectedElement.DataModel.AppendChild(newNode);
@@ -474,15 +497,20 @@ namespace QXEditorModule.ViewModels {
             }
         }
         private void AddAltQueue(XmlNodeType newNodeType) {
+
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString();
+
             XmlNode newNode = this.DataModel.CreateElement("altqueue");
             XmlAttribute newAttribute = this.DataModel.CreateAttribute("type");
             newAttribute.Value = "MSMQ";
             XmlAttribute newAttribute2 = this.DataModel.CreateAttribute("name");
             newAttribute2.Value = "Messages that fail the filter";
             XmlAttribute newAttribute3 = this.DataModel.CreateAttribute("queue");
-            newAttribute3.Value = @".\private$\QUEUENAME-ALTQUEUE";
+            newAttribute3.Value = @".\private$\nopassqueue";
 
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
             newNode.Attributes.Append(newAttribute2);
             newNode.Attributes.Append(newAttribute3);
 
@@ -528,7 +556,11 @@ namespace QXEditorModule.ViewModels {
             XmlAttribute newAttribute4 = this.DataModel.CreateAttribute("createQueue");
             newAttribute4.Value = "True";
 
+            XmlAttribute newAttribute0 = this.DataModel.CreateAttribute("id");
+            newAttribute0.Value = Guid.NewGuid().ToString();
+
             newNode.Attributes.Append(newAttribute);
+            newNode.Attributes.Append(newAttribute0);
             newNode.Attributes.Append(newAttribute2);
             newNode.Attributes.Append(newAttribute3);
             newNode.Attributes.Append(newAttribute4);

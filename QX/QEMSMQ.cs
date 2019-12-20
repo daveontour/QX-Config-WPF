@@ -34,7 +34,7 @@ namespace QueueExchange {
             }
         }
 
-        public new bool SetUp() {
+        public override bool SetUp() {
             logger.Info(queueName);
 
             // On output queues, if the maxMessages parameter is set, then set up a task to maitain the queue size at or below the value set
@@ -152,13 +152,13 @@ namespace QueueExchange {
             //}
 
             //// Connection to the queue
-            //if (ResetWrtiteConnect() == maxRetry) {
-            //    logger.Error($"Cannot Write to Queue: {queueName}");
-            //    this.SendToUndeliverableQueue(mess);
-            //    mess.sent = false;
-            //    mess.status = $"Unable to deliver to {queueName}. Sent to Undeliverable";
-            //    return mess;
-            //}
+            if (ResetWrtiteConnect() == maxRetry) {
+                logger.Error($"Cannot Write to Queue: {queueName}");
+                this.SendToUndeliverableQueue(mess);
+                mess.sent = false;
+                mess.status = $"Unable to deliver to {queueName}. Sent to Undeliverable";
+                return mess;
+            }
 
             // Locking on send is neccessary because writing to a MSMQ queue is not thread safe
             // and this method may be concurrently called.

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace QueueExchange {
-    class QXMonitor {
+    public class QXMonitor {
 
         /*
          * Static classfor logging details
@@ -14,11 +14,11 @@ namespace QueueExchange {
          * 
          */
 
-        private readonly static QueueAbstract monitorQueue = null;
-        private readonly static bool monitorEnabled = false;
-        private readonly static object logLock = new object();
-        private readonly static bool json = false;
-        static QXMonitor() {
+        private readonly QueueAbstract monitorQueue = null;
+        private readonly bool monitorEnabled = false;
+        private readonly object logLock = new object();
+        private readonly bool json = false;
+        public QXMonitor() {
 
 
             XDocument doc = XDocument.Load(Exchange.configFileName);
@@ -42,7 +42,7 @@ namespace QueueExchange {
                 json = false;
             }
         }
-        public static void Log(ExchangeMonitorMessage monMess) {
+        public void Log(ExchangeMonitorMessage monMess) {
             if (!monitorEnabled) {
                 return;
             }

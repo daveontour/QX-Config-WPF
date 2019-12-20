@@ -17,7 +17,7 @@ namespace QueueExchange {
         public object sendLock = new object();
 
         public QEMQ(XElement defn) : base(defn) { }
-        public new bool SetUp() {
+        public override bool SetUp() {
 
             OK_TO_RUN = false;
 
