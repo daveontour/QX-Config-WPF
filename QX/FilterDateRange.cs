@@ -29,13 +29,8 @@ namespace QueueExchange {
                     ns.AddNamespace(n.Attribute("prefix").Value, n.Attribute("uri").Value);
                 }
                 XmlNode node = doc.SelectSingleNode(nodePath, ns);
-                string[] dateStringArr = node.InnerText.Split('-');
 
-                int year = Int32.Parse(dateStringArr[0]);
-                int month = Int32.Parse(dateStringArr[1]);
-                int day = Int32.Parse(dateStringArr[2]);
-
-                DateTime check = new DateTime(year, month, day);
+                DateTime check = DateTime.Parse(node.InnerText);
                 DateTime from = DateTime.Now.AddDays(fromOffset);
                 from = new DateTime(from.Year, from.Month, from.Day, 0, 0, 0);
                 DateTime to = DateTime.Now.AddDays(toOffset);

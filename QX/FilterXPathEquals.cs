@@ -41,8 +41,8 @@ namespace QueueExchange {
         }
 
         public FilterXPathEquals(XElement config) : base(config) {
-            equals = config.Attribute("type").Value == "equals";
-            matches = config.Attribute("type").Value == "matches";
+            equals = config.Name == "xpequals";
+            matches = config.Name == "xpmatches";
 
             nodePath = config.Attribute("xpath").Value;
             value = config.Attribute("value").Value;
