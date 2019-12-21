@@ -1183,7 +1183,7 @@ namespace QXEditorModule.Views {
                 case "filter":
                     if (LogicalTreeHelper.FindLogicalNode(c, "filter") is Path path) {
                         SolidColorBrush brush = new SolidColorBrush {
-                            Color = Colors.Red
+                            Color = Colors.DarkOrange
                         };
                         path.Fill = brush;
                     }
@@ -1192,6 +1192,9 @@ namespace QXEditorModule.Views {
                     highlightBrush.Color = Color.FromArgb(255, 255, 127, 200);
                     break;
             }
+
+            highlightBrush.Color = Colors.DarkOrange;
+
 
             c.Background = highlightBrush;
 

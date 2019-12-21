@@ -22,7 +22,18 @@ namespace QXEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "SINK", "Test Source"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","Kafka", "Rabbit MQ",  "Test Source"
+            };
+            return types; ;
+        }
+    }
+
+    public class NodeTypeListOut : IItemsSource {
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "SINK"
             };
             return types; ;
         }

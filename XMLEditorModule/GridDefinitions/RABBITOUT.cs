@@ -14,7 +14,7 @@ namespace QXEditorModule.GridDefinitions {
             this.type = "Rabbit MQ";
         }
 
-        [CategoryAttribute("Required"), DisplayName("Node Type"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Node Type"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeListOut))]
         public string NodeType {
             get { return "Rabbit MQ"; }
             set { SetType(value); }

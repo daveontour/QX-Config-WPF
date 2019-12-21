@@ -13,7 +13,7 @@ namespace QXEditorModule.GridDefinitions {
             this.type = "RESTFul";
         }
 
-        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeList))]
+        [CategoryAttribute("Required"), DisplayName("Node Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("Type of the endpoint node"), ItemsSource(typeof(NodeTypeListOut))]
         public string TypeData {
             get { return "RESTful"; }
             set { SetType(value); }

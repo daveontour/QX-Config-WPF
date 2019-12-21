@@ -114,7 +114,7 @@ namespace QXEditorModule.Views {
         void newMenuItem_Click(object sender, RoutedEventArgs e) {
 
             XmlDocument document = new XmlDocument();
-            document.LoadXml("<?xml version=\"1.0\" encoding=\"utf - 8\"?><config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">  <settings> </settings><pipes></pipes></config>"); ;
+            document.LoadXml($"<?xml version=\"1.0\" encoding=\"utf - 8\"?><config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">  <settings> </settings><pipes><pipe name=\"Name of Pipe\" id=\"{Guid.NewGuid().ToString()}\" numInstances=\"1\" ><input type=\"MSMQ\" id=\"{Guid.NewGuid().ToString()}\" name=\"Description of the Node\" /><output type=\"MSMQ\" id=\"{Guid.NewGuid().ToString()}\" name=\"Description of the Node\" /></pipe></pipes></config>"); ;
 
             try {
 
