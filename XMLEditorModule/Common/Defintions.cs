@@ -147,6 +147,11 @@ namespace QXEditorModule.Common {
             }
         }
 
+
+        protected void ClearAttributes() {
+            _node.Attributes.RemoveAll();
+            view.UpdateParamBindings("XMLText");
+        }
         protected void SetAttribute(string attribName, string value) {
             if (value == null || value == "") {
                 try {
@@ -219,6 +224,15 @@ namespace QXEditorModule.Common {
 
         protected void SetType(string value) {
             if (this.type != value) {
+
+                string n = GetAttribute("name");
+                string i = GetAttribute("id");
+
+                ClearAttributes();
+
+                SetAttribute("name", n);
+                SetAttribute("id", i);
+
                 switch (value) {
                     case "IBM MQ":
                         SetAttribute("type", "MQ");

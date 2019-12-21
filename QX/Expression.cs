@@ -97,9 +97,15 @@ namespace QueueExchange {
 
                 foreach (Expression exp in expressions) {
                     result = result || exp.Pass(message);
+                    if (result) {
+                        return result;
+                    }
                 }
                 foreach (IQueueFilter filter in filters) {
                     result = result || filter.Pass(message);
+                    if (result) {
+                        return result;
+                    }
                 }
 
                 return result;

@@ -151,7 +151,7 @@ namespace QueueExchange {
                             }
 
                             logger.Info("=============Recieved Message From Kafka============");
-                            _ = serviceQueue.Send(new ExchangeMessage(consumeResult.Value));
+                            _ = serviceQueue.ServiceSend(new ExchangeMessage(consumeResult.Value));
 
                             //if (consumeResult.Offset % commitPeriod == 0) {
                             //    try {

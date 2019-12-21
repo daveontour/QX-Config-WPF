@@ -252,6 +252,11 @@ namespace QueueExchange {
             }
         }
 
+        public async Task<ExchangeMessage> ServiceSend(ExchangeMessage xm) {
+            xm = await SendToOutputAsync(xm);
+            return xm;
+        }
+
         public ExchangeMessage ListenToQueue(bool immediateReturn, int priorityWait = 200) {
 
             // Get the message from the Input.
@@ -302,12 +307,11 @@ namespace QueueExchange {
                         Task.Run(() =>
                         {
                             logger.Info($"Sending to Alt Queue {altQueue.name}");
-                            //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue"));
+                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue"));
                             _ = altQueue.Send(xm);
                         });
                     } else {
-                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured"));
-                        logger.Info("ALT QUEUE IS NULL??");
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured"));
                     }
                     xm.pass = false;
                     return xm;
@@ -324,11 +328,10 @@ namespace QueueExchange {
                 if (!pass) {
                     if (altQueue != null) {
                         logger.Info($"Sending to Alt Queue {altQueue.name}");
-                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue"));
                         _ = altQueue.Send(xm);
                     } else {
-                        //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured"));
-                        logger.Info("ALT QUEUE IS NULL??");
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured"));
                     }
                     xm.pass = false;
                     return xm;
@@ -340,9 +343,9 @@ namespace QueueExchange {
 
             // If a XSLT transform has been specified
             if (bTransform) {
-                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Starting Message Transformation", ""));
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Starting Message Transformation", ""));
                 message = Transform(message, xslVersion);
-                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message Transformation Complete", ""));
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Message Transformation Complete", ""));
                 xm.transformed = true;
             } else {
                 xm.transformed = false;
@@ -352,7 +355,7 @@ namespace QueueExchange {
                 logger.Info("Message blocked by XSL Transform of Zero Length");
                 xm.payload = null;
                 xm.status = "Message blocked by XSL Transform. Null or Zero Length";
-                //  qMon.Log.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Messaage Transformation", "Transformation resulted in a message of zero length"));
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, this.id, this.name, null, null, "Messaage Transformation", "Transformation resulted in a message of zero length"));
 
                 return xm;
             }

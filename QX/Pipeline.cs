@@ -211,14 +211,14 @@ namespace QueueExchange {
                     ExchangeMessage xm = await Task.Run(() => inQ.ListenToQueue(immediateReturn, priorityWait));
                     if (xm != null) {
                         if (xm.payload != null) {
-                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, inQ.id, inQ.name, this.id, this.name, "Message Received", null));
+                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, inQ.id, inQ.name, this.id, this.name, "Pipe: Message Received", null));
                             return xm;
                         } else {
                             if (immediateReturn) {
                                 // Return null so the pipeline can check other higher priority inputs 
                                 return null;
                             } else {
-                                qMon.Log(new ExchangeMonitorMessage(xm.uuid, inQ.id, inQ.name, this.id, this.name, "NULL Message", "Message was null after filtering and transformation"));
+                                qMon.Log(new ExchangeMonitorMessage(xm.uuid, inQ.id, inQ.name, this.id, this.name, "Pipe: NULL Message", "Message was null after filtering and transformation"));
                             }
 
                             // If we get here, then the input isn't part of a prioity set, so 
@@ -266,14 +266,14 @@ namespace QueueExchange {
 
                 //Get the message from the input
                 ExchangeMessage xm = await GetMessage();
-                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Recieved Message", ""));
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Recieved Message", ""));
 
 
                 if (throttleInterval <= 0) {
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Sending Message to Context Proceesor", ""));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Sending Message to Context Proceesor", ""));
                     await ContextProcessorAsync(xm);
                 } else {
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Sending Message to Injector", ""));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Sending Message to Injector", ""));
                     await InjectMessage(xm);
                     Thread.Sleep(throttleInterval);
                 }
@@ -285,7 +285,7 @@ namespace QueueExchange {
 
             // If no contextKey has been provided, just inject the message straight away
             if (contextCacheKeyXPath == null && !useMessageAsKey) {
-                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: No Context Key Defined", "Message being injected"));
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, No Context Key Defined", "Message being injected"));
                 await InjectMessage(xm);
                 return;
             }
@@ -295,7 +295,7 @@ namespace QueueExchange {
                 string nodeValue = null;
 
                 if (useMessageAsKey) {
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Entire Message Being Used As Key", ""));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor: Entire Message Being Used As Key", ""));
                     using (SHA256 mySHA256 = SHA256.Create()) {
                         using (var stream = GenerateStreamFromString(xm.payload)) {
                             byte[] hashValue = mySHA256.ComputeHash(stream);
@@ -321,17 +321,17 @@ namespace QueueExchange {
 
                         logger.Trace($"\n\n KEY = {nodeValue}\n\n");
                     } catch {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Error Retrieving Context Key", "Message being injected directly"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Error Retrieving Context Key", "Message being injected directly"));
                         _ = InjectMessage(xm);
                         return;
                     }
 
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Context Key Retrieves", $"Context Key = {nodeValue}"));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Context Key Retrieves", $"Context Key = {nodeValue}"));
 
                 }
 
                 if (firstOnly && _fistProcessed.Contains(nodeValue)) {
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: 'Fist Message Only' Defined", "Message being injected directly"));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, 'Fist Message Only' Defined", "Message being injected directly"));
                     _ = InjectMessage(xm);
                     return;
                 }
@@ -356,11 +356,11 @@ namespace QueueExchange {
                     };
                     _bufferPopperTimer.Elapsed += async (source, eventArgs) =>
                     {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Re-Injection  Timer Fired", $"Checking for ReInjectable Messages for ${nodeValue }"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Re-Injection  Timer Fired", $"Checking for ReInjectable Messages for ${nodeValue }"));
                         logger.Trace("Popper Timer Went Off");
                         if (_bufferMemoryQueue.Count != 0) {
                             logger.Trace("Popper Timer Went Off - Message to Process");
-                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Re-Injection  Timer Fired", $"ReInjecting Messages for ${nodeValue }"));
+                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Re-Injection  Timer Fired", $"ReInjecting Messages for ${nodeValue }"));
                             await ContextProcessorAsync(_bufferMemoryQueue.Dequeue());
                         } else {
                             logger.Trace("Popper Timer Went Off - No Message to Process");
@@ -375,7 +375,7 @@ namespace QueueExchange {
                 if (!_contextCache.Contains(nodeValue)) {
                     //It's not in the context cache, so add it and immediately send the inject the message to the output nodes
                     logger.Info($"No existing key in cache, so injecting it and adding to cache");
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Key Not In Cache", "Message being injected directly"));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Key Not In Cache", "Message being injected directly"));
                     _contextCache.AddOrGetExisting(nodeValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
                     await InjectMessage(xm);
 
@@ -391,11 +391,11 @@ namespace QueueExchange {
                     _fistProcessed.AddOrGetExisting(nodeValue, nodeValue, DateTime.Now.AddHours(18));
 
                     if (this.discardInCache) {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Key Found In Cache", "Discarding Message"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Key Found In Cache", "Discarding Message"));
                         return;
                     }
 
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Context Proceesor: Key Found In Cache", "Message ReInjection Being Added to ReInjection"));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Key Found In Cache", "Message ReInjection Being Added to ReInjection"));
 
                     // Schedule the injection of the message back to the output
                     DateTimeOffset t = DateTimeOffset.Parse(_contextCache.Get(nodeValue).ToString());
@@ -450,7 +450,7 @@ namespace QueueExchange {
                 xm.status = "Message Recieved";
 
                 // Pipeline specific logging
-                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Starting Output Meesage Processing", null));
+                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Starting Output Meesage Processing", null));
 
                 if (randomDistribution) {
                     // Distributes the message to a random output
@@ -460,16 +460,16 @@ namespace QueueExchange {
 
                     logger.Trace($"Random Distributor. Sending message {xm.uuid } to {output[index].name}");
 
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Output Meesage Processing", "Distributing to Random Output"));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Output Meesage Processing", "Distributing to Random Output"));
 
                     if (outputIsolation) {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Async Message Start", "Distribution to Random Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message Start", "Distribution to Random Output"));
                         _ = Task.Run(() => SendAndLog(output[index], xm));
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Async Message End", "Distribution to Random Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message End", "Distribution to Random Output"));
                     } else {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Sync Message Start", "Distribution to Random Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message Start", "Distribution to Random Output"));
                         _ = await SendAndLog(output[index], xm);
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Sync Message End", "Distribution to Random Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message End", "Distribution to Random Output"));
                     }
 
                 } else if (roundRobinDistribution) {
@@ -479,16 +479,16 @@ namespace QueueExchange {
 
                     logger.Trace($"Round Robin Distributor. Sending message {xm.uuid } to {output[index].name}");
 
-                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Output Meesage Processing", "Distribution to Round  Robin Output"));
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Output Meesage Processing", "Distribution to Round  Robin Output"));
 
                     if (outputIsolation) {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Async Message Start", "Distribution to Round  Robin Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message Start", "Distribution to Round  Robin Output"));
                         _ = Task.Run(() => SendAndLog(output[index], xm));
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Async Message End", "Distribution to Round  Robin Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message End", "Distribution to Round  Robin Output"));
                     } else {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Sync Message Start", "Distribution toRound  Robin Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message Start", "Distribution toRound  Robin Output"));
                         _ = await SendAndLog(output[index], xm);
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe Sync Message End", "Distribution to Round  Robin Output"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message End", "Distribution to Round  Robin Output"));
                     }
 
                     nextOutput++;
@@ -499,18 +499,18 @@ namespace QueueExchange {
 
                         // Wont wait for the Send to complete before completing
                         foreach (QueueAbstract q in output) {
-                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, q.id, q.name, this.id, this.name, "Pipe Async Message Start", "Normal Distribution"));
+                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, q.id, q.name, this.id, this.name, "Pipe: Async Message Start", "Normal Distribution"));
                             _ = Task.Run(() => SendAndLog(q, xm));
-                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, q.id, q.name, this.id, this.name, "Pipe Async Message End", "Normal Distribution"));
+                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, q.id, q.name, this.id, this.name, "Pipe: Async Message End", "Normal Distribution"));
                         }
                     } else {
 
                         // Will wait for all Sends to complete before proceeding
 
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Sync Message Start", "Normal Distribution"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Sync Message Start", "Normal Distribution"));
 
                         foreach (QueueAbstract q in output) {
-                            logger.Info($"  Sending message {xm.uuid } to {q.name}");
+                            logger.Info($"Sending message {xm.uuid } to {q.name}");
                             _ = await SendAndLog(q, xm);
 
                             if (xm.sent) {
@@ -525,7 +525,7 @@ namespace QueueExchange {
 
                         }
 
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe Sync Message End", "Normal Distribution"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Sync Message End", "Normal Distribution"));
                     }
                 }
             }

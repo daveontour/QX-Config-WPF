@@ -201,7 +201,7 @@ namespace QueueExchange {
                 output.Close();
 
                 // serviceQueue.Send(new ExchangeMessage(message));
-                _ = Task.Run(() => serviceQueue.Send(new ExchangeMessage(message)));
+                _ = Task.Run(() => serviceQueue.ServiceSend(new ExchangeMessage(message)));
             }
         }
 

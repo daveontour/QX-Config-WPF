@@ -100,21 +100,13 @@ namespace QueueExchange {
             var tcs = new TaskCompletionSource<bool>();
 
             try {
-                watcher = new FileSystemWatcher {
-                    Path = fullPath,
-                    // Watch for changes in LastAccess and LastWrite times, and
-                    // the renaming of files or directories.
-                    NotifyFilter = NotifyFilters.LastAccess
-                                     | NotifyFilters.LastWrite
-                                     | NotifyFilters.CreationTime
-                                     | NotifyFilters.FileName
-                                     | NotifyFilters.DirectoryName,
-                    Filter = fileFilter
-                };
-                watcher.Changed += new FileSystemEventHandler(OnChanged);
-                watcher.Created += new FileSystemEventHandler(OnChanged);
+                watcher = new FileSystemWatcher();
+                watcher.Path = fullPath;
+                watcher.NotifyFilter = NotifyFilters.LastWrite;
+                watcher.Filter = fileFilter;
                 watcher.Changed += new FileSystemEventHandler(OnChanged);
                 watcher.EnableRaisingEvents = true;
+
                 logger.Info("Started FileWatcher");
                 return await tcs.Task;
             } catch (Exception ex) {
@@ -131,25 +123,39 @@ namespace QueueExchange {
         //}
 
         private void OnChanged(object source, FileSystemEventArgs e) {
-            logger.Info($"Change Detected - {e.ChangeType}");
-            if (e.ChangeType == WatcherChangeTypes.Changed || e.ChangeType == WatcherChangeTypes.Created) {
-                _ = Task.Run(() => ProcessFile(e.FullPath));
+            logger.Info($"Change Detected - {e.ChangeType} {e.FullPath}");
+
+            if (File.Exists(e.FullPath)) {
+                if (e.ChangeType == WatcherChangeTypes.Changed) {
+                    _ = Task.Run(() => ProcessFile(e.FullPath));
+                }
             }
+
+
+            //if (e.ChangeType == WatcherChangeTypes.Created) {
+            //    _ = Task.Run(() => ProcessFile(e.FullPath));
+            //}
         }
 
         private void ProcessFile(string fullPath) {
+
+
 
             while (!IsFileReady(fullPath)) {
                 Thread.Sleep(5);
             }
             logger.Info($"Received file {fullPath}");
 
+            if (!File.Exists(fullPath)) {
+                logger.Info($"File {fullPath} no longer exists");
+                return;
+            }
+
             try {
                 string text = File.ReadAllText(fullPath, Encoding.UTF8);
                 ExchangeMessage xm = new ExchangeMessage(text);
 
-
-                _ = Task.Run(() => serviceQueue.Send(xm));
+                _ = Task.Run(() => serviceQueue.ServiceSend(xm));
 
                 if (deleteAfterSend) {
                     File.Delete(fullPath);
@@ -157,6 +163,7 @@ namespace QueueExchange {
             } catch (Exception ex) {
                 logger.Error(ex);
             }
+
         }
 
         public static bool IsFileReady(string filename) {
