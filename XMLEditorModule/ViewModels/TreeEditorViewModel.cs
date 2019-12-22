@@ -243,6 +243,8 @@ namespace QXEditorModule.ViewModels {
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
 
+            View.HightLightCanvas(newNode);
+
         }
 
         private bool CanAddPipe(XmlNodeType newNodeType) {
@@ -350,9 +352,12 @@ namespace QXEditorModule.ViewModels {
                 }
             }
 
+
+
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
 
+            View.HightLightCanvas(newNode);
         }
 
         private void AddTypeOutput(String type) {
@@ -415,9 +420,12 @@ namespace QXEditorModule.ViewModels {
                 }
             }
 
+
+
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
 
+            View.HightLightCanvas(newNode);
         }
 
 
@@ -571,6 +579,8 @@ namespace QXEditorModule.ViewModels {
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
 
+            View.HightLightCanvas(newNode);
+
         }
         private bool CanAddMonitor(XmlNodeType newNodeType) {
 
@@ -607,6 +617,8 @@ namespace QXEditorModule.ViewModels {
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
+
+            View.HightLightCanvas(newNode);
 
         }
         private bool CanAddNamespace(XmlNodeType newNodeType) {
@@ -650,6 +662,8 @@ namespace QXEditorModule.ViewModels {
 
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
+
+            View.HightLightCanvas(newNode);
 
         }
         private bool CanAddServiceSetting(XmlNodeType newNodeType) {
@@ -726,6 +740,8 @@ namespace QXEditorModule.ViewModels {
             currentNode.ParentNode.RemoveChild(currentNode);
             OnPropertyChanged("XMLText");
             View.DrawQXConfig();
+            MyGrid = null;
+            OnPropertyChanged("MyGrid");
         }
 
         private bool CanDeleteElement(XmlNode currentNode) {
