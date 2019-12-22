@@ -93,11 +93,14 @@
     <Compile Include="Views\CommandsBarView.xaml.cs">
       <DependentUpon>CommandsBarView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\QXAbout - Copy.xaml.cs">
+      <DependentUpon>QXAbout - Copy.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\QXPackageMsg.xaml.cs">
       <DependentUpon>QXPackageMsg.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\QXAbout.xaml.cs">
-      <DependentUpon>QXAbout.xaml</DependentUpon>
+    <Compile Include="Views\QXSplash.xaml.cs">
+      <DependentUpon>QXSplash.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TreeEditorsView.xaml.cs">
       <DependentUpon>TreeEditorsView.xaml</DependentUpon>
@@ -112,11 +115,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\QXAbout - Copy.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\QXPackageMsg.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\QXAbout.xaml">
+    <Page Include="Views\QXSplash.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -135,6 +142,11 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\QXScreen.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

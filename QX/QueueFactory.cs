@@ -69,6 +69,9 @@ namespace QueueExchange {
                 case "contains":
                     filter = new FilterContains(ep);
                     break;
+                case "equals":
+                    filter = new FilterEquals(ep);
+                    break;
                 case "matches":
                     filter = new FilterMatches(ep);
                     break;

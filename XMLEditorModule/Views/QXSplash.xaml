@@ -1,0 +1,38 @@
+﻿<Window x:Class="QXEditorModule.Views.QXSplash"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Queue Exchange"
+    Height="500"
+    Width="600"
+    MinHeight="10"
+    MinWidth="300"
+    Background="AliceBlue"
+    ShowInTaskbar="False"
+    WindowStartupLocation="CenterOwner" >
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel  Grid.Column="0" Grid.Row="0"  HorizontalAlignment="Center" Orientation="Vertical">
+
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontSize="36" Margin="0,0" FontFamily="Dubai" FontStyle="Italic" Height="53" >Queue Exchange</TextBlock>
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontSize="24" Margin="0,0" FontFamily="Dubai" Height="37"  >Configuration Utility, Executor and Packager</TextBlock>
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,0"  Text="{Binding Path=VersionString, Mode=OneWay}" />
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" >This utility creates the configuration files used by a running instance of QueueExchange(QX). The utility will also allow for the immediate execution of those configuration files and can package the configuration together with the necessary executeables to run QX indepedant of this utility.</TextBlock>
+            <Image Source="/QXEditorModule;component/Resources/QXScreen.png" Stretch="None" />
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" Height="18" ><Run Text="Copyright: David Burton, 2019"/></TextBlock>
+          
+
+        </StackPanel>
+        <!-- Accept or Cancel -->
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,0,10" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+            <Button  Width="100" Name="okButton" IsDefault="True" Click="clickOK" Margin="5,0,5,0">OK</Button>
+        </StackPanel>
+    </Grid>
+</Window>

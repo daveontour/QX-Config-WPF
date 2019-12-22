@@ -22,7 +22,7 @@
         <StackPanel  Grid.Column="0" Grid.Row="0"  HorizontalAlignment="Center" Orientation="Vertical">
 
             <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontWeight="Bold" Margin="5,5" >Configuration Utility for Queue Exchange</TextBlock>
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,0" >Version 1.6</TextBlock>
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,0"  Text="{Binding Path=VersionString, Mode=OneWay}" />
             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" >This utility creates the configuration files used by a running instance of QueueExchange(QX). The utility will also allow for the immediate execution of those configuration files and can package the configuration together with the necessary executeables to run QX indepedant of this utility.</TextBlock>
             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" >Copyright: David Burton, 2019</TextBlock>
 

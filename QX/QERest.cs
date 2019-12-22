@@ -27,7 +27,7 @@ namespace QueueExchange {
             } catch (Exception) {
                 return false;
             }
-            if (definition.Name == "output") {
+            if (definition.Name == "output" || definition.Name == "monitor") {
                 try {
                     serviceQueue = new QEMSMQ(bufferQueueName);
                     OK_TO_RUN = true;

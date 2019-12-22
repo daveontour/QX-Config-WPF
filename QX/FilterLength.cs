@@ -4,7 +4,7 @@ using System.Xml.Linq;
 namespace QueueExchange {
     class FilterLength : MustInitialize<XElement>, IQueueFilter {
 
-        private int length = 0;
+        private readonly int length = 0;
 
         public bool Pass(string message) {
             if (length == 0) {

@@ -173,6 +173,7 @@
     <Compile Include="ExchangeMessage.cs" />
     <Compile Include="Expression.cs" />
     <Compile Include="FilterBool.cs" />
+    <Compile Include="FilterEquals.cs" />
     <Compile Include="FilterContextContains.cs" />
     <Compile Include="FilterContains.cs" />
     <Compile Include="FilterDateRange.cs" />
