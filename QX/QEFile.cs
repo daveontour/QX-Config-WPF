@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -13,10 +14,28 @@ namespace QueueExchange {
         private QEMSMQ serviceQueue;
         private string fileFilter = "*.*";
         private FileSystemWatcher watcher;
+        private Queue<string> files = new Queue<string>();
 
         public QEFile(XElement defn) : base(defn) {
+
         }
         public override ExchangeMessage Listen(bool immediateReturn, int priorityWait) {
+            logger.Info("Listen for files");
+            if (sequentialDir) {
+                if (files.Count > 0) {
+                    string fileName = files.Dequeue();
+                    string text = File.ReadAllText(fileName, Encoding.UTF8);
+                    logger.Info($"Sending file {fileName}");
+                    ExchangeMessage xm = new ExchangeMessage(text);
+                    if (deleteAfterSend) {
+                        File.Delete(fileName);
+                    }
+                    return xm;
+                } else {
+                    return null;
+                }
+            }
+
             try {
                 ExchangeMessage xm = serviceQueue.Listen(immediateReturn, priorityWait);
                 return xm;
@@ -28,15 +47,29 @@ namespace QueueExchange {
 
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess) {
 
-            int count = 1;
+            int count = 0;
+            string countStr = count.ToString();
+
+            while (countStr.Length < 6) {
+                countStr = "0" + countStr;
+            }
+
 
             string fileNameOnly = Path.GetFileNameWithoutExtension(fullPath);
             string extension = Path.GetExtension(fullPath);
             string path = Path.GetDirectoryName(fullPath);
-            string newFullPath = fullPath;
+            string newFullPath;
+            string tempFileName = string.Format("{0}{1}", fileNameOnly, countStr);
+            newFullPath = Path.Combine(path, tempFileName + extension);
 
             while (File.Exists(newFullPath)) {
-                string tempFileName = string.Format("{0}({1})", fileNameOnly, count++);
+                count++;
+                countStr = count.ToString();
+
+                while (countStr.Length < 6) {
+                    countStr = "0" + countStr;
+                }
+                tempFileName = string.Format("{0}{1}", fileNameOnly, countStr);
                 newFullPath = Path.Combine(path, tempFileName + extension);
             }
 
@@ -84,6 +117,19 @@ namespace QueueExchange {
                 deleteAfterSend = bool.Parse(definition.Attribute("deleteAfterSend").Value);
             } catch (Exception) {
                 deleteAfterSend = false;
+            }
+
+
+            try {
+                sequentialDir = bool.Parse(definition.Attribute("sequentialDir").Value);
+                string[] fileEntries = Directory.GetFiles(fullPath);
+                foreach (string file in fileEntries) {
+                    files.Enqueue(file);
+                }
+                Array.Sort(fileEntries);
+                return true;
+            } catch (Exception) {
+                sequentialDir = false;
             }
 
             if (definition.Name == "input") {

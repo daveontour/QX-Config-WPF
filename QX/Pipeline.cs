@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -33,7 +34,8 @@ namespace QueueExchange {
         protected readonly string contextCacheKeyXPath;
         protected readonly double contextCacheExpiry = 10.0;
         protected readonly MemoryCache _contextCache;
-        protected readonly MemoryCache _fistProcessed;
+        protected readonly MemoryCache _firstProcessed = new MemoryCache("firstprocessed");
+        protected readonly MemoryCache _firstProcessedCompleted = new MemoryCache("firstprocessedcompleted");
         protected readonly bool discardInCache = false;
         protected readonly Dictionary<String, Queue<ExchangeMessage>> _bufferMemoryQueueDict = new Dictionary<String, Queue<ExchangeMessage>>();
         protected readonly Dictionary<String, System.Timers.Timer> _bufferTimerDict = new Dictionary<String, System.Timers.Timer>();
@@ -270,6 +272,7 @@ namespace QueueExchange {
 
                 //Get the message from the input
                 ExchangeMessage xm = await GetMessage();
+
                 try {
                     qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Recieved Message", ""));
                 } catch (Exception) { }
@@ -293,6 +296,10 @@ namespace QueueExchange {
 
         public async Task ContextProcessorAsync(ExchangeMessage xm) {
 
+            if (!xm.pass) {
+                return;
+            }
+
             // If no contextKey has been provided, just inject the message straight away
             if (contextCacheKeyXPath == null && !useMessageAsKey) {
                 try {
@@ -304,17 +311,21 @@ namespace QueueExchange {
 
             try {
 
-                string nodeValue = null;
+                string contextKeyValue = null;
 
                 if (useMessageAsKey) {
                     try {
                         qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor: Entire Message Being Used As Key", ""));
                     } catch (Exception) { }
                     using (SHA256 mySHA256 = SHA256.Create()) {
-                        using (var stream = GenerateStreamFromString(xm.payload)) {
+
+                        byte[] byteArray = Encoding.UTF8.GetBytes(xm.payload);
+
+
+                        using (MemoryStream stream = new MemoryStream(byteArray)) {
                             byte[] hashValue = mySHA256.ComputeHash(stream);
-                            nodeValue = BitConverter.ToString(hashValue);
-                            logger.Trace($"\n\nMessage Hash {nodeValue}\n\n");
+                            contextKeyValue = BitConverter.ToString(hashValue);
+                            logger.Trace($"Message Hash {contextKeyValue}");
                         }
                     }
                 } else {
@@ -331,10 +342,12 @@ namespace QueueExchange {
 
                     try {
                         XmlNode node = doc.SelectSingleNode(contextCacheKeyXPath, ns);
-                        nodeValue = node.InnerText;
+                        contextKeyValue = node.InnerText;
 
-                        logger.Trace($"\n\n KEY = {nodeValue}\n\n");
+                        logger.Info($"Context Key for Message = {contextKeyValue}");
                     } catch {
+
+                        // Unable to find the defined context key, so just inject the message. 
                         try {
                             qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Error Retrieving Context Key", "Message being injected directly"));
                         } catch (Exception) { }
@@ -342,12 +355,15 @@ namespace QueueExchange {
                         return;
                     }
                     try {
-                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Context Key Retrieves", $"Context Key = {nodeValue}"));
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Context Key Retrieves", $"Context Key = {contextKeyValue}"));
                     } catch (Exception) { }
 
                 }
 
-                if (firstOnly && _fistProcessed.Contains(nodeValue)) {
+                //So at this point we have the message and a contextKey
+
+                if (firstOnly && _firstProcessed.Contains(contextKeyValue) && _firstProcessedCompleted.Contains(contextKeyValue)) {
+                    //Inject the message straight away if there is no need to wait
                     try {
                         qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, 'Fist Message Only' Defined", "Message being injected directly"));
                     } catch (Exception) { }
@@ -355,105 +371,90 @@ namespace QueueExchange {
                     return;
                 }
 
-                Queue<ExchangeMessage> _bufferMemoryQueue = null;
-                System.Timers.Timer _bufferPopperTimer = null;
+                Queue<ExchangeMessage> bufferMemoryQueue = null;
+                System.Timers.Timer bufferPopperTimer = null;
 
                 try {
-                    _bufferMemoryQueue = _bufferMemoryQueueDict[nodeValue];
-                    _bufferPopperTimer = _bufferTimerDict[nodeValue];
+                    // Get the buffer queue and popperTimer for this key
+                    bufferMemoryQueue = _bufferMemoryQueueDict[contextKeyValue];
+                    bufferPopperTimer = _bufferTimerDict[contextKeyValue];
                 } catch (Exception) {
 
-                    logger.Trace($"Creating queue and timer for {nodeValue}");
+                    // They don't exist, so they need to be created.
+                    logger.Trace($"Creating queue and timer for {contextKeyValue}");
 
-                    _bufferMemoryQueue = new Queue<ExchangeMessage>();
-                    _bufferMemoryQueueDict.Add(nodeValue, _bufferMemoryQueue);
+                    //Create the queue
+                    bufferMemoryQueue = new Queue<ExchangeMessage>();
+                    _bufferMemoryQueueDict.Add(contextKeyValue, bufferMemoryQueue);
 
-                    _bufferPopperTimer = new System.Timers.Timer {
-                        AutoReset = false,
-                        Interval = contextCacheExpiry * 1000 + 100.0,
-                        Enabled = false
-                    };
-                    _bufferPopperTimer.Elapsed += async (source, eventArgs) =>
-                    {
-                        try {
-                            qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Re-Injection  Timer Fired", $"Checking for ReInjectable Messages for ${nodeValue }"));
-                        } catch (Exception) { }
-                        logger.Trace("Popper Timer Went Off");
-                        if (_bufferMemoryQueue.Count != 0) {
-                            logger.Trace("Popper Timer Went Off - Message to Process");
-                            try {
-                                qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Re-Injection  Timer Fired", $"ReInjecting Messages for ${nodeValue }"));
-                            } catch (Exception) { }
-                            await ContextProcessorAsync(_bufferMemoryQueue.Dequeue());
-                        } else {
-                            logger.Trace("Popper Timer Went Off - No Message to Process");
-                            _bufferPopperTimer.Enabled = false;
-                        }
-                    };
-
-                    _bufferTimerDict.Add(nodeValue, _bufferPopperTimer);
+                    //Create the timer
+                    bufferPopperTimer = CreatePopperTask(xm, bufferMemoryQueue, contextKeyValue);
+                    _bufferTimerDict.Add(contextKeyValue, bufferPopperTimer);
                 }
 
+
+
                 // See if the key is currently in the context cache
-                if (!_contextCache.Contains(nodeValue)) {
+                if (!_contextCache.Contains(contextKeyValue)) {
                     //It's not in the context cache, so add it and immediately send the inject the message to the output nodes
-                    logger.Info($"No existing key in cache, so injecting it and adding to cache");
+                    logger.Info($"No existing key in cache, so injecting it and adding to cache. Key = {contextKeyValue}");
                     try {
                         qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Key Not In Cache", "Message being injected directly"));
                     } catch (Exception) { }
-                    _contextCache.AddOrGetExisting(nodeValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
+
+                    _contextCache.AddOrGetExisting(contextKeyValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
                     await InjectMessage(xm);
 
-
                     //Start the task to pop the next message if it appears in the meantime
-                    _bufferPopperTimer.Enabled = true;
-                    _bufferPopperTimer.Start();
-
+                    bufferPopperTimer.Enabled = true;
+                    bufferPopperTimer.Start();
 
                 } else {
-                    logger.Trace("The key was found in the Context Cache");
 
-                    _fistProcessed.AddOrGetExisting(nodeValue, nodeValue, DateTime.Now.AddHours(18));
+                    _firstProcessed.AddOrGetExisting(contextKeyValue, contextKeyValue, DateTime.Now.AddHours(18));
 
                     if (this.discardInCache) {
+                        logger.Info($"The key was found in the Context Cache. Message will be discarded.  Key = {contextKeyValue}");
                         try {
                             qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Key Found In Cache", "Discarding Message"));
                         } catch (Exception) { }
 
                         return;
+                    } else {
+                        logger.Info($"The key was found in the Context Cache. Message Re-Injection will be scheduled. Key = {contextKeyValue}");
                     }
                     try {
                         qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Key Found In Cache", "Message ReInjection Being Added to ReInjection"));
                     } catch (Exception) { }
 
                     // Schedule the injection of the message back to the output
-                    DateTimeOffset t = DateTimeOffset.Parse(_contextCache.Get(nodeValue).ToString());
+                    DateTimeOffset t = DateTimeOffset.Parse(_contextCache.Get(contextKeyValue).ToString());
                     TimeSpan ts = t - DateTime.Now;
                     double interval = ts.TotalMilliseconds + 5.0;
 
                     logger.Trace($"Found in cache {t.ToString()},  Now =  {DateTime.Now.ToString()}, Interval =  {interval}  {xm.uuid}\n\n");
                     //Create a Timer Task to inject the message after the buffer time since the last message was sent expired
 
-                    if (interval < 0 && _bufferMemoryQueue.Count == 0) {
+                    if (interval < 0 && bufferMemoryQueue.Count == 0) {
 
                         logger.Trace("The interval is less than zero => immediate injection");
 
-                        _bufferPopperTimer.Enabled = true;
-                        _bufferPopperTimer.Stop();
-                        _bufferPopperTimer.Start();
+                        bufferPopperTimer.Enabled = true;
+                        bufferPopperTimer.Stop();
+                        bufferPopperTimer.Start();
 
-                        _contextCache.Remove(nodeValue);
-                        _contextCache.AddOrGetExisting(nodeValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
+                        _contextCache.Remove(contextKeyValue);
+                        _contextCache.AddOrGetExisting(contextKeyValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
                         _ = InjectMessage(xm);
 
                         return;
                     } else {
 
-                        _bufferMemoryQueue.Enqueue(xm);
+                        bufferMemoryQueue.Enqueue(xm);
 
-                        if (!_bufferPopperTimer.Enabled) {
-                            _bufferPopperTimer.Enabled = true;
-                            _bufferPopperTimer.Start();
+                        if (!bufferPopperTimer.Enabled) {
+                            bufferPopperTimer.Enabled = true;
+                            bufferPopperTimer.Start();
                         }
 
                     }
@@ -464,6 +465,34 @@ namespace QueueExchange {
             } catch (Exception ex) {
                 logger.Error(ex);
             }
+        }
+
+        private System.Timers.Timer CreatePopperTask(ExchangeMessage xm, Queue<ExchangeMessage> bufferMemoryQueue, string contextKeyValue) {
+
+            System.Timers.Timer bufferPopperTimer = new System.Timers.Timer {
+                AutoReset = false,
+                Interval = contextCacheExpiry * 1000 + 100.0,
+                Enabled = false
+            };
+            bufferPopperTimer.Elapsed += async (source, eventArgs) =>
+            {
+                try {
+                    qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Re-Injection  Timer Fired", $"Checking for ReInjectable Messages for ${contextKeyValue }"));
+                } catch (Exception) { }
+
+                if (bufferMemoryQueue.Count != 0) {
+                    logger.Trace($"Reinjection Popper Timer Went Off for key = {contextKeyValue} - {bufferMemoryQueue.Count} Messages on queue");
+                    try {
+                        qMon.Log(new ExchangeMonitorMessage(xm.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Re-Injection  Timer Fired", $"ReInjecting Messages for ${contextKeyValue }"));
+                    } catch (Exception) { }
+                    await ContextProcessorAsync(bufferMemoryQueue.Dequeue());
+                } else {
+                    logger.Trace($"Reinjection Popper Timer Went Off for key = {contextKeyValue} - No Message to Process");
+                    bufferPopperTimer.Enabled = false;
+                }
+            };
+
+            return bufferPopperTimer;
         }
         protected async Task InjectMessage(ExchangeMessage xm) {
 

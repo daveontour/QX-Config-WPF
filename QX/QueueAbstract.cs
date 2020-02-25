@@ -42,6 +42,7 @@ namespace QueueExchange {
         protected string xpathDestination = null;
         protected string xpathContentDestination;
         public string id;
+        public bool sequentialDir;
         public QXMonitor qMon;
         private Pipeline pipeParent;
 
@@ -153,6 +154,7 @@ namespace QueueExchange {
             } catch (Exception) {
                 bufferQueueName = null;
             }
+
 
             try {
                 xpathDestination = definition.Attribute("xpathDestination").Value;

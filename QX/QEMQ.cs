@@ -122,7 +122,7 @@ namespace QueueExchange {
                     }
                 } catch (Exception ex) {
                     // Exception occurs on read timeout or on failure to connect
-                    logger.Trace($"Unable to get message from: {queueName} { ex.Message }");
+                    logger.Trace($"No messages on: {queueName} { ex.Message }");
                     if (immediateReturn) {
                         return null;
                     } else {

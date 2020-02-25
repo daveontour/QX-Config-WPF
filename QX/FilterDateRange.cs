@@ -11,9 +11,9 @@ namespace QueueExchange {
         // xpath specifies the date under test in YYYY-MM-DD format
         // The fromOffset and toOffset are the number of days relative to NOW() (can be negative)
 
-        private string nodePath;
-        private int fromOffset;
-        private int toOffset;
+        private readonly string nodePath;
+        private readonly int fromOffset;
+        private readonly int toOffset;
 
         public bool Pass(string message) {
             try {

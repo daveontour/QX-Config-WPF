@@ -871,9 +871,9 @@ namespace QXEditorModule.ViewModels {
                 newDoc.Save(sw);
             }
 
-            string serviceName = "Queue Exchange Service";
-            string serviceDisplayName = "Queue Exchange Service";
-            string serviceDescription = "Connects input nodes with output nodes";
+            string serviceName;
+            string serviceDisplayName;
+            string serviceDescription;
 
             try {
 

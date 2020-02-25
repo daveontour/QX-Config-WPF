@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Xml.Linq;
 
 namespace QueueExchange {
     class FilterContains : MustInitialize<XElement>, IQueueFilter {
@@ -8,6 +9,10 @@ namespace QueueExchange {
         public bool Pass(string message) {
             if (value == null) {
                 return true;
+            }
+            bool res = message.Contains(value);
+            if (res) {
+                Console.WriteLine(value);
             }
             return message.Contains(value);
         }
