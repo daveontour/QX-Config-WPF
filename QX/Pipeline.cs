@@ -209,17 +209,33 @@ namespace QueueExchange {
 
 
             while (true) {
+                //for (int i = 0; i < input.Count; i++) {
+                //    QueueAbstract inQ = input[i];
+                //    if ((i+1) < input.Count) {
+                //        QueueAbstract inQNext = input[i+1];
+                //        if ((inQ.priority == inQNext.priority) && inQ.lastUsed) {
+                //            inQ.used = false;
+                //            inQNext.used = true;
+                //           inQ = inQNext;
+                //        } else {
+                //            inQ.used = true;
+                //        }
+                //    } 
                 foreach (QueueAbstract inQ in input) {
                     ExchangeMessage xm = await Task.Run(() => inQ.ListenToQueue(immediateReturn, priorityWait));
+                    inQ.lastUsed = true;
+
                     if (xm != null) {
                         if (xm.payload != null) {
                             try {
                                 qMon.Log(new ExchangeMonitorMessage(xm.uuid, inQ.id, inQ.name, this.id, this.name, "Pipe: Message Received", null));
                             } catch (Exception) { }
+                            ReOrderInputs(inQ);
                             return xm;
                         } else {
                             if (immediateReturn) {
                                 // Return null so the pipeline can check other higher priority inputs 
+                                ReOrderInputs(inQ);
                                 return null;
                             } else {
                                 try {
@@ -233,6 +249,21 @@ namespace QueueExchange {
                     }
                 }
             }
+        }
+
+        private void ReOrderInputs(QueueAbstract inQ) {
+            //Rearranges the input list so the most recently used queue is put behind other
+            // queue of the same priority. 
+
+            int priority = inQ.priority;
+            input.Remove(inQ);
+            for (int i = 0; i < input.Count; i++) {
+                if (input[i].priority > priority) {
+                    input.Insert(i, inQ);
+                    return;
+                }
+            }
+            input.Add(inQ);
         }
 
         public void StopPipeLine() {

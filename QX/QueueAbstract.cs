@@ -30,6 +30,7 @@ namespace QueueExchange {
         private readonly Expression expression = null;
         private readonly QueueFactory fact = new QueueFactory();
         public int priority = 0;
+        public bool lastUsed = false;
         protected int getTimeout = 5000;
         protected string bufferQueueName;
         public bool isLogger = false;
