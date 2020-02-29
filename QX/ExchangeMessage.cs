@@ -15,6 +15,7 @@ namespace QueueExchange {
         public bool destinationSet = false;
         public string destination;
         public string time;
+        public bool enqueued = false;
         public ExchangeMessage(string message) {
             uuid = Guid.NewGuid().ToString();
             payload = message;
