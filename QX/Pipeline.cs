@@ -374,7 +374,6 @@ namespace QueueExchange {
                     return;
                 }
 
-                xm.enqueued = true;
                 bufferMemoryQueue.Enqueue(xm);
 
                 // So the message is enqueued, now just work out how long how to set the popper
@@ -382,15 +381,22 @@ namespace QueueExchange {
                 //Let's deal with it if it is not a firstOnly
 
                 if (!firstOnly) {
-                    //It's not in the cache
+
                     if (!_contextCache.Contains(contextKeyValue)) {
+                        //It's not in the cachce
+
                         if (!bufferPopperTimer.Enabled) {
-                            bufferPopperTimer.Interval = 10.0;
+                            //If the popper isn't already enabled, enable it to pop straight away (5ms) 
+                            bufferPopperTimer.Interval = 5.0;
                             bufferPopperTimer.Enabled = true;
                             bufferPopperTimer.Start();
                         }
+
                     } else {
+
+                        //It's in tha cache, 
                         if (!bufferPopperTimer.Enabled) {
+                            //If the popper isn't already enabled, then set the popper. (If it is in the cache, then really, the popper should already be set) 
                             bufferPopperTimer.Interval = contextCacheExpiry * 1000;
                             bufferPopperTimer.Enabled = true;
                             bufferPopperTimer.Start();
