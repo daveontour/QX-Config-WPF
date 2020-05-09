@@ -6,51 +6,67 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace QueueExchange {
-    class QEFile : QueueAbstract, IDisposable {
+namespace QueueExchange
+{
+    class QEFile : QueueAbstract, IDisposable
+    {
 
         private string fullPath;
         private bool deleteAfterSend = true;
         private QEMSMQ serviceQueue;
         private string fileFilter = "*.*";
         private FileSystemWatcher watcher;
-        private Queue<string> files = new Queue<string>();
+        private readonly Queue<string> files = new Queue<string>();
 
-        public QEFile(XElement defn) : base(defn) {
+        public QEFile(XElement defn) : base(defn)
+        {
 
         }
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait) {
+        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+        {
             logger.Info("Listen for files");
-            if (sequentialDir) {
-                if (files.Count > 0) {
-                    string fileName = files.Dequeue();
-                    string text = File.ReadAllText(fileName, Encoding.UTF8);
-                    logger.Info($"Sending file {fileName}");
-                    ExchangeMessage xm = new ExchangeMessage(text);
-                    if (deleteAfterSend) {
-                        File.Delete(fileName);
-                    }
-                    return xm;
-                } else {
+
+            if (files.Count > 0)
+            {
+                ExchangeMessage xm;
+                string fileName = files.Dequeue();
+                try
+                {
+                    xm = new ExchangeMessage(File.ReadAllText(fileName, Encoding.UTF8));
+                }
+                catch (Exception)
+                {
                     return null;
                 }
-            }
+                logger.Info($"Sending file {fileName}");
 
-            try {
-                ExchangeMessage xm = serviceQueue.Listen(immediateReturn, priorityWait);
+                try
+                {
+                    if (deleteAfterSend)
+                    {
+                        File.Delete(fileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
                 return xm;
-            } catch (Exception ex) {
-                logger.Error(ex);
+            }
+            else
+            {
                 return null;
             }
         }
 
-        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess) {
+        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
+        {
 
             int count = 0;
             string countStr = count.ToString();
 
-            while (countStr.Length < 6) {
+            while (countStr.Length < 6)
+            {
                 countStr = "0" + countStr;
             }
 
@@ -62,23 +78,28 @@ namespace QueueExchange {
             string tempFileName = string.Format("{0}{1}", fileNameOnly, countStr);
             newFullPath = Path.Combine(path, tempFileName + extension);
 
-            while (File.Exists(newFullPath)) {
+            while (File.Exists(newFullPath))
+            {
                 count++;
                 countStr = count.ToString();
 
-                while (countStr.Length < 6) {
+                while (countStr.Length < 6)
+                {
                     countStr = "0" + countStr;
                 }
                 tempFileName = string.Format("{0}{1}", fileNameOnly, countStr);
                 newFullPath = Path.Combine(path, tempFileName + extension);
             }
 
-            try {
+            try
+            {
                 await Task.Run(() => File.WriteAllText(newFullPath, mess.payload));
                 mess.sent = true;
                 mess.status = $"Sent file to {newFullPath}";
 
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 mess.sent = false;
                 mess.status = $"Unable to write file to {newFullPath}";
             }
@@ -86,53 +107,76 @@ namespace QueueExchange {
             return mess;
         }
 
-        public new void Stop() {
+        public new void Stop()
+        {
             OK_TO_RUN = false;
 
-            try {
+            try
+            {
                 watcher.EnableRaisingEvents = false;
-            } catch (Exception) {
-                //
             }
-            try {
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+            }
+            try
+            {
                 serviceQueue.Stop();
-            } catch (Exception) {
-                //
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
             }
         }
-        public override bool SetUp() {
+        public override bool SetUp()
+        {
 
-            try {
+            try
+            {
                 fullPath = definition.Attribute("path").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 fullPath = null;
             }
-            try {
+            try
+            {
                 fileFilter = definition.Attribute("fileFilter").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 fileFilter = "*.*";
             }
 
-            try {
+            try
+            {
                 deleteAfterSend = bool.Parse(definition.Attribute("deleteAfterSend").Value);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 deleteAfterSend = false;
             }
 
 
-            try {
-                sequentialDir = bool.Parse(definition.Attribute("sequentialDir").Value);
+            try
+            {
                 string[] fileEntries = Directory.GetFiles(fullPath);
-                foreach (string file in fileEntries) {
-                    files.Enqueue(file);
+                if (fileEntries != null)
+                {
+                    foreach (string file in fileEntries)
+                    {
+                        files.Enqueue(file);
+                    }
+                    Array.Sort(fileEntries);
                 }
-                Array.Sort(fileEntries);
-                return true;
-            } catch (Exception) {
-                sequentialDir = false;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
             }
 
-            if (definition.Name == "input") {
+            if (definition.Name == "input")
+            {
                 logger.Trace("Starting FileWatcher");
                 // Create a service queue manager to write to and read from the buffer queue
                 serviceQueue = new QEMSMQ(bufferQueueName);
@@ -142,91 +186,92 @@ namespace QueueExchange {
             return true;
         }
 
-        private async Task<bool> Watch() {
+        private async Task<bool> Watch()
+        {
             var tcs = new TaskCompletionSource<bool>();
 
-            try {
-                watcher = new FileSystemWatcher();
-                watcher.Path = fullPath;
-                watcher.NotifyFilter = NotifyFilters.LastWrite;
-                watcher.Filter = fileFilter;
+            try
+            {
+                watcher = new FileSystemWatcher
+                {
+                    Path = fullPath,
+                    NotifyFilter = NotifyFilters.LastWrite,
+                    Filter = fileFilter
+                };
                 watcher.Changed += new FileSystemEventHandler(OnChanged);
                 watcher.EnableRaisingEvents = true;
 
                 logger.Info("Started FileWatcher");
                 return await tcs.Task;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 logger.Error(ex.Message);
                 throw;
             }
         }
 
-        //private static void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e) {
-        //    logger.Trace($"A new file has been renamed from {e.OldName} to {e.Name}");
-        //}
-        //private static void FileSystemWatcher_Created(object sender, FileSystemEventArgs e) {
-        //    Console.WriteLine($"A new file has been created - {e.Name}");
-        //}
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
 
-        private void OnChanged(object source, FileSystemEventArgs e) {
             logger.Info($"Change Detected - {e.ChangeType} {e.FullPath}");
 
-            if (File.Exists(e.FullPath)) {
-                if (e.ChangeType == WatcherChangeTypes.Changed) {
+            if (File.Exists(e.FullPath))
+            {
+                if (e.ChangeType == WatcherChangeTypes.Changed)
+                {
                     _ = Task.Run(() => ProcessFile(e.FullPath));
                 }
             }
-
-
-            //if (e.ChangeType == WatcherChangeTypes.Created) {
-            //    _ = Task.Run(() => ProcessFile(e.FullPath));
-            //}
         }
 
-        private void ProcessFile(string fullPath) {
-
-
-
-            while (!IsFileReady(fullPath)) {
+        private void ProcessFile(string fullPath)
+        {
+            while (!IsFileReady(fullPath))
+            {
                 Thread.Sleep(5);
             }
             logger.Info($"Received file {fullPath}");
 
-            if (!File.Exists(fullPath)) {
+            if (!File.Exists(fullPath))
+            {
                 logger.Info($"File {fullPath} no longer exists");
                 return;
             }
 
-            try {
-                string text = File.ReadAllText(fullPath, Encoding.UTF8);
-                ExchangeMessage xm = new ExchangeMessage(text);
-
-                _ = Task.Run(() => serviceQueue.ServiceSend(xm));
-
-                if (deleteAfterSend) {
-                    File.Delete(fullPath);
-                }
-            } catch (Exception ex) {
+            try
+            {
+                files.Enqueue(fullPath);
+            }
+            catch (Exception ex)
+            {
                 logger.Error(ex);
             }
 
         }
 
-        public static bool IsFileReady(string filename) {
+        public static bool IsFileReady(string filename)
+        {
             // If the file can be opened for exclusive access it means that the file is no longer locked by another process.
-            try {
+            try
+            {
                 using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.None))
                     return inputStream.Length > 0;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 return false;
             }
         }
 
-        public void Dispose() {
-            try {
+        public void Dispose()
+        {
+            try
+            {
                 serviceQueue.Dispose();
                 watcher.Dispose();
-            } catch { }
+            }
+            catch { }
         }
     }
 }

@@ -4,11 +4,14 @@ using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
     [DisplayName("File Input Node")]
-    public class FILEIN : MyNodeInPropertyGrid {
+    public class FILEIN : MyNodeInPropertyGrid
+    {
 
-        public FILEIN(XmlNode dataModel, IView view) {
+        public FILEIN(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "File";
@@ -30,20 +33,20 @@ namespace QXEditorModule.GridDefinitions {
             get { return GetAttribute("fileFilter"); }
             set { SetAttribute("fileFilter", value); }
         }
-        [CategoryAttribute("Required"), DisplayName("Sequential from Directory"), PropertyOrder(5), Browsable(true), DescriptionAttribute("Select the files from the directory one at a time in sequential order")]
-        public bool SequentialFromDirectory {
-            get { return GetBoolAttribute("sequentialDir"); }
-            set { SetAttribute("sequentialDir", value); }
-        }
+        //[CategoryAttribute("Required"), DisplayName("Sequential from Directory"), PropertyOrder(5), Browsable(true), DescriptionAttribute("Select the files from the directory one at a time in sequential order")]
+        //public bool SequentialFromDirectory {
+        //    get { return GetBoolAttribute("sequentialDir"); }
+        //    set { SetAttribute("sequentialDir", value); }
+        //}
         [CategoryAttribute("Required"), DisplayName("Delete After Send"), PropertyOrder(6), Browsable(true), DescriptionAttribute("Delete the source file after the pipeline picks it up")]
         public bool Delete {
             get { return GetBoolAttribute("deleteAfterSend"); }
             set { SetAttribute("deleteAfterSend", value); }
         }
-        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(7), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
-        public string Buffer {
-            get { return GetAttribute("bufferQueueName"); }
-            set { SetAttribute("bufferQueueName", value); }
-        }
+        //[CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(7), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
+        //public string Buffer {
+        //    get { return GetAttribute("bufferQueueName"); }
+        //    set { SetAttribute("bufferQueueName", value); }
+        //}
     }
 }

@@ -5,12 +5,15 @@ using System.Xml;
 using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
     [DisplayName("Pipe Connecting Input and Output")]
-    public class PIPE : MyPropertyGrid {
+    public class PIPE : MyPropertyGrid
+    {
 
 
-        public PIPE(XmlNode dataModel, IView view) {
+        public PIPE(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
         }
@@ -28,13 +31,14 @@ namespace QXEditorModule.GridDefinitions {
         public int Instances {
             get { return GetIntAttribute("numInstances"); }
             set {
-                if (value > 1) {
+                if (value > 1)
+                {
                     MessageBox.Show("Make sure you know what you're doing!", "Multi Thread Warning");
                 }
                 SetAttribute("numInstances", value);
             }
         }
-
+        [RefreshProperties(RefreshProperties.All)]
         [CategoryAttribute("Optional"), DisplayName("Max Msgs/Min"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Maximum Number of Messages Per Minute (-1 for unlimited)")]
         public int MessPerMinute {
             get {
@@ -42,13 +46,32 @@ namespace QXEditorModule.GridDefinitions {
                 return value;
             }
             set {
-                if (value < -1) {
+                if (value < -1)
+                {
                     SetAttribute("maxMsgPerMinute", -1);
-                } else if (value > 250) {
-                    SetAttribute("maxMsgPerMinute", 250);
-                } else {
-                    SetAttribute("maxMsgPerMinute", value);
                 }
+                else if (value > 250)
+                {
+                    SetAttribute("maxMsgPerMinute", 250);
+                    SetAttribute("maxMsgPerMinuteProfile", null);
+                }
+                else
+                {
+                    SetAttribute("maxMsgPerMinute", value);
+                    SetAttribute("maxMsgPerMinuteProfile", null);
+                }
+            }
+        }
+        [RefreshProperties(RefreshProperties.All)]
+        [CategoryAttribute("Optional"), DisplayName("Max Msgs/Min Profile"), Browsable(true), PropertyOrder(2), DescriptionAttribute("Maximum Number of Messages Per Minute Profile e.g '0:10,60:40,120:10'. The string is a comma seperated list of value pairs, where the values pairs are: TimeFromStartInMinutes:MaxMessagesPerMin")]
+        public string MessPerMinuteProfile {
+            get {
+                string value = GetAttribute("maxMsgPerMinuteProfile");
+                return value;
+            }
+            set {
+                SetAttribute("maxMsgPerMinuteProfile", value);
+                SetAttribute("maxMsgPerMinute", -1);
             }
         }
 
@@ -62,13 +85,16 @@ namespace QXEditorModule.GridDefinitions {
         public string OutputDistribution {
             get {
                 string dist = GetAttribute("distribution");
-                if (dist == "all" || dist == null || dist == "") {
+                if (dist == "all" || dist == null || dist == "")
+                {
                     return "Distribute to All";
                 }
-                if (dist == "roundRobin") {
+                if (dist == "roundRobin")
+                {
                     return "Round Robin";
                 }
-                if (dist == "random") {
+                if (dist == "random")
+                {
                     return "Random";
                 }
 
@@ -89,7 +115,8 @@ namespace QXEditorModule.GridDefinitions {
                 bool value = GetBoolAttribute("contextAware");
 
 
-                if (!value) {
+                if (!value)
+                {
                     SetAttribute("useMessageAsKey", "");
                     SetAttribute("contextCacheKeyXPath", "");
                     SetAttribute("contextCacheExpiry", "");
@@ -174,10 +201,13 @@ namespace QXEditorModule.GridDefinitions {
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (value) {
+                if (value)
+                {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                     SetAttribute("contextCacheKeyXPath", "");
-                } else {
+                }
+                else
+                {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
                 return value;
@@ -191,14 +221,18 @@ namespace QXEditorModule.GridDefinitions {
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (value) {
+                if (value)
+                {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                     SetAttribute("contextCacheKeyXPath", "");
-                } else {
+                }
+                else
+                {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
 
-                if (ContextExpiry <= 0) {
+                if (ContextExpiry <= 0)
+                {
                     ContextExpiry = 10;
                 }
             }
@@ -211,7 +245,8 @@ namespace QXEditorModule.GridDefinitions {
             set {
                 //SetAttribute("maxMsgPerMinute", "");
                 SetAttribute("contextCacheKeyXPath", value);
-                if (ContextExpiry <= 0) {
+                if (ContextExpiry <= 0)
+                {
                     ContextExpiry = 10;
                 }
             }
@@ -222,7 +257,8 @@ namespace QXEditorModule.GridDefinitions {
         public int ContextExpiry {
             get { return GetIntAttribute("contextCacheExpiry"); }
             set {
-                if (value <= 0) {
+                if (value <= 0)
+                {
                     value = 1;
                 }
                 SetAttribute("contextCacheExpiry", value);
