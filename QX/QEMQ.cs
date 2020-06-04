@@ -4,8 +4,10 @@ using System.Collections;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace QueueExchange {
-    class QEMQ : QueueAbstract {
+namespace QueueExchange
+{
+    class QEMQ : QueueAbstract
+    {
         private string qMgr;
         private string qSvrChan;
         private string qHost;
@@ -16,73 +18,101 @@ namespace QueueExchange {
         private readonly Hashtable connectionParams = new Hashtable();
         public object sendLock = new object();
 
-        public QEMQ(XElement defn) : base(defn) { }
-        public override bool SetUp() {
+        public QEMQ(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
+        public override bool SetUp()
+        {
 
             OK_TO_RUN = false;
 
-            try {
+            try
+            {
                 qMgr = definition.Attribute("queueMgr").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // Can't do anything if the connection is not speicifed
                 return false;
             }
-            try {
+            try
+            {
                 qSvrChan = definition.Attribute("channel").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // Can't do anything if the connection is not speicifed
                 return false;
             }
 
-            try {
+            try
+            {
                 qHost = definition.Attribute("host").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // Can't do anything if the connection is not speicifed
                 return false;
             }
 
-            try {
+            try
+            {
                 qPort = definition.Attribute("port").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 // Can't do anything if the connection is not speicifed
                 return false;
             }
 
-            try {
+            try
+            {
                 qUser = definition.Attribute("username").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 qUser = null;
             }
 
-            try {
+            try
+            {
                 qPass = definition.Attribute("password").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 qPass = null;
             }
 
-            try {
+            try
+            {
                 // Set the connection parameter 
                 connectionParams.Add(MQC.CHANNEL_PROPERTY, qSvrChan);
                 connectionParams.Add(MQC.HOST_NAME_PROPERTY, qHost);
                 connectionParams.Add(MQC.PORT_PROPERTY, qPort);
                 connectionParams.Add(MQC.TRANSPORT_PROPERTY, MQC.TRANSPORT_MQSERIES_MANAGED);
 
-                if (qUser != null) {
+                if (qUser != null)
+                {
                     connectionParams.Add(MQC.USER_ID_PROPERTY, qUser);
                 }
-                if (qPass != null) {
+                if (qPass != null)
+                {
                     connectionParams.Add(MQC.PASSWORD_PROPERTY, qPass);
                 }
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 return false;
             }
 
             // On output queues, if the maxMessages parameter is set, then set up a task to maitain the queue size at or below the value set
-            try {
-                if (definition.Name == "output") {
+            try
+            {
+                if (definition.Name == "output")
+                {
                     maxMessages = Int32.Parse(definition.Attribute("maxMessages").Value);
                 }
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 maxMessages = -1;
             }
 
@@ -91,27 +121,35 @@ namespace QueueExchange {
             return true;
         }
 
-        public new void Stop() {
+        public new void Stop()
+        {
             OK_TO_RUN = false;
         }
 
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait) {
+        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+        {
 
-            if (immediateReturn) {
+            if (immediateReturn)
+            {
                 getTimeout = priorityWait;
             }
-            while (OK_TO_RUN) {
-                try {
-                    using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams)) {
+            while (OK_TO_RUN)
+            {
+                try
+                {
+                    using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams))
+                    {
                         var openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_FAIL_IF_QUIESCING;
                         MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
 
-                        MQGetMessageOptions getOptions = new MQGetMessageOptions {
+                        MQGetMessageOptions getOptions = new MQGetMessageOptions
+                        {
                             WaitInterval = getTimeout,
                             Options = MQC.MQGMO_WAIT
                         };
 
-                        MQMessage msg = new MQMessage {
+                        MQMessage msg = new MQMessage
+                        {
                             Format = MQC.MQFMT_STRING
                         };
 
@@ -120,12 +158,17 @@ namespace QueueExchange {
 
                         return new ExchangeMessage(msg.ReadString(msg.MessageLength));
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     // Exception occurs on read timeout or on failure to connect
                     logger.Trace($"No messages on: {queueName} { ex.Message }");
-                    if (immediateReturn) {
+                    if (immediateReturn)
+                    {
                         return null;
-                    } else {
+                    }
+                    else
+                    {
                         continue;
                     }
                 }
@@ -133,25 +176,32 @@ namespace QueueExchange {
 
             return null;
         }
-        public new async void Send(ExchangeMessage xm) {
+        public new async void Send(ExchangeMessage xm)
+        {
             logger.Debug($"Sending to {xm.uuid} IBMMQ {queueName}");
             await SendToOutputAsync(xm);
         }
-        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess) {
+        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
+        {
 
-            if (maxMessages != -1) {
+            if (maxMessages != -1)
+            {
                 MaintainQueueInline();
             }
 
-            try {
+            try
+            {
 
                 mess = await SendMqStuff(mess);
-                if (mess.sent) {
+                if (mess.sent)
+                {
                     logger.Debug($"MQ Sent to {name}");
                     mess.sent = true;
                     mess.status = $"Sent to {queueName}";
                     return mess;
-                } else {
+                }
+                else
+                {
                     logger.Error($"MQ Failed Sent to  {name}");
                     SendToUndeliverableQueue(mess);
                     mess.sent = false;
@@ -159,8 +209,11 @@ namespace QueueExchange {
                     return mess;
                 }
 
-            } catch (Exception ex) {
-                if (!isLogger) {
+            }
+            catch (Exception ex)
+            {
+                if (!isLogger)
+                {
                     logger.Error(ex, $"MQ Failed Sent to {name}");
                 }
                 SendToUndeliverableQueue(mess);
@@ -171,28 +224,35 @@ namespace QueueExchange {
 
         }
 
-        public async Task<ExchangeMessage> SendMqStuff(ExchangeMessage xm) {
+        public async Task<ExchangeMessage> SendMqStuff(ExchangeMessage xm)
+        {
 
             await Task.Run(() => { });
             string messageXML = xm.payload;
             bool sent = false;
             int tries = 1;
 
-            lock (sendLock) {
+            lock (sendLock)
+            {
 
-                do {
+                do
+                {
 
-                    if (tries > maxRetry && maxRetry > 0) {
+                    if (tries > maxRetry && maxRetry > 0)
+                    {
                         xm.sent = false;
                         xm.status = $"Exceeded Connection retries on MQ {queueName}";
                         return xm;
                     }
 
-                    try {
-                        using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams)) {
+                    try
+                    {
+                        using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams))
+                        {
                             var openOptions = MQC.MQOO_OUTPUT + MQC.MQOO_FAIL_IF_QUIESCING;
                             MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
-                            var message = new MQMessage {
+                            var message = new MQMessage
+                            {
                                 CharacterSet = 1208 // UTF-8
                             };
                             message.WriteString(messageXML);
@@ -203,13 +263,17 @@ namespace QueueExchange {
                             sent = true;
                             logger.Trace($"===Message Sent {xm.uuid} to {queueName}");
                         }
-                    } catch (Exception ex) {
-                        if (!isLogger) {
+                    }
+                    catch (Exception ex)
+                    {
+                        if (!isLogger)
+                        {
                             logger.Info("Unable to send message to : " + queueName + " : " + ex.Message);
                         }
                         tries++;
                     }
-                    if (!sent) {
+                    if (!sent)
+                    {
                         logger.Trace($"===Message NOT Sent {xm.uuid} to  {queueName}");
                     }
                 } while (!sent);
@@ -220,24 +284,31 @@ namespace QueueExchange {
             return xm;
         }
 
-        public void MaintainQueueInline() {
+        public void MaintainQueueInline()
+        {
 
 
-            try {
-                using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams)) {
+            try
+            {
+                using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams))
+                {
 
                     int openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_OUTPUT + MQC.MQOO_FAIL_IF_QUIESCING + MQC.MQOO_INQUIRE;
                     MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
                     MQGetMessageOptions getOptions = new MQGetMessageOptions { WaitInterval = 5, Options = MQC.MQGMO_WAIT };
                     MQMessage msg = new MQMessage { Format = MQC.MQFMT_STRING };
 
-                    while (queue.CurrentDepth > this.maxMessages) {
+                    while (queue.CurrentDepth > this.maxMessages)
+                    {
                         GetMessage();
                     }
                     queue.Close();
                 }
-            } catch (Exception ex) {
-                if (!isLogger) {
+            }
+            catch (Exception ex)
+            {
+                if (!isLogger)
+                {
                     logger.Error($"Unable to maintain queue: {queueName}: {ex.Message}");
                 }
 
@@ -245,9 +316,12 @@ namespace QueueExchange {
         }
 
 
-        private void GetMessage() {
-            try {
-                using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams)) {
+        private void GetMessage()
+        {
+            try
+            {
+                using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams))
+                {
                     var openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_OUTPUT + MQC.MQOO_FAIL_IF_QUIESCING + MQC.MQOO_INQUIRE;
                     MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
                     MQGetMessageOptions getOptions = new MQGetMessageOptions { WaitInterval = 5, Options = MQC.MQGMO_WAIT };
@@ -255,8 +329,11 @@ namespace QueueExchange {
                     queue.Get(msg, getOptions);
                     queue.Close();
                 }
-            } catch (Exception ex) {
-                if (!isLogger) {
+            }
+            catch (Exception ex)
+            {
+                if (!isLogger)
+                {
                     logger.Error($"Unable to maintain queue: {queueName}: {ex.Message}");
                 }
             }

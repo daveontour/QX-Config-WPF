@@ -18,7 +18,7 @@ namespace QueueExchange
         private FileSystemWatcher watcher;
         private readonly Queue<string> files = new Queue<string>();
 
-        public QEFile(XElement defn) : base(defn)
+        public QEFile(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
 
         }

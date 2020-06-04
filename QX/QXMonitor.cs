@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+﻿using System.Threading.Tasks;
 
-namespace QueueExchange {
-    public class QXMonitor {
+namespace QueueExchange
+{
+    public class QXMonitor
+    {
 
         /*
          * Static classfor logging details
@@ -18,38 +17,45 @@ namespace QueueExchange {
         private readonly bool monitorEnabled = false;
         private readonly object logLock = new object();
         private readonly bool json = false;
-        public QXMonitor() {
+        public QXMonitor()
+        {
 
 
-            XDocument doc = XDocument.Load(Exchange.configFileName);
-            XElement loggerQueueDefn = doc.Descendants("monitor").FirstOrDefault();
+            //XDocument doc = XDocument.Load(Exchange.configFileName);
+            //XElement loggerQueueDefn = doc.Descendants("monitor").FirstOrDefault();
 
-            try {
-                if (loggerQueueDefn != null) {
-                    monitorQueue = new QueueFactory().GetQueue(loggerQueueDefn);
-                    monitorQueue.isLogger = true;
-                    monitorEnabled = true;
-                } else {
-                    monitorEnabled = false;
-                }
-            } catch (Exception) {
-                monitorEnabled = false;
-            }
+            //try {
+            //    if (loggerQueueDefn != null) {
+            //        monitorQueue = new QueueFactory().GetQueue(loggerQueueDefn);
+            //        monitorQueue.isLogger = true;
+            //        monitorEnabled = true;
+            //    } else {
+            //        monitorEnabled = false;
+            //    }
+            //} catch (Exception) {
+            //    monitorEnabled = false;
+            //}
 
-            try {
-                json = bool.Parse(loggerQueueDefn.Attribute("json").Value);
-            } catch (Exception) {
-                json = false;
-            }
+            //try {
+            //    json = bool.Parse(loggerQueueDefn.Attribute("json").Value);
+            //} catch (Exception) {
+            //    json = false;
+            //}
         }
-        public void Log(ExchangeMonitorMessage monMess) {
-            if (!monitorEnabled) {
+        public void Log(ExchangeMonitorMessage monMess)
+        {
+            if (!monitorEnabled)
+            {
                 return;
             }
-            lock (logLock) {
-                if (json) {
+            lock (logLock)
+            {
+                if (json)
+                {
                     _ = Task.Run(() => monitorQueue.SendToOutputAsync(new ExchangeMessage(monMess.ToJSONString())));
-                } else {
+                }
+                else
+                {
                     _ = Task.Run(() => monitorQueue.SendToOutputAsync(new ExchangeMessage(monMess.ToString())));
                 }
             }

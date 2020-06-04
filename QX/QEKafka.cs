@@ -3,8 +3,10 @@ using System;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace QueueExchange {
-    class QEKafka : QueueAbstract, IDisposable {
+namespace QueueExchange
+{
+    class QEKafka : QueueAbstract, IDisposable
+    {
 
         private string topic;
         private string key;
@@ -13,47 +15,66 @@ namespace QueueExchange {
         private string consumerGroup;
 
 
-        public QEKafka(XElement defn) : base(defn) {
+        public QEKafka(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
+        {
 
         }
 
-        public override bool SetUp() {
+        public override bool SetUp()
+        {
 
             OK_TO_RUN = false;
 
-            try {
+            try
+            {
                 bootStrapServers = definition.Attribute("connection").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 return false;
             }
-            try {
+            try
+            {
                 key = definition.Attribute("key").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 key = null;
             }
 
 
-            try {
+            try
+            {
                 consumerGroup = definition.Attribute("consumerGroup").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 consumerGroup = "QueueExchange";
             }
-            try {
+            try
+            {
                 topic = definition.Attribute("topic").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 topic = "my_topic";
             }
 
-            if (key == null) {
+            if (key == null)
+            {
                 key = topic;
             }
 
-            try {
+            try
+            {
                 // Create a service queue manager to write to and read from the buffer queue
                 serviceQueue = new QEMSMQ(bufferQueueName);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 bufferQueueName = null;
-                if (definition.Name == "input") {
+                if (definition.Name == "input")
+                {
                     logger.Error($"A bufferQueueName must be correctly specified for a KAFKA interface");
                     return false;
                 }
@@ -61,7 +82,8 @@ namespace QueueExchange {
 
             OK_TO_RUN = true;
 
-            if (definition.Name == "input") {
+            if (definition.Name == "input")
+            {
                 _ = Task.Run(() => Run_Consume());
             }
 
@@ -69,41 +91,54 @@ namespace QueueExchange {
 
         }
 
-        public new void Stop() {
+        public new void Stop()
+        {
             OK_TO_RUN = false;
-            if (serviceQueue != null) {
+            if (serviceQueue != null)
+            {
                 serviceQueue.Stop();
             }
         }
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait) {
+        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+        {
             // The serviceQueue is monitored and messages are returned as the appear on the queue
             logger.Debug("Listening to KAFKA QUEUE");
             return (serviceQueue.Listen(immediateReturn, priorityWait));
         }
 
-        public new async void Send(ExchangeMessage xm) {
+        public new async void Send(ExchangeMessage xm)
+        {
             logger.Debug($"Sending to {xm.uuid} Kafka Topic {topic}");
             await SendToOutputAsync(xm);
         }
-        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess) {
+        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
+        {
 
             var config = new ProducerConfig { BootstrapServers = this.bootStrapServers };
 
             // Set the topic bassed on the content of the message if configured
             mess = SetDestinationFromMessage(mess);
-            if (mess.destinationSet) {
+            if (mess.destinationSet)
+            {
                 topic = queueName;
-            } else {
-                if (topic == null) {
+            }
+            else
+            {
+                if (topic == null)
+                {
                     mess.sent = false;
                     return mess;
                 }
             }
 
-            using (var p = new ProducerBuilder<string, string>(config).Build()) {
-                try {
+            using (var p = new ProducerBuilder<string, string>(config).Build())
+            {
+                try
+                {
                     var dr = await p.ProduceAsync(topic, new Message<string, string> { Key = key, Value = mess.payload });
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     logger.Error(e.Message);
                     logger.Error(e);
                     logger.Error($"Unable to deliver to Kafka Server on topic {topic}");
@@ -123,10 +158,12 @@ namespace QueueExchange {
 
 
 
-        public void Run_Consume() {
+        public void Run_Consume()
+        {
             logger.Info("Starting the KAFKA Consumer");
 
-            var config = new ConsumerConfig {
+            var config = new ConsumerConfig
+            {
                 BootstrapServers = bootStrapServers,
                 GroupId = consumerGroup,
                 EnableAutoCommit = true,
@@ -136,16 +173,21 @@ namespace QueueExchange {
                 EnablePartitionEof = true
             };
 
-            using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build()) {
+            using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
+            {
 
                 consumer.Subscribe(topic);
 
-                try {
-                    while (OK_TO_RUN) {
-                        try {
+                try
+                {
+                    while (OK_TO_RUN)
+                    {
+                        try
+                        {
                             var consumeResult = consumer.Consume();
 
-                            if (consumeResult.IsPartitionEOF) {
+                            if (consumeResult.IsPartitionEOF)
+                            {
                                 logger.Info($"Reached end of topic {consumeResult.Topic}, partition {consumeResult.Partition}, offset {consumeResult.Offset}.");
                                 continue;
                             }
@@ -161,20 +203,27 @@ namespace QueueExchange {
                             //    }
                             //}
 
-                        } catch (ConsumeException e) {
+                        }
+                        catch (ConsumeException e)
+                        {
                             logger.Info($"Consume error: {e.Error.Reason}");
                         }
                     }
-                } catch (OperationCanceledException) {
+                }
+                catch (OperationCanceledException)
+                {
                     // consumer.Close();
                 }
             }
         }
 
-        public void Dispose() {
-            try {
+        public void Dispose()
+        {
+            try
+            {
                 serviceQueue.Dispose();
-            } catch { }
+            }
+            catch { }
         }
     }
 }

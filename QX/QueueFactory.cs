@@ -1,42 +1,46 @@
 ﻿using System.Xml.Linq;
 
-namespace QueueExchange {
-    public class QueueFactory {
+namespace QueueExchange
+{
+    public class QueueFactory
+    {
         public QueueFactory() { }
 
-        public QueueAbstract GetQueue(XElement ep) {
+        public QueueAbstract GetQueue(XElement ep, System.IProgress<MonitorMessage> monitorMessageProgress)
+        {
 
             string queueType = ep.Attribute("type").Value;
 
             QueueAbstract queue;
 
-            switch (queueType) {
+            switch (queueType)
+            {
                 case "MSMQ":
-                    queue = new QEMSMQ(ep);
+                    queue = new QEMSMQ(ep, monitorMessageProgress);
                     break;
                 case "MQ":
-                    queue = new QEMQ(ep);
+                    queue = new QEMQ(ep, monitorMessageProgress);
                     break;
                 case "HTTP":
-                    queue = new QEHTTP(ep);
+                    queue = new QEHTTP(ep, monitorMessageProgress);
                     break;
                 case "REST":
-                    queue = new QERest(ep);
+                    queue = new QERest(ep, monitorMessageProgress);
                     break;
                 case "KAFKA":
-                    queue = new QEKafka(ep);
+                    queue = new QEKafka(ep, monitorMessageProgress);
                     break;
                 case "RABBITDEFEX":
-                    queue = new QERabbitDefExchange(ep);
+                    queue = new QERabbitDefExchange(ep, monitorMessageProgress);
                     break;
                 case "FILE":
-                    queue = new QEFile(ep);
+                    queue = new QEFile(ep, monitorMessageProgress);
                     break;
                 case "SINK":
-                    queue = new QESink(ep);
+                    queue = new QESink(ep, monitorMessageProgress);
                     break;
                 case "TESTSOURCE":
-                    queue = new QESink(ep);
+                    queue = new QESink(ep, monitorMessageProgress);
                     break;
                 default:
                     queue = null;
@@ -46,13 +50,15 @@ namespace QueueExchange {
             return queue;
         }
 
-        public IQueueFilter GetFilter(XElement ep, QueueAbstract queue) {
+        public IQueueFilter GetFilter(XElement ep, QueueAbstract queue)
+        {
 
             string type = ep.Name.ToString();
 
             IQueueFilter filter = null;
 
-            switch (type) {
+            switch (type)
+            {
                 case "xpexists":
                     filter = new FilterXPathExists(ep);
                     break;
