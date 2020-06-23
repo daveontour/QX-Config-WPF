@@ -18,7 +18,7 @@ namespace QueueExchange
         private readonly Hashtable connectionParams = new Hashtable();
         public object sendLock = new object();
 
-        public QEMQ(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
+        public QEMQ(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
         public override bool SetUp()
         {
 

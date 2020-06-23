@@ -15,7 +15,7 @@ namespace QueueExchange
         private string consumerGroup;
 
 
-        public QEKafka(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
+        public QEKafka(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
 
         }

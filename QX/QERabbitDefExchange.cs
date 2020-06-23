@@ -11,7 +11,7 @@ namespace QueueExchange
     {
 
         public QEMSMQ serviceQueue;
-        public QERabbitDefExchange(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
+        public QERabbitDefExchange(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
 
         public override bool SetUp()
         {

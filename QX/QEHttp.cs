@@ -19,7 +19,7 @@ namespace QueueExchange
         private QEMSMQ serviceQueue;
         private bool isXML;
 
-        public QEHTTP(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
+        public QEHTTP(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
 
         public override bool SetUp()
         {

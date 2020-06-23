@@ -18,7 +18,7 @@ namespace QueueExchange
         public object sendLock = new object();
         public int maxMessages = -1;
 
-        public QERest(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
+        public QERest(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
 
         public override bool SetUp()
         {

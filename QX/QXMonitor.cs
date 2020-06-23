@@ -52,7 +52,7 @@ namespace QueueExchange
             {
                 if (json)
                 {
-                    _ = Task.Run(() => monitorQueue.SendToOutputAsync(new ExchangeMessage(monMess.ToJSONString())));
+                    _ = Task.Run(() => monitorQueue.SendToOutputAsync(new ExchangeMessage(monMess.ToString())));
                 }
                 else
                 {

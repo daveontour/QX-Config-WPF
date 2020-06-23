@@ -16,15 +16,17 @@ namespace QueueExchange
         private QEMSMQ serviceQueue;
         private string fileFilter = "*.*";
         private FileSystemWatcher watcher;
+        private bool isOutput = false;
         private readonly Queue<string> files = new Queue<string>();
 
-        public QEFile(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
+        public QEFile(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
 
         }
         public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
         {
             logger.Info("Listen for files");
+            QXLog(id, "Looking for Message", null, "PROGRESS");
 
             if (files.Count > 0)
             {
@@ -133,6 +135,23 @@ namespace QueueExchange
 
             try
             {
+                if (definition.Name == "output" || definition.Name == "altqueue")
+                {
+                    isOutput = true;
+                }
+                else
+                {
+                    isOutput = false;
+                }
+
+            }
+            catch (Exception)
+            {
+                isOutput = false;
+            }
+
+            try
+            {
                 fullPath = definition.Attribute("path").Value;
             }
             catch (Exception)
@@ -157,22 +176,24 @@ namespace QueueExchange
                 deleteAfterSend = false;
             }
 
-
-            try
+            if (!isOutput)
             {
-                string[] fileEntries = Directory.GetFiles(fullPath);
-                if (fileEntries != null)
+                try
                 {
-                    foreach (string file in fileEntries)
+                    string[] fileEntries = Directory.GetFiles(fullPath);
+                    if (fileEntries != null)
                     {
-                        files.Enqueue(file);
+                        foreach (string file in fileEntries)
+                        {
+                            files.Enqueue(file);
+                        }
+                        Array.Sort(fileEntries);
                     }
-                    Array.Sort(fileEntries);
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message);
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message);
+                }
             }
 
             if (definition.Name == "input")

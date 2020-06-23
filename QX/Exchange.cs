@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace QueueExchange
@@ -31,40 +30,28 @@ namespace QueueExchange
         public List<Thread> pipeThreads = new List<Thread>();  // Reference to the thread of each pipe
         public static string configFileName;                   // Config file name "ExchangeConfig.xml" by default
         public static Dictionary<string, string> nsDict = new Dictionary<string, string>();
-        public Progress<MonitorMessage> monitorMessageProgress;
-        private QueueAbstract monitorQueue;
-        private bool monitorEnabled;
-        private bool monitorJson;
+        public Progress<PipelineMonitorMessage> monitorMessageProgress;
+        private Monitor mon;
+        private string xid = Guid.NewGuid().ToString();
+        //       public SimpleHTTPServer httpListener;
+        //      private MQTTBroker mqttBroker;
 
         public Exchange()
         {
-            monitorMessageProgress = new Progress<MonitorMessage>();
+            monitorMessageProgress = new Progress<PipelineMonitorMessage>();
             monitorMessageProgress.ProgressChanged += MonitorStatusMessage;
+
+            //       httpListener = new SimpleHTTPServer("C:\\Users\\dave_\\Desktop\\", 5555);
+
         }
 
-        private void MonitorStatusMessage(object sender, MonitorMessage e)
+        private void MonitorStatusMessage(object sender, PipelineMonitorMessage e)
         {
-            try
-            {
-                Console.WriteLine($"{e.uuid} {e.v} {e.v1}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            ExchangeMonitorMessage msg = new ExchangeMonitorMessage(e);
+            msg.type = "PIPELINEMESSAGE";
+            msg.xid = xid;
 
-            if (!monitorEnabled)
-            {
-                return;
-            }
-            if (monitorJson)
-            {
-                Task.Run(() => monitorQueue.SendToOutputAsync(new ExchangeMessage($"{e.uuid} {e.v} {e.v1}")));
-            }
-            else
-            {
-                Task.Run(() => monitorQueue.SendToOutputAsync(new ExchangeMessage($"{e.uuid} {e.v} {e.v1}")));
-            }
+            mon?.Send(msg.ToString());
         }
 
         public bool Start()
@@ -93,6 +80,9 @@ namespace QueueExchange
 
         public void Stop()
         {
+            ExchangeMonitorMessage msg = new ExchangeMonitorMessage("STOP", "Stopping Pipelines", "XCHANGEMESSAGE");
+            msg.xid = xid;
+            mon?.Send(msg.ToString());
 
             foreach (Pipeline p in pipes)
             {
@@ -117,6 +107,10 @@ namespace QueueExchange
                     //
                 }
             }
+            msg = new ExchangeMonitorMessage("STOP", "Stopped Pipelines", "XCHANGEMESSAGE");
+            msg.xid = xid;
+            mon?.Send(msg.ToString());
+
         }
 
         public void Configure()
@@ -128,36 +122,24 @@ namespace QueueExchange
             Exchange.configFileName = string.IsNullOrEmpty(appSettings["ConfigFileName"]) ? "ExchangeConfig.xml" : appSettings["ConfigFileName"];
 
             XDocument doc = XDocument.Load(Exchange.configFileName);
-            XElement monitorQueueDefn = doc.Descendants("monitor").FirstOrDefault();
+            XElement monitorDefn = doc.Descendants("monitor").FirstOrDefault();
 
             try
             {
-                if (monitorQueueDefn != null)
+                if (monitorDefn != null)
                 {
-                    monitorQueue = new QueueFactory().GetQueue(monitorQueueDefn, null);
-                    monitorQueue.isLogger = true;
-                    monitorEnabled = true;
+                    this.mon = Monitor.Instance;
+                    mon.setConfig(monitorDefn);
 
-                    try
-                    {
-                        monitorJson = bool.Parse(monitorQueueDefn.Attribute("json").Value);
-                    }
-                    catch (Exception)
-                    {
-                        monitorJson = false;
-                    }
-                }
-                else
-                {
-                    monitorEnabled = false;
+                    ExchangeMonitorMessage msg = new ExchangeMonitorMessage("START", "Monitor Started", "XCHANGEMESSAGE");
+                    msg.xid = xid;
+                    mon?.Send(msg.ToString());
                 }
             }
             catch (Exception)
             {
-                monitorEnabled = false;
+                Console.WriteLine("---> Monitor could not be contacted <---");
             }
-
-
 
             IEnumerable<XElement> nsDefn = from n in doc.Descendants("namespace") select n;
 

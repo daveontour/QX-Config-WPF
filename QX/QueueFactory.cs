@@ -6,7 +6,7 @@ namespace QueueExchange
     {
         public QueueFactory() { }
 
-        public QueueAbstract GetQueue(XElement ep, System.IProgress<MonitorMessage> monitorMessageProgress)
+        public QueueAbstract GetQueue(XElement ep, System.IProgress<QueueMonitorMessage> monitorMessageProgress)
         {
 
             string queueType = ep.Attribute("type").Value;

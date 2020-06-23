@@ -17,7 +17,7 @@ namespace QueueExchange
 
         public string name;
         protected string connection;
-        private IProgress<MonitorMessage> monitorMessageProgress;
+        private IProgress<QueueMonitorMessage> monitorMessageProgress;
         protected XElement definition;
         protected bool bTransform = false;
         protected bool createQueue = false;
@@ -49,6 +49,7 @@ namespace QueueExchange
         //public bool sequentialDir;
         //public QXMonitor qMon;
         private Pipeline pipeParent;
+        protected Monitor mon = Monitor.Instance;
 
         // Instances have to implement these three methods to be used in the pipeline
 
@@ -78,7 +79,7 @@ namespace QueueExchange
         }
         // Constructor to extract the common defintion and setup the transformation and filters
         // Calls the instance specific SetUp method at the end to allow instanc e specific configuration.
-        public QueueAbstract(XElement defn, IProgress<MonitorMessage> monitorMessageProgress)
+        public QueueAbstract(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress)
         {
             this.monitorMessageProgress = monitorMessageProgress;
             this.definition = defn;
@@ -301,6 +302,7 @@ namespace QueueExchange
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                return null;
             }
 
             // Check the result of the filtering and transformations
@@ -308,12 +310,12 @@ namespace QueueExchange
             {
                 xm.status = $"Message blocked by filter to {queueName}";
                 xm.pass = false;
-                QXLog(xm?.uuid, this.id, this.name, pipeParent?.id, pipeParent?.name, "Output Node: Post Processing", "Messages did not pass filter");
+                QXLog(xm?.uuid, "Output Node", "Messages did not pass filter", "PROGRESS");
                 return xm;
             }
             else
             {
-                QXLog(xm?.uuid, this.id, this.name, pipeParent?.id, pipeParent?.name, "Output Node: Sending Message", "Start");
+                QXLog(xm?.uuid, "Output Node", "Sending Message", "PROGRESS");
                 // Send it to the destination. 
                 // The state of the message should be updated by the particuar output
                 xm = await SendToOutputAsync(xm);
@@ -344,19 +346,19 @@ namespace QueueExchange
                 return null;
             }
 
-            QXLog(xm?.uuid, this.id, this.name, pipeParent?.id, pipeParent?.name, "Input Node: Message Recieved", "");
+            QXLog(xm?.uuid, "Input Node", "Message Recieved", "PROGRESS");
             // If the message is not null, then perform any filtering or transformation 
             // before returning it
 
             xm = PreAndPostProcess(xm);
-            QXLog(xm?.uuid, this.id, this.name, pipeParent?.id, pipeParent?.name, "Input Node: Message Recieved", "PreProcessing Complete, Passing to Pipe");
+            QXLog(xm?.uuid, "Input Node", "PreProcessing Complete", "PROGRESS");
             return xm;
         }
 
         public ExchangeMessage PreAndPostProcess(ExchangeMessage xm)
         {
 
-            QXLog(xm?.uuid, this.id, this.name, pipeParent?.id, pipeParent?.name, "Output Node: Message Recieved From Pipe", "");
+            QXLog(xm?.uuid, "Output Node: Message Recieved From Pipe", null, "PROGRESS");
 
             // Just a small unpublished hack to allow the Input/Output itself to 
             // limit it's throughput. Preferred mechanism is to throttle the PipeLine itself
@@ -382,16 +384,16 @@ namespace QueueExchange
                 {
                     if (altQueue != null)
                     {
-                        Task.Run(() =>
-                        {
-                            logger.Info($"Sending to Alt Queue {altQueue.name}");
-                            QXLog(xm?.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue");
-                            _ = altQueue.Send(xm);
-                        });
+                        // Task.Run(() =>
+                        // {
+                        logger.Info($"Sending to Alt Queue {altQueue.name}");
+                        QXLog(xm?.uuid, "Message did not pass filter", "Sending to Alt Queue", "PROGRESS");
+                        altQueue.Send(xm);
+                        //   });
                     }
                     else
                     {
-                        QXLog(xm?.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured");
+                        QXLog(xm?.uuid, "Message did not pass filter", "No Alt Queue Configured", "WARNING");
                     }
                     xm.pass = false;
                     return xm;
@@ -413,12 +415,12 @@ namespace QueueExchange
                     if (altQueue != null)
                     {
                         logger.Info($"Sending to Alt Queue {altQueue.name}");
-                        QXLog(xm?.uuid, this.id, this.name, null, null, "Message did not pass filter", "Sending to Alt Queue");
+                        QXLog(xm?.uuid, "Message did not pass filter", "Sending to Alt Queue", "PROGRESS");
                         _ = altQueue.Send(xm);
                     }
                     else
                     {
-                        QXLog(xm?.uuid, this.id, this.name, null, null, "Message did not pass filter", "No Alt Queue Configured");
+                        QXLog(xm?.uuid, "Message did not pass filter", "No Alt Queue Configured", "WARNING");
                     }
                     xm.pass = false;
                     return xm;
@@ -433,9 +435,9 @@ namespace QueueExchange
             // If a XSLT transform has been specified
             if (bTransform)
             {
-                QXLog(xm?.uuid, this.id, this.name, null, null, "Starting Message Transformation", "");
+                QXLog(xm?.uuid, "Starting Message Transformation", null, "PROGRESS");
                 message = Transform(message, xslVersion);
-                QXLog(xm?.uuid, this.id, this.name, null, null, "Message Transformation Complete", "");
+                QXLog(xm?.uuid, "Message Transformation Complete", null, "PROGRESS");
 
                 xm.transformed = true;
             }
@@ -450,13 +452,13 @@ namespace QueueExchange
                 xm.payload = null;
                 xm.status = "Message blocked by XSL Transform. Null or Zero Length";
 
-                QXLog(xm?.uuid, this.id, this.name, null, null, "Messaage Transformation", "Transformation resulted in a message of zero length");
+                QXLog(xm?.uuid, "Messaage Transformation", "Transformation resulted in a message of zero length", "WARNING");
 
                 return xm;
             }
 
             xm.payload = message;
-            QXLog(xm?.uuid, this.id, this.name, pipeParent?.id, pipeParent?.name, "Output Node: Post Processing Complete", "");
+            QXLog(xm?.uuid, "Output Node: Post Processing Complete", null, "PROGRESS");
             return xm;
         }
 
@@ -637,12 +639,12 @@ namespace QueueExchange
                 return;
             }
 
-            QXLog(xm?.uuid, this.id, this.name, this.pipeParent.id, this.pipeParent.name, "Output Node Send Failure", "Message Could Not Be Delivered to the Output Node");
+            QXLog(xm?.uuid, "Output Node Send Failure", "Message Could Not Be Delivered to the Output Node", "PROGRESS");
 
             if (undeliverableQueue == null)
             {
                 logger.Debug($"No Undeliverable Message Queue has been defined for {queueName}");
-                QXLog(xm?.uuid, this.id, this.name, this.pipeParent.id, this.pipeParent.name, "Output Node Send Failure", "No Undeliverable Queue Defined");
+                QXLog(xm?.uuid, "Output Node Send Failure", "No Undeliverable Queue Defined", "WARNING");
 
                 return;
             }
@@ -653,9 +655,9 @@ namespace QueueExchange
                 {
                     using (MessageQueue er = new MessageQueue(undeliverableQueue))
                     {
-                        QXLog(xm?.uuid, this.id, this.name, this.pipeParent?.id, this.pipeParent?.name, "Output Node Send Failure", "Sending Message to Undeliverable Queue");
+                        QXLog(xm?.uuid, "Output Node Send Failure", "Sending Message to Undeliverable Queue", "PROGRESS");
                         er.Send(xm);
-                        QXLog(xm?.uuid, this.id, this.name, this.pipeParent?.id, this.pipeParent?.name, "Output Node Send Failure", "Message Sent to Undeliverable Queue");
+                        QXLog(xm?.uuid, "Output Node Send Failure", "Message Sent to Undeliverable Queue", "PROGRESS");
 
 
                         logger.Info("Message Sent to Undeliverble Queue");
@@ -663,7 +665,7 @@ namespace QueueExchange
                 }
                 catch (Exception ex)
                 {
-                    QXLog(xm?.uuid, this.id, this.name, this.pipeParent?.id, this.pipeParent?.name, "Output Node Send Failure", "Message Could Not Be Sent To Undeliverable Queue");
+                    QXLog(xm?.uuid, "Output Node Send Failure", "Message Could Not Be Sent To Undeliverable Queue", "ERROR");
 
                     logger.Error("Unable to Send to Undeliverble Queue");
                     logger.Error(ex.StackTrace);
@@ -671,16 +673,17 @@ namespace QueueExchange
             }
         }
 
-        public void QXLog(string uuid, string id, string name, string id1, string name1, string v, string v1)
+        public void QXLog(string uuid, string topic, string message, string type)
         {
-            //       if (this.monitorMessageProgress != null)
-            //{
-            //    try
-            //    {
-            //        this.monitorMessageProgress.Report(new MonitorMessage(uuid, id, name, id1, name1, v, v1));
-            //    }
-            //    catch (Exception) { }
-            //}
+
+            try
+            {
+                QueueMonitorMessage msg = new QueueMonitorMessage(id, name, uuid, topic, message, type);
+
+                this.monitorMessageProgress?.Report(msg);
+            }
+            catch (Exception) { }
+
         }
     }
 }

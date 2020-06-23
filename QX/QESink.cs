@@ -25,7 +25,7 @@ namespace QueueExchange
         private readonly Queue<ExchangeMessage> _queue = new Queue<ExchangeMessage>();
         private readonly System.Timers.Timer _timer;
 
-        public QESink(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
+        public QESink(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
 
             try

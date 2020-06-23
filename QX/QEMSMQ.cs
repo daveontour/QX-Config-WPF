@@ -18,7 +18,7 @@ namespace QueueExchange
         public bool isXML = true;
 
 
-        public QEMSMQ(XElement defn, IProgress<MonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
+        public QEMSMQ(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
             CreateQueue(queueName);
         }

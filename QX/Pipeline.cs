@@ -54,11 +54,15 @@ namespace QueueExchange
         public string name;
         protected static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         protected bool firstOnly;
-        private IProgress<MonitorMessage> monitorMessageProgress;
+        private IProgress<PipelineMonitorMessage> monitorMessageProgress;
+        private Progress<QueueMonitorMessage> monitorPipelineProgress;
 
-        public Pipeline(XElement pipeConfig, IProgress<MonitorMessage> monitorMessageProgress)
+        public Pipeline(XElement pipeConfig, IProgress<PipelineMonitorMessage> monitorMessageProgress)
         {
             this.monitorMessageProgress = monitorMessageProgress;
+
+            monitorPipelineProgress = new Progress<QueueMonitorMessage>();
+            monitorPipelineProgress.ProgressChanged += MonitorStatusMessage;
             try
             {
                 string dist = pipeConfig.Attribute("distribution").Value;
@@ -156,7 +160,7 @@ namespace QueueExchange
             IEnumerable<XElement> InEndPoints = from ep in pipeConfig.Descendants("input") select ep;
             foreach (XElement ep in InEndPoints)
             {
-                QueueAbstract queue = queueFactory.GetQueue(ep, monitorMessageProgress);
+                QueueAbstract queue = queueFactory.GetQueue(ep, monitorPipelineProgress);
                 queue.SetParentPipe(this);
                 if (queue != null)
                 {
@@ -178,30 +182,44 @@ namespace QueueExchange
 
             // The output queues. There may be multiple output queues for each input queue
             IEnumerable<XElement> OutEndPoints = from ep in pipeConfig.Descendants("output") select ep;
+            int disambiguate = 0;
             foreach (XElement ep in OutEndPoints)
             {
-                QueueAbstract queue = queueFactory.GetQueue(ep, monitorMessageProgress);
-                // queue.SetMonitor(qMon, this);
-                if (queue.queueName != null)
+
+                try
                 {
-                    msgCount.Add(queue.queueName, 0);
-                }
-                else
-                {
-                    msgCount.Add(queue.name, 0);
-                }
-                if (queue != null)
-                {
-                    if (!queue.isValid)
+                    QueueAbstract queue = queueFactory.GetQueue(ep, monitorPipelineProgress);
+                    // queue.SetMonitor(qMon, this);
+                    if (msgCount.ContainsKey(queue.queueName))
                     {
-                        logger.Warn($"Could not add Output Queue {queue.queueName} to {name}. Invalid Configuration");
-                        continue;
+                        queue.queueName = $"{queue.queueName}-{disambiguate}";
+                        disambiguate++;
                     }
-                    output.Add(queue);
+                    if (queue.queueName != null)
+                    {
+                        msgCount.Add(queue.queueName, 0);
+                    }
+                    else
+                    {
+                        msgCount.Add(queue.name, 0);
+                    }
+                    if (queue != null)
+                    {
+                        if (!queue.isValid)
+                        {
+                            logger.Warn($"Could not add Output Queue {queue.queueName} to {name}. Invalid Configuration");
+                            continue;
+                        }
+                        output.Add(queue);
+                    }
+                    else
+                    {
+                        logger.Error($"Could not proccess Output Queue {queue.queueName}");
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    logger.Error($"Could not proccess Output Queue {queue.queueName}");
+                    logger.Error(ex.Message);
                 }
             }
 
@@ -269,6 +287,7 @@ namespace QueueExchange
         }
 
 
+
         protected async Task<ExchangeMessage> GetMessage()
         {
 
@@ -298,7 +317,7 @@ namespace QueueExchange
                     {
                         if (xm.payload != null)
                         {
-                            QXLog(xm?.uuid, inQ.id, inQ.name, this.id, this.name, "Pipe: Message Received", null);
+                            QXLog("Message Received", xm.uuid, "PROGRESS");
                             ReOrderInputs(inQ);
                             return xm;
                         }
@@ -312,7 +331,7 @@ namespace QueueExchange
                             }
                             else
                             {
-                                QXLog(xm?.uuid, inQ.id, inQ.name, this.id, this.name, "Pipe: NULL Message", "Message was null after filtering and transformation");
+                                QXLog("NULL Message", "Message was null after filtering and transformation", "WARNING");
                             }
 
                             // If we get here, then the input isn't part of a prioity set, so 
@@ -435,16 +454,16 @@ namespace QueueExchange
 
                     //Get the message from the input
                     ExchangeMessage xm = await GetMessage();
-                    QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Recieved Message", "");
+                    QXLog("Recieved Message", null, "PROGRESS");
 
                     if (throttleInterval <= 0)
                     {
-                        QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Sending Message to Context Proceesor", "");
+                        QXLog("Sending Message to Context Proceesor", null, "PROGRESS");
                         await ContextProcessorAsync(xm);
                     }
                     else
                     {
-                        QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Sending Message to Injector", "");
+                        QXLog("Sending Message to Injector", null, "PROGRESS");
                         await InjectMessage(xm);
                         Thread.Sleep(throttleInterval);
                     }
@@ -591,7 +610,7 @@ namespace QueueExchange
 
             if (useMessageAsKey)
             {
-                QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor: Entire Message Being Used As Key", "");
+                QXLog("Context Proceesor", "Entire Message Being Used As Key", "PROGRESS");
                 using (SHA256 mySHA256 = SHA256.Create())
                 {
 
@@ -632,7 +651,7 @@ namespace QueueExchange
                 {
                     return null;
                 }
-                QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Context Proceesor, Context Key Retrieves", $"Context Key = {contextKeyValue}");
+                QXLog("Context Proceesor", $"Context Key Retrieves Context Key = {contextKeyValue}", "PROGRESS");
 
                 return contextKeyValue;
             }
@@ -717,7 +736,7 @@ namespace QueueExchange
                 xm.status = "Message Recieved";
 
                 // Pipeline specific logging
-                QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Starting Output Meesage Processing", null);
+                QXLog("Starting Output Meesage Processing", null, "PROGRESS");
 
                 if (randomDistribution)
                 {
@@ -727,19 +746,19 @@ namespace QueueExchange
                     int index = rnd.Next(0, output.Count);
 
                     logger.Trace($"Random Distributor. Sending message {xm.uuid } to {output[index].name}");
-                    QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Output Meesage Processing", "Distributing to Random Output");
+                    QXLog("Output Meesage Processing", "Distributing to Random Output", "PROGRESS");
 
                     if (outputIsolation)
                     {
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message Start", "Distribution to Random Output");
+                        QXLog("Async Message Start", "Distribution to Random Output", "PROGRESS");
                         _ = Task.Run(() => SendAndLog(output[index], xm));
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message End", "Distribution to Random Output");
+                        QXLog("Async Message End", "Distribution to Random Output", "PROGRESS");
                     }
                     else
                     {
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message Start", "Distribution to Random Output");
+                        QXLog("Sync Message Start", "Distribution to Random Output", "PROGRESS");
                         _ = await SendAndLog(output[index], xm);
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message End", "Distribution to Random Output");
+                        QXLog("Sync Message End", "Distribution to Random Output", "PROGRESS");
                     }
 
                 }
@@ -749,19 +768,19 @@ namespace QueueExchange
                     int index = nextOutput % output.Count;
 
                     logger.Trace($"Round Robin Distributor. Sending message {xm.uuid } to {output[index].name}");
-                    QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Output Meesage Processing", "Distribution to Round  Robin Output");
+                    QXLog("Output Message Processing", "Distribution to Round Robin Output", "PROGRESS");
 
                     if (outputIsolation)
                     {
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message Start", "Distribution to Round  Robin Output");
+                        QXLog("Async Message Start", "Distribution to Round Robin Output", "PROGRESS");
                         _ = Task.Run(() => SendAndLog(output[index], xm));
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Async Message End", "Distribution to Round  Robin Output");
+                        QXLog("Async Message End", "Distribution to Round Robin Output", "PROGRESS");
                     }
                     else
                     {
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message Start", "Distribution toRound  Robin Output");
+                        QXLog("Sync Message Start", "Distribution to Round Robin Output", "PROGRESS");
                         _ = await SendAndLog(output[index], xm);
-                        QXLog(xm?.uuid, output[index].id, output[index].name, this.id, this.name, "Pipe: Sync Message End", "Distribution to Round  Robin Output");
+                        QXLog("Sync Message End", "Distribution to Round Robin Output", "PROGRESS");
                     }
 
                     nextOutput++;
@@ -775,16 +794,16 @@ namespace QueueExchange
                         // Wont wait for the Send to complete before completing
                         foreach (QueueAbstract q in output)
                         {
-                            QXLog(xm?.uuid, q.id, q.name, this.id, this.name, "Pipe: Async Message Start", "Normal Distribution");
+                            QXLog("Async Message Start", "Normal Distribution", "PROGRESS");
                             _ = Task.Run(() => SendAndLog(q, xm));
-                            QXLog(xm?.uuid, q.id, q.name, this.id, this.name, "Pipe: Async Message End", "Normal Distribution");
+                            QXLog("Async Message End", "Normal Distribution", "PROGRESS");
                         }
                     }
                     else
                     {
 
                         // Will wait for all Sends to complete before proceeding
-                        QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Sync Message Start", "Normal Distribution");
+                        QXLog("Sync Message Start", "Normal Distribution", "PROGRESS");
 
                         foreach (QueueAbstract q in output)
                         {
@@ -806,7 +825,7 @@ namespace QueueExchange
                             }
 
                         }
-                        QXLog(xm?.uuid, null, null, this.id, this.name, "Pipe: Sync Message End", "Normal Distribution");
+                        QXLog("Sync Message End", "Normal Distribution", "PROGRESS");
                     }
                 }
             }
@@ -855,16 +874,18 @@ namespace QueueExchange
                 _disposed = true;
             }
         }
-        public void QXLog(string uuid, string id, string name, string id1, string name1, string v, string v1)
+        private void MonitorStatusMessage(object sender, QueueMonitorMessage e)
         {
-            if (this.monitorMessageProgress != null)
-            {
-                try
-                {
-                    this.monitorMessageProgress.Report(new MonitorMessage(uuid, id, name, id1, name1, v, v1));
-                }
-                catch (Exception) { }
-            }
+            PipelineMonitorMessage msg = new PipelineMonitorMessage(e);
+            msg.pipeID = this.id;
+            msg.pipeName = this.name;
+            msg.pipemessageType = "QUEUEMESSAGE";
+            monitorMessageProgress?.Report(msg);
+        }
+        public void QXLog(string topic, string message, string messageType)
+        {
+            PipelineMonitorMessage msg = new PipelineMonitorMessage(id, name, topic, message, messageType);
+            monitorMessageProgress?.Report(msg);
         }
 
     }
