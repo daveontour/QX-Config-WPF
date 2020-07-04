@@ -10,8 +10,6 @@ namespace QXEditorModule.GridDefinitions
     [DisplayName("Pipe Connecting Input and Output")]
     public class PIPE : MyPropertyGrid
     {
-
-
         public PIPE(XmlNode dataModel, IView view)
         {
             this._node = dataModel;
@@ -150,6 +148,10 @@ namespace QXEditorModule.GridDefinitions
                 isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
 
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["MostRecentOnly"];
+                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
                 return value;
             }
             set {
@@ -187,6 +189,10 @@ namespace QXEditorModule.GridDefinitions
                 isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
 
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["MostRecentOnly"];
+                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
 
                 SetAttribute("contextAware", value);
             }
@@ -239,7 +245,7 @@ namespace QXEditorModule.GridDefinitions
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Key"), Browsable(true), PropertyOrder(2), DescriptionAttribute("XPath for the Context Key")]
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Key"), Browsable(true), PropertyOrder(2), DescriptionAttribute("XPath for the Context Key. If you want to match all messages, enter '*' ")]
         public string ContextKey {
             get { return GetAttribute("contextCacheKeyXPath"); }
             set {
@@ -270,8 +276,12 @@ namespace QXEditorModule.GridDefinitions
             get { return GetBoolAttribute("discardInCache"); }
             set { SetAttribute("discardInCache", value); }
         }
-
-        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Cache First Only"), Browsable(true), PropertyOrder(5), DescriptionAttribute("Only apply Context Cache to first occurance")]
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Most Recent Only"), Browsable(true), PropertyOrder(5), DescriptionAttribute("Only send the most recent message each time")]
+        public bool MostRecentOnly {
+            get { return GetBoolAttribute("mostRecentOnly"); }
+            set { SetAttribute("mostRecentOnly", value); }
+        }
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Cache First Only"), Browsable(true), PropertyOrder(6), DescriptionAttribute("Only apply Context Cache to first occurance")]
         public bool FirstOnly {
             get { return GetBoolAttribute("firstOnly"); }
             set { SetAttribute("firstOnly", value); }

@@ -56,6 +56,7 @@ namespace QueueExchange
         protected bool firstOnly;
         private IProgress<PipelineMonitorMessage> monitorMessageProgress;
         private Progress<QueueMonitorMessage> monitorPipelineProgress;
+        private bool mostRecentOnly;
 
         public Pipeline(XElement pipeConfig, IProgress<PipelineMonitorMessage> monitorMessageProgress)
         {
@@ -116,6 +117,17 @@ namespace QueueExchange
             {
                 preWait = true;
             }
+
+
+            try
+            {
+                mostRecentOnly = bool.Parse(pipeConfig.Attribute("mostRecentOnly").Value);
+            }
+            catch (Exception)
+            {
+                mostRecentOnly = false;
+            }
+
             try
             {
                 name = pipeConfig.Attribute("name").Value;
@@ -532,6 +544,11 @@ namespace QueueExchange
                     return;
                 }
 
+                if (mostRecentOnly)
+                {
+                    bufferMemoryQueue.Clear();
+                }
+
                 bufferMemoryQueue.Enqueue(xm);
 
                 // So the message is enqueued, now just work out how long how to set the popper
@@ -625,6 +642,10 @@ namespace QueueExchange
                     }
                     return contextKeyValue;
                 }
+            }
+            else if (contextCacheKeyXPath == "*")
+            {
+                return "ALL_MESSAGES";
             }
             else
             {
