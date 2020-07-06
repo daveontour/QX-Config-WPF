@@ -13,6 +13,19 @@ using System.Xml.Linq;
 
 namespace QueueExchange
 {
+
+    public class ContextStats
+    {
+        public string key;
+        public int recieved = 0;
+        public int send = 0;
+
+        override
+        public String ToString()
+        {
+            return $"Key: {key}, Received: {recieved}, Sent:{send}";
+        }
+    }
     /*
      * The class that links inputs to outputs
      */
@@ -22,6 +35,7 @@ namespace QueueExchange
         protected readonly List<QueueAbstract> output = new List<QueueAbstract>();
         protected readonly List<QueueAbstract> input = new List<QueueAbstract>();
         protected readonly Dictionary<string, int> msgCount = new Dictionary<string, int>();
+        protected readonly Dictionary<string, ContextStats> statDict = new Dictionary<string, ContextStats>();
         protected readonly QueueFactory queueFactory = new QueueFactory();  // Factory class that takes queue and filter defintions and returns the instantiated object
         protected int throttleInterval = 0;
         protected int priorityWait = 200; // If there is more than on input queue, this is the time in ms that polling of each input will wait
@@ -53,6 +67,7 @@ namespace QueueExchange
 
         public string name;
         protected static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        protected static NLog.Logger statLogger = NLog.LogManager.GetLogger("ContextStats");
         protected bool firstOnly;
         private IProgress<PipelineMonitorMessage> monitorMessageProgress;
         private Progress<QueueMonitorMessage> monitorPipelineProgress;
@@ -538,6 +553,20 @@ namespace QueueExchange
                     _bufferTimerDict.Add(contextKeyValue, bufferPopperTimer);
                 }
 
+                ContextStats stats = null;
+                if (statDict.ContainsKey(contextKeyValue))
+                {
+                    stats = statDict[contextKeyValue];
+                }
+                else
+                {
+                    ContextStats v = new ContextStats();
+                    v.key = contextKeyValue;
+                    statDict.Add(contextKeyValue, v);
+                }
+
+                stats.recieved++;
+
                 if (_contextCache.Contains(contextKeyValue) && this.discardInCache)
                 {
                     logger.Info("Message found in Cache, but discard configured");
@@ -720,6 +749,16 @@ namespace QueueExchange
                     }
                     bufferPopperTimer.AutoReset = true;
                     bufferPopperTimer.Enabled = true;
+
+                    try
+                    {
+                        statDict[contextKeyValue].send++;
+                        statLogger.Info(statDict[contextKeyValue]);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error($"Stats dictionary problem {ex.Message}");
+                    }
                 }
                 else
                 {
