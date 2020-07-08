@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Messaging;
 using System.Runtime.Caching;
 using System.Security.Cryptography;
 using System.Text;
@@ -40,6 +41,7 @@ namespace QueueExchange
         protected int throttleInterval = 0;
         protected int priorityWait = 200; // If there is more than on input queue, this is the time in ms that polling of each input will wait
         protected bool preWait = true;
+        protected int contextStatsInterval;
         protected int msgRecieved = 0;
         protected int maxMsgPerMinute;   // Maximum number of input messages that the pipe will process per minute
         protected string maxMsgPerMinuteProfile;   // Maximum number of input messages that the pipe will process per minute
@@ -61,6 +63,7 @@ namespace QueueExchange
         protected readonly Dictionary<String, System.Timers.Timer> _bufferTimerDict = new Dictionary<String, System.Timers.Timer>();
         protected readonly bool useMessageAsKey;
         protected bool _disposed = false;
+        protected bool allAsyncInputs = true;
         //public QXMonitor qMon = new QXMonitor();
 
         public string id;
@@ -72,6 +75,11 @@ namespace QueueExchange
         private IProgress<PipelineMonitorMessage> monitorMessageProgress;
         private Progress<QueueMonitorMessage> monitorPipelineProgress;
         private bool mostRecentOnly;
+        private System.Timers.Timer resetTimer;
+        private int totalReceived = 0;
+        private int totalSent = 0;
+        private string inputQueueName;
+        private MessageQueue pipeInputQueue;
 
         public Pipeline(XElement pipeConfig, IProgress<PipelineMonitorMessage> monitorMessageProgress)
         {
@@ -121,8 +129,18 @@ namespace QueueExchange
             }
             catch (Exception)
             {
-                priorityWait = 200;
+                priorityWait = 1;
             }
+
+            try
+            {
+                this.contextStatsInterval = int.Parse(pipeConfig.Attribute("contextStatsInterval").Value);
+            }
+            catch (Exception)
+            {
+                contextStatsInterval = 30000;
+            }
+
 
             try
             {
@@ -151,6 +169,16 @@ namespace QueueExchange
             {
                 name = "Un Named PipeLine";
             }
+
+            try
+            {
+                inputQueueName = pipeConfig.Attribute("pipeInputQueueName").Value;
+            }
+            catch (Exception)
+            {
+                inputQueueName = null;
+            }
+
 
             // Configure a throttling time to limit the throughput of the pipeline
             try
@@ -216,6 +244,10 @@ namespace QueueExchange
                 try
                 {
                     QueueAbstract queue = queueFactory.GetQueue(ep, monitorPipelineProgress);
+                    if (!queue.SupportsAsync())
+                    {
+                        this.allAsyncInputs = false;
+                    }
                     // queue.SetMonitor(qMon, this);
                     if (msgCount.ContainsKey(queue.queueName))
                     {
@@ -247,6 +279,31 @@ namespace QueueExchange
                 catch (Exception ex)
                 {
                     logger.Error(ex.Message);
+                }
+            }
+
+            if (this.allAsyncInputs)
+            // Create a queue that all the inputs will sent messages to
+            {
+                try
+                {
+
+                    if (!MessageQueue.Exists(inputQueueName))
+                    {
+                        using (MessageQueue t = MessageQueue.Create(inputQueueName))
+                        {
+                            this.pipeInputQueue = t;
+                            Console.WriteLine($"Created Input Queue {inputQueueName} for pipeline");
+                        }
+                    }
+                    else
+                    {
+                        this.pipeInputQueue = new MessageQueue(inputQueueName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
                 }
             }
 
@@ -297,6 +354,41 @@ namespace QueueExchange
                 this.useMessageAsKey = false;
             }
 
+            //Output and reset context
+            if (contextCacheKeyXPath != null)
+            {
+                resetTimer = new System.Timers.Timer()
+                {
+                    AutoReset = true,
+                    Interval = contextStatsInterval
+                };
+                logger.Info($"Context Cache Stats Interval set to {this.contextStatsInterval}");
+                resetTimer.Elapsed += (source, eventArgs) =>
+                {
+                    statLogger.Info($"Total received: {this.totalReceived}, Total sent: {this.totalSent}");
+                    statLogger.Info($">>>> Context Cache Stats for Previous {resetTimer.Interval}ms");
+
+                    try
+                    {
+                        foreach (var v in statDict.Values)
+                        {
+                            statLogger.Info(v);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error($"Stats dictionary problem {ex.Message}");
+                    }
+                    finally
+                    {
+                        statDict.Clear();
+                    }
+
+                    statLogger.Info($"<<<<< End of Context Cache Stats");
+
+                };
+                resetTimer.Start();
+            }
             /* Only allow if there are output queues configured
              * It is OK if there are no inputs defined. An output only queue may be
              * defined just to specifiy a maxMessages parameter on the queue for size maintenance
@@ -317,6 +409,12 @@ namespace QueueExchange
 
         protected async Task<ExchangeMessage> GetMessage()
         {
+
+            // All the inputs support async mode, so go wait for it
+            if (this.allAsyncInputs)
+            {
+                return new ExchangeMessage(GetAsyncMessageFromInputQueue());
+            }
 
             // Goes through the input queues and return the message.
             // After each message is returned, it always checks the queues 
@@ -367,6 +465,50 @@ namespace QueueExchange
                     }
                 }
             }
+        }
+
+        private string GetAsyncMessageFromInputQueue()
+        {
+            using (pipeInputQueue)
+            {
+                while (OK_TO_RUN)
+                {
+                    try
+                    {
+                        using (Message msg = pipeInputQueue.Receive())
+                        {
+                            // Wait for the next message on the input queue
+
+                            msg.Formatter = new ActiveXMessageFormatter();
+                            using (var reader = new StreamReader(msg.BodyStream))
+                            {
+                                return reader.ReadToEnd();
+                            }
+                        }
+                    }
+                    catch (MessageQueueException e)
+                    {
+                        // Handle no message arriving in the queue.
+                        if (e.MessageQueueErrorCode == MessageQueueErrorCode.IOTimeout)
+                        {
+
+                        }
+                        else
+                        {
+                            logger.Info($"Queue Error: {this.pipeInputQueue.Path} {e.StackTrace}");
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Trace(ex.Message);
+                        logger.Info(ex, "Unhandled MSMQ listen Error");
+                    }
+                }
+            }
+
+            return null;
+
         }
 
         private void ReOrderInputs(QueueAbstract inQ)
@@ -471,6 +613,15 @@ namespace QueueExchange
                 PrepareProfileThreads();
             }
 
+            if (this.allAsyncInputs)
+            {
+                foreach (QueueAbstract inQ in input)
+                {
+                    logger.Info($"Starting Async Listener for {inQ.name}");
+                    Task.Run(() => inQ.StartListener(this.inputQueueName));
+                }
+            }
+
             logger.Info($"Pipe {name} running. Input Queues = {input.Count()}, Output Queues = {output.Count()}");
             logger.Info($"Throttle interval = {throttleInterval}");
 
@@ -563,9 +714,12 @@ namespace QueueExchange
                     ContextStats v = new ContextStats();
                     v.key = contextKeyValue;
                     statDict.Add(contextKeyValue, v);
+                    stats = v;
                 }
 
                 stats.recieved++;
+
+                this.totalReceived++;
 
                 if (_contextCache.Contains(contextKeyValue) && this.discardInCache)
                 {
@@ -738,7 +892,14 @@ namespace QueueExchange
                     _firstProcessedCompleted.AddOrGetExisting(contextKeyValue, contextKeyValue, DateTime.Now.AddHours(18));
                     _contextCache.AddOrGetExisting(contextKeyValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
 
-                    await InjectMessage(bufferMemoryQueue.Dequeue());
+                    if (bufferMemoryQueue.Count > 0)
+                    {
+                        await InjectMessage(bufferMemoryQueue.Dequeue());
+                    }
+                    else
+                    {
+                        return;
+                    }
                     if (firstOnly && _firstProcessedCleared.Contains(contextKeyValue))
                     {
                         bufferPopperTimer.Interval = 10.0;
@@ -753,12 +914,13 @@ namespace QueueExchange
                     try
                     {
                         statDict[contextKeyValue].send++;
-                        statLogger.Info(statDict[contextKeyValue]);
+                        statLogger.Trace(statDict[contextKeyValue]);
                     }
                     catch (Exception ex)
                     {
                         logger.Error($"Stats dictionary problem {ex.Message}");
                     }
+                    this.totalSent++;
                 }
                 else
                 {

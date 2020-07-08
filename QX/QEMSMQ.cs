@@ -78,6 +78,79 @@ namespace QueueExchange
         {
             OK_TO_RUN = false;
         }
+
+        public override bool SupportsAsync()
+        {
+            return true;
+        }
+
+        override public async Task StartListener(string pipeInputQueueName)
+        {
+            await Task.Run(() =>
+             {
+
+                 // Wait until we can connect
+                 ResetReadConnect();
+
+                 using (msgQueue)
+                 {
+                     while (OK_TO_RUN)
+                     {
+                         try
+                         {
+                             using (Message msg = msgQueue.Receive())
+                             {
+                                 // Wait for the next message on the input queue
+
+                                 msg.Formatter = new ActiveXMessageFormatter();
+                                 using (var reader = new StreamReader(msg.BodyStream))
+                                 {
+                                     MessageQueue pipeInputQueue = new MessageQueue(pipeInputQueueName);
+                                     try
+                                     {
+                                         // Send it to the input of the pipe
+
+                                         Message myMessage = new Message(Encoding.ASCII.GetBytes(reader.ReadToEnd()), new ActiveXMessageFormatter());
+                                         pipeInputQueue.Send(myMessage);
+                                     }
+                                     catch (Exception ex)
+                                     {
+                                         logger.Error(ex.Message);
+                                         logger.Error(ex.StackTrace);
+                                     }
+                                 }
+                             }
+                         }
+                         catch (MessageQueueException e)
+                         {
+                             // Handle no message arriving in the queue.
+                             if (e.MessageQueueErrorCode == MessageQueueErrorCode.IOTimeout)
+                             {
+
+                             }
+                             else
+                             {
+                                 logger.Info($"Queue Error: {queueName} {e.StackTrace}");
+                                 ResetReadConnect();
+                             }
+
+                         }
+                         catch (Exception ex)
+                         {
+                             logger.Trace(ex.Message);
+                             logger.Info(ex, "Unhandled MSMQ listen Error");
+                         }
+                     }
+
+                 }
+             });
+        }
+
+        private object ExchangeMessage(string v)
+        {
+            throw new NotImplementedException();
+        }
+
         public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
         {
 

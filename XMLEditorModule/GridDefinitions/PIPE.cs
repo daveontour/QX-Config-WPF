@@ -106,7 +106,18 @@ namespace QXEditorModule.GridDefinitions
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [CategoryAttribute("Optional"), DisplayName("Context Aware Pipe"), Browsable(true), PropertyOrder(7), DescriptionAttribute("Enable this Pipe to be Context Aware")]
+        [CategoryAttribute("Optional"), DisplayName("Pipe Input Queue Name"), Browsable(true), PropertyOrder(8), DescriptionAttribute("If alll the input nodes are Asynchronous capable (only MSMQ at the moment), then specify a queue name for the asynchronous nodes to write to which then becomes the input to the pipe")]
+        public string InputQueueNAme {
+            get {
+                return GetAttribute("pipeInputQueueName");
+            }
+            set {
+                SetAttribute("pipeInputQueueName", value);
+            }
+        }
+
+        [RefreshProperties(RefreshProperties.All)]
+        [CategoryAttribute("Optional"), DisplayName("Context Aware Pipe"), Browsable(true), PropertyOrder(20), DescriptionAttribute("Enable this Pipe to be Context Aware")]
         public bool ContextAware {
             get {
 
@@ -152,6 +163,12 @@ namespace QXEditorModule.GridDefinitions
                 theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextStatInterval"];
+                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+
                 return value;
             }
             set {
@@ -190,6 +207,11 @@ namespace QXEditorModule.GridDefinitions
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
 
                 descriptor = TypeDescriptor.GetProperties(this.GetType())["MostRecentOnly"];
+                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextStatInterval"];
                 theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
@@ -285,6 +307,14 @@ namespace QXEditorModule.GridDefinitions
         public bool FirstOnly {
             get { return GetBoolAttribute("firstOnly"); }
             set { SetAttribute("firstOnly", value); }
+        }
+
+        [CategoryAttribute("Optional - Temporal Context Awareness"), DisplayName("Context Stats Interval (ms)"), Browsable(true), PropertyOrder(10), DescriptionAttribute("How often the usage context stats are flushed to the log")]
+        public int ContextStatInterval {
+            get { return GetIntAttribute("contextStatsInterval"); }
+            set {
+                SetAttribute("contextStatsInterval", value);
+            }
         }
     }
 }

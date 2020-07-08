@@ -68,6 +68,15 @@ namespace QueueExchange
         // Just recieve the message
         public abstract ExchangeMessage Listen(bool immediateReturn, int priorityWait = 200);
 
+        virtual public bool SupportsAsync()
+        {
+            return false;
+        }
+        virtual public async Task StartListener(string pipeInputQueue)
+        {
+            await Task.Run(() => { });
+        }
+
         public void Stop()
         {
 
