@@ -13,9 +13,8 @@ namespace QueueExchange
     {
 
         public MessageQueue msgQueue;
-        public int maxMessages = -1;
-        public object sendLock = new object();
-        public bool isXML = true;
+        private int maxMessages = -1;
+        private readonly object sendLock = new object();
 
 
         public QEMSMQ(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
@@ -23,7 +22,7 @@ namespace QueueExchange
             CreateQueue(queueName);
         }
 
-        public QEMSMQ(string qDef, bool isXML = true) : base(qDef)
+        public QEMSMQ(string qDef) : base(qDef)
         {
 
             if (qDef != null)
@@ -35,7 +34,6 @@ namespace QueueExchange
                 }
                 logger.Trace($"QUEUE NAME = {qDef}");
                 this.queueName = qDef;
-                this.isXML = isXML;
                 CreateQueue(queueName, true);
             }
         }
@@ -50,23 +48,11 @@ namespace QueueExchange
                 if (definition.Name == "output")
                 {
                     maxMessages = Int32.Parse(definition.Attribute("maxMessages").Value);
-                    //if (maxMessages != -1) {
-                    //    _ = Task.Run(() => MaintainQueue());
-                    //}
                 }
             }
             catch (Exception)
             {
                 maxMessages = -1;
-            }
-
-            try
-            {
-                this.isXML = bool.Parse(definition.Attribute("isXML").Value);
-            }
-            catch (Exception)
-            {
-                this.isXML = true;
             }
 
             OK_TO_RUN = true;
@@ -79,16 +65,10 @@ namespace QueueExchange
             OK_TO_RUN = false;
         }
 
-        public override bool SupportsAsync()
-        {
-            return true;
-        }
-
-        override public async Task StartListener(string pipeInputQueueName)
+        override public async Task StartListener()
         {
             await Task.Run(() =>
              {
-
                  // Wait until we can connect
                  ResetReadConnect();
 
@@ -98,26 +78,16 @@ namespace QueueExchange
                      {
                          try
                          {
-                             using (Message msg = msgQueue.Receive())
+                             // Wait for the next message on the input queue
+                             using (Message msg = msgQueue.Receive(new TimeSpan(0, 0, 0, 30)))
                              {
-                                 // Wait for the next message on the input queue
-
                                  msg.Formatter = new ActiveXMessageFormatter();
                                  using (var reader = new StreamReader(msg.BodyStream))
                                  {
-                                     MessageQueue pipeInputQueue = new MessageQueue(pipeInputQueueName);
-                                     try
-                                     {
-                                         // Send it to the input of the pipe
+                                     string message = reader.ReadToEnd();
+                                     logger.Trace($"Messages recieved on {queueName}");
 
-                                         Message myMessage = new Message(Encoding.ASCII.GetBytes(reader.ReadToEnd()), new ActiveXMessageFormatter());
-                                         pipeInputQueue.Send(myMessage);
-                                     }
-                                     catch (Exception ex)
-                                     {
-                                         logger.Error(ex.Message);
-                                         logger.Error(ex.StackTrace);
-                                     }
+                                     SendToPipe(message);
                                  }
                              }
                          }
@@ -126,14 +96,13 @@ namespace QueueExchange
                              // Handle no message arriving in the queue.
                              if (e.MessageQueueErrorCode == MessageQueueErrorCode.IOTimeout)
                              {
-
+                                 logger.Info($"No messages on {queueName}");
                              }
                              else
                              {
                                  logger.Info($"Queue Error: {queueName} {e.StackTrace}");
                                  ResetReadConnect();
                              }
-
                          }
                          catch (Exception ex)
                          {
@@ -141,79 +110,8 @@ namespace QueueExchange
                              logger.Info(ex, "Unhandled MSMQ listen Error");
                          }
                      }
-
                  }
              });
-        }
-
-        private object ExchangeMessage(string v)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
-        {
-
-            // Wait until we can connect
-            ResetReadConnect();
-
-            using (msgQueue)
-            {
-                while (OK_TO_RUN)
-                {
-                    try
-                    {
-                        if (immediateReturn)
-                        {
-                            getTimeout = priorityWait;
-                        }
-                        using (Message msg = msgQueue.Receive(new TimeSpan(0, 0, 0, 0, getTimeout)))
-                        {
-
-                            msg.Formatter = new ActiveXMessageFormatter();
-                            using (var reader = new StreamReader(msg.BodyStream))
-                            {
-                                return new ExchangeMessage(reader.ReadToEnd());
-                            }
-                        }
-                    }
-                    catch (MessageQueueException e)
-                    {
-                        // Handle no message arriving in the queue.
-                        if (e.MessageQueueErrorCode == MessageQueueErrorCode.IOTimeout)
-                        {
-                            if (immediateReturn)
-                            {
-                                // Return immediately
-                                return null;
-                            }
-                            else
-                            {
-                                //Keep loopping around the read until there is a message available
-                                continue;
-                            }
-                        }
-                        else if (e.MessageQueueErrorCode == MessageQueueErrorCode.QueueDeleted)
-                        {
-                            logger.Info($"Queue Deleted {queueName}");
-                            ResetReadConnect();
-                        }
-                        else
-                        {
-                            logger.Info($"Queue Error: {queueName} {e.StackTrace}");
-                            ResetReadConnect();
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Trace(ex.Message);
-                        logger.Info(ex, "Unhandled MSMQ listen Error");
-                    }
-                }
-
-                return null;
-            }
         }
 
         public void ResetReadConnect()
@@ -228,7 +126,7 @@ namespace QueueExchange
                 Thread.Sleep(2000);
             }
         }
-        private int ResetWrtiteConnect()
+        private int ResetWriteConnect()
         {
 
             //Connect to the queue that is to be written to
@@ -240,12 +138,11 @@ namespace QueueExchange
 
                 logger.Error($"Cannot Write to Queue: {queueName}  {counter}/ {maxRetry}");
                 counter++;
-                Thread.Sleep(retryInterval);
+                Thread.Sleep(2000);
             }
 
             return counter;
         }
-
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
         {
 
@@ -256,16 +153,8 @@ namespace QueueExchange
                 MaintainQueueInline();
             }
 
-
-            //// Set the queueName bassed on the content of the message if configured
-            //mess = SetDestinationFromMessage(mess);
-            //if (!mess.destinationSet) {
-            //    mess.sent = false;
-            //    return mess;
-            //}
-
             //// Connection to the queue
-            if (ResetWrtiteConnect() == maxRetry)
+            if (ResetWriteConnect() == maxRetry)
             {
                 logger.Error($"Cannot Write to Queue: {queueName}");
                 this.SendToUndeliverableQueue(mess);
@@ -316,7 +205,6 @@ namespace QueueExchange
                 }
             }
         }
-
         private bool TestReadConnect()
         {
             try
@@ -339,14 +227,11 @@ namespace QueueExchange
                 return false;
             }
         }
-
         public void MaintainQueueInline()
         {
 
             // Keeps the queue to a maximum size by reading of the oldest messages.
-
-
-            ResetWrtiteConnect();
+            ResetWriteConnect();
             try
             {
                 lock (sendLock)
@@ -375,7 +260,6 @@ namespace QueueExchange
             }
 
         }
-
         private static long GetMessaegCount(String msmqName)
         {
 
@@ -410,7 +294,6 @@ namespace QueueExchange
             }
             throw new ArgumentException(String.Format("MSMQ with name {0} not found", msmqName));
         }
-
         public void Dispose()
         {
             try

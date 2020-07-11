@@ -43,7 +43,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\ConfigEditor\bin\Release\Executable\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -240,6 +240,7 @@
     <Compile Include="QEMQ.cs" />
     <Compile Include="QEMSMQ.cs" />
     <Compile Include="QERabbitDefExchange.cs" />
+    <Compile Include="QETCPClient.cs" />
     <Compile Include="QESink.cs" />
     <Compile Include="QueueAbstract.cs" />
     <Compile Include="QueueFactory.cs" />

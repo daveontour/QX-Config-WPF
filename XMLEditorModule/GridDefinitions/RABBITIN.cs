@@ -4,12 +4,15 @@ using System.Reflection;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
 
     [DisplayName("Rabbit MQ Input Node")]
-    public class RABBITIN : MyNodeInPropertyGrid {
+    public class RABBITIN : MyNodeInPropertyGrid
+    {
 
-        public RABBITIN(XmlNode dataModel, IView view) {
+        public RABBITIN(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "RABBITDEFEX";
@@ -39,12 +42,6 @@ namespace QXEditorModule.GridDefinitions {
         public string Topic {
             get { return GetAttribute("queue"); }
             set { SetAttribute("queue", value); }
-        }
-
-        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(6), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
-        public string Buffer {
-            get { return GetAttribute("bufferQueueName"); }
-            set { SetAttribute("bufferQueueName", value); }
         }
     }
 }

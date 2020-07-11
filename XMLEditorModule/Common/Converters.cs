@@ -4,27 +4,37 @@ using System.Windows.Data;
 using System.Xml;
 
 
-namespace QXEditorModule.Common {
-    public class TreeViewHeightConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            if (value is double) {
-                return (double)value - 50;
+namespace QXEditorModule.Common
+{
+    public class TreeViewHeightConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is double @double)
+            {
+                return @double - 50;
             }
             return value;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
 
-    public class XmlAttributesToLableConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+    public class XmlAttributesToLableConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             XmlAttributeCollection attributes = value as XmlAttributeCollection;
-            if (attributes != null) {
+            if (attributes != null)
+            {
                 //Step to store name attribute if present.
-                foreach (XmlAttribute item in attributes) {
-                    if (item != null && string.Compare(item.Name, "name", true) == 0) {
+                foreach (XmlAttribute item in attributes)
+                {
+                    if (item != null && string.Compare(item.Name, "name", true) == 0)
+                    {
                         return ":" + item.Value;
                     }
                 }
@@ -33,81 +43,105 @@ namespace QXEditorModule.Common {
             return Binding.DoNothing;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
 
 
-    public class BoolToVisibilityConverter : IValueConverter {
+    public class BoolToVisibilityConverter : IValueConverter
+    {
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            if (value is bool && (bool)value) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool && (bool)value)
+            {
                 return Visibility.Visible;
-            } else {
+            }
+            else
+            {
                 return Visibility.Collapsed;
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
 
 
-    public class BoolToVisibilityInverter : IValueConverter {
+    public class BoolToVisibilityInverter : IValueConverter
+    {
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
-            if (value is bool && (bool)value) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool && (bool)value)
+            {
                 return Visibility.Collapsed;
-            } else {
+            }
+            else
+            {
                 return Visibility.Visible;
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
 
 
-    public class AddChildVisibilityConverter : IValueConverter {
+    public class AddChildVisibilityConverter : IValueConverter
+    {
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
 
             XmlNode node = value as XmlNode;
 
             //If Node is text type then do not show add.
-            if (node != null && ((node.NodeType == XmlNodeType.Text) || (node.FirstChild != null && node.FirstChild.NodeType == XmlNodeType.Text))) {
+            if (node != null && ((node.NodeType == XmlNodeType.Text) || (node.FirstChild != null && node.FirstChild.NodeType == XmlNodeType.Text)))
+            {
                 return Visibility.Collapsed;
-            } else
-              //If Node is of other type show add
-              {
+            }
+            else
+            //If Node is of other type show add
+            {
                 return Visibility.Visible;
             }
 
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }
 
-    public class RemoveChildVisibilityConverter : IValueConverter {
+    public class RemoveChildVisibilityConverter : IValueConverter
+    {
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
 
             XmlNode node = value as XmlNode;
 
             //If Node is text type or contains more than one attribute then  show remove.
-            if (node != null && (node.NodeType == XmlNodeType.Text || (node.Attributes != null && node.Attributes.Count > 0))) {
+            if (node != null && (node.NodeType == XmlNodeType.Text || (node.Attributes != null && node.Attributes.Count > 0)))
+            {
                 return Visibility.Visible;
-            } else {
+            }
+            else
+            {
                 return Visibility.Collapsed;
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
             throw new NotImplementedException();
         }
     }

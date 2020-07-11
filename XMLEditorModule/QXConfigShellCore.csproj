@@ -62,8 +62,15 @@
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\TaskListDataTemplateSelector.cs" />
     <Compile Include="GridDefinitions\FILEIN.cs" />
+    <Compile Include="GridDefinitions\FileNameSelector.xaml.cs">
+      <DependentUpon>FileNameSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GridDefinitions\FILEOUT.cs" />
+    <Compile Include="GridDefinitions\FolderNameSelector.xaml.cs">
+      <DependentUpon>FolderNameSelector.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GridDefinitions\HTTPIN.cs" />
+    <Compile Include="GridDefinitions\TCPOUT.cs" />
     <Compile Include="GridDefinitions\HTTPOUT.cs" />
     <Compile Include="GridDefinitions\KAFKAIN.cs" />
     <Compile Include="GridDefinitions\KAFKAOUT.cs" />
@@ -111,6 +118,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="GridDefinitions\FileNameSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GridDefinitions\FolderNameSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CommandsBarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -26,13 +26,13 @@
             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,0"  Text="{Binding Path=VersionString, Mode=OneWay}" />
             <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" >This utility creates the configuration files used by a running instance of QueueExchange(QX). The utility will also allow for the immediate execution of those configuration files and can package the configuration together with the necessary executeables to run QX indepedant of this utility.</TextBlock>
             <Image Source="/QXEditorModule;component/Resources/QXScreen.png" Stretch="None" />
-            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" Height="18" ><Run Text="Copyright: David Burton, 2019"/></TextBlock>
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" Margin="5,10" Height="18" ><Run Text="Copyright: David Burton, 2020"/></TextBlock>
           
 
         </StackPanel>
         <!-- Accept or Cancel -->
         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,0,0,10" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
-            <Button  Width="100" Name="okButton" IsDefault="True" Click="clickOK" Margin="5,0,5,0">OK</Button>
+            <Button  Width="100" Name="okButton" IsDefault="True" Click="ClickOK" Margin="5,0,5,0">OK</Button>
         </StackPanel>
     </Grid>
 </Window>

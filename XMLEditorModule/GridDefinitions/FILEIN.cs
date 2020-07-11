@@ -23,6 +23,7 @@ namespace QXEditorModule.GridDefinitions
             set { SetType(value); }
         }
 
+        [Editor(typeof(FolderNameSelector), typeof(FolderNameSelector))]
         [CategoryAttribute("Required"), DisplayName("Directory Path"), Browsable(true), PropertyOrder(3), DescriptionAttribute("Path to the directory to watch")]
         public string Path {
             get { return GetAttribute("path"); }
@@ -30,23 +31,21 @@ namespace QXEditorModule.GridDefinitions
         }
         [CategoryAttribute("Required"), DisplayName("File Filter"), PropertyOrder(4), Browsable(true), DescriptionAttribute("File Pattern to Match. (e.g. *.xml)")]
         public string FileFilter {
-            get { return GetAttribute("fileFilter"); }
+            get {
+                string val = GetAttribute("fileFilter");
+                if (val == null || val == "")
+                {
+                    val = "*.*";
+                    SetAttribute("fileFilter", val);
+                }
+                return val;
+            }
             set { SetAttribute("fileFilter", value); }
         }
-        //[CategoryAttribute("Required"), DisplayName("Sequential from Directory"), PropertyOrder(5), Browsable(true), DescriptionAttribute("Select the files from the directory one at a time in sequential order")]
-        //public bool SequentialFromDirectory {
-        //    get { return GetBoolAttribute("sequentialDir"); }
-        //    set { SetAttribute("sequentialDir", value); }
-        //}
         [CategoryAttribute("Required"), DisplayName("Delete After Send"), PropertyOrder(6), Browsable(true), DescriptionAttribute("Delete the source file after the pipeline picks it up")]
         public bool Delete {
             get { return GetBoolAttribute("deleteAfterSend"); }
             set { SetAttribute("deleteAfterSend", value); }
         }
-        //[CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(7), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
-        //public string Buffer {
-        //    get { return GetAttribute("bufferQueueName"); }
-        //    set { SetAttribute("bufferQueueName", value); }
-        //}
     }
 }

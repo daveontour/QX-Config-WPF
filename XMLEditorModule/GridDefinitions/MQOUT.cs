@@ -4,12 +4,13 @@ using System.Reflection;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
     [DisplayName("IBM MQ Output Node")]
-    public class MQOUT : MQIN {
-
-
-        public MQOUT(XmlNode dataModel, IView view) : base(dataModel, view) {
+    public class MQOUT : MQIN
+    {
+        public MQOUT(XmlNode dataModel, IView view) : base(dataModel, view)
+        {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["Priority"];
             BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
             FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -22,7 +23,8 @@ namespace QXEditorModule.GridDefinitions {
         public int MaxMessages {
             get { return GetIntAttribute("maxMessages"); }
             set {
-                if (value <= -1) {
+                if (value <= -1)
+                {
                     value = -1;
                 }
                 SetAttribute("maxMessages", value);
@@ -36,7 +38,5 @@ namespace QXEditorModule.GridDefinitions {
                 SetAttribute("undeliverableQueue", value);
             }
         }
-
-
     }
 }

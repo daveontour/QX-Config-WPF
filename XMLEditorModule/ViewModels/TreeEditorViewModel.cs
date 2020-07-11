@@ -201,6 +201,9 @@ namespace QXEditorModule.ViewModels
                     case "HTTP":
                         MyGrid = new HTTPOUT(selectedItem, this.View);
                         break;
+                    case "TCPCLIENT":
+                        MyGrid = new TCPOUT(selectedItem, this.View);
+                        break;
                     case "RABBITDEFEX":
                         MyGrid = new RABBITOUT(selectedItem, this.View);
                         break;

@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
 
     [DisplayName("Kafka Output Node")]
-    public class KAFKAOUT : MyNodePropertyGrid {
+    public class KAFKAOUT : MyNodePropertyGrid
+    {
 
-        public KAFKAOUT(XmlNode dataModel, IView view) {
+        public KAFKAOUT(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "Kafka";

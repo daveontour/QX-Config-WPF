@@ -6,8 +6,10 @@ using System.Security.Cryptography;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace QueueExchange {
-    class FilterContextContains : MustInitialize<XElement>, IQueueFilter, IDisposable {
+namespace QueueExchange
+{
+    class FilterContextContains : MustInitialize<XElement>, IQueueFilter, IDisposable
+    {
 
         // private QueueAbstract queue;
         private readonly string contextCacheKeyXPath;
@@ -16,20 +18,27 @@ namespace QueueExchange {
         private readonly bool useMessageAsKey = false;
         public MemoryCache _contextCache;
 
-        public bool Pass(string message) {
+        public bool Pass(string message)
+        {
 
-            if (useMessageAsKey) {
-                using (SHA256 mySHA256 = SHA256.Create()) {
-                    using (var stream = GenerateStreamFromString(message)) {
+            if (useMessageAsKey)
+            {
+                using (SHA256 mySHA256 = SHA256.Create())
+                {
+                    using (var stream = GenerateStreamFromString(message))
+                    {
                         byte[] hashValue = mySHA256.ComputeHash(stream);
                         string nodeValue = BitConverter.ToString(hashValue);
 
                         bool inCache = _contextCache.Contains(nodeValue);
 
-                        if (!inCache) {
+                        if (!inCache)
+                        {
                             logger.Info($"Adding Key:{nodeValue}  to Context Cache");
                             _contextCache.AddOrGetExisting(nodeValue, nodeValue, DateTime.Now.AddSeconds(this.contextCacheExpiry));
-                        } else {
+                        }
+                        else
+                        {
                             logger.Info($"NOT Adding Key:{nodeValue}  to Context Cache");
                         }
 
@@ -38,12 +47,14 @@ namespace QueueExchange {
                 }
             }
 
-            try {
+            try
+            {
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(message);
                 XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
 
-                foreach (KeyValuePair<string, string> item in Exchange.nsDict) {
+                foreach (KeyValuePair<string, string> item in Exchange.nsDict)
+                {
                     ns.AddNamespace(item.Key, item.Value);
                 }
                 XmlNode node = doc.SelectSingleNode(contextCacheKeyXPath, ns);
@@ -51,49 +62,66 @@ namespace QueueExchange {
 
                 bool inCache = _contextCache.Contains(nodeValue);
 
-                if (!inCache) {
+                if (!inCache)
+                {
                     logger.Info($"Adding Key:{nodeValue}  to Context Cache");
                     _contextCache.AddOrGetExisting(nodeValue, nodeValue, DateTime.Now.AddSeconds(this.contextCacheExpiry));
-                } else {
+                }
+                else
+                {
                     logger.Info($"NOT Adding Key:{nodeValue}  to Context Cache");
                 }
 
                 return !inCache;
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 logger.Info(ex.Message);
                 return false;
             }
         }
 
-        public FilterContextContains(XElement config, QueueAbstract queue) : base(config) {
+        public FilterContextContains(XElement config, QueueAbstract queue) : base(config)
+        {
 
             _contextCache = new MemoryCache(queue.queueName);
 
-            try {
+            try
+            {
                 contextCacheKeyXPath = config.Attribute("contextCacheKeyXPath").Value;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 contextCacheKeyXPath = null;
             }
 
-            try {
+            try
+            {
                 this.contextCacheExpiry = double.Parse(config.Attribute("contextCacheExpiry").Value);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 this.contextCacheExpiry = 10.0;
             }
 
-            try {
+            try
+            {
                 this.useMessageAsKey = bool.Parse(config.Attribute("useMessageAsKey").Value);
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 this.useMessageAsKey = false;
             }
 
             //          this.queue = queue;
         }
 
-        public static Stream GenerateStreamFromString(string s) {
+        public static Stream GenerateStreamFromString(string s)
+        {
             var stream = new MemoryStream();
-            using (var writer = new StreamWriter(stream)) {
+            using (var writer = new StreamWriter(stream))
+            {
                 writer.Write(s);
                 writer.Flush();
             }
@@ -101,10 +129,13 @@ namespace QueueExchange {
             return stream;
         }
 
-        public void Dispose() {
-            try {
+        public void Dispose()
+        {
+            try
+            {
                 _contextCache.Dispose();
-            } catch { }
+            }
+            catch { }
         }
     }
 }

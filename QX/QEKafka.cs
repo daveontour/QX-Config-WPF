@@ -14,7 +14,6 @@ namespace QueueExchange
         public QEMSMQ serviceQueue;
         private string consumerGroup;
 
-
         public QEKafka(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
 
@@ -82,10 +81,10 @@ namespace QueueExchange
 
             OK_TO_RUN = true;
 
-            if (definition.Name == "input")
-            {
-                _ = Task.Run(() => Run_Consume());
-            }
+            //if (definition.Name == "input")
+            //{
+            //    _ = Task.Run(() => Run_Consume());
+            //}
 
             return true;
 
@@ -99,12 +98,17 @@ namespace QueueExchange
                 serviceQueue.Stop();
             }
         }
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+
+        override public async Task StartListener()
         {
-            // The serviceQueue is monitored and messages are returned as the appear on the queue
-            logger.Debug("Listening to KAFKA QUEUE");
-            return (serviceQueue.Listen(immediateReturn, priorityWait));
+            await Task.Run(() => Run_Consume());
         }
+        //public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+        //{
+        //    // The serviceQueue is monitored and messages are returned as the appear on the queue
+        //    logger.Debug("Listening to KAFKA QUEUE");
+        //    return (serviceQueue.Listen(immediateReturn, priorityWait));
+        //}
 
         public new async void Send(ExchangeMessage xm)
         {
@@ -193,15 +197,8 @@ namespace QueueExchange
                             }
 
                             logger.Info("=============Recieved Message From Kafka============");
-                            _ = serviceQueue.ServiceSend(new ExchangeMessage(consumeResult.Value));
-
-                            //if (consumeResult.Offset % commitPeriod == 0) {
-                            //    try {
-                            //        consumer.Commit(consumeResult);
-                            //    } catch (KafkaException e) {
-                            //        logger.Info($"Commit error: {e.Error.Reason}");
-                            //    }
-                            //}
+                            SendToPipe(consumeResult.Value);
+                            //_ = serviceQueue.ServiceSend(new ExchangeMessage(consumeResult.Value));
 
                         }
                         catch (ConsumeException e)

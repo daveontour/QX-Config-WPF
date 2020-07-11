@@ -85,11 +85,6 @@ namespace QueueExchange
             }
         }
 
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
-        {
-            // this type can only be used as an output
-            return null;
-        }
 
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
         {

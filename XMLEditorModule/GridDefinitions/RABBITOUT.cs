@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
 
     [DisplayName("Rabbit MQ Output Node")]
-    public class RABBITOUT : MyNodePropertyGrid {
+    public class RABBITOUT : MyNodePropertyGrid
+    {
 
-        public RABBITOUT(XmlNode dataModel, IView view) {
+        public RABBITOUT(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "Rabbit MQ";

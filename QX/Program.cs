@@ -3,10 +3,13 @@ using System.Collections.Specialized;
 using System.Configuration;
 using Topshelf;
 
-namespace QueueExchange {
-    class Program {
+namespace QueueExchange
+{
+    class Program
+    {
         // Primarily skeleton code for defining the ConsoleApp/Service to be managed by TopShelf
-        static void Main(string[] args) {
+        static void Main(string[] args)
+        {
             var exitCode = HostFactory.Run(x =>
             {
                 /*

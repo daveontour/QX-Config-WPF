@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QXEditorModule.GridDefinitions;
+using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Xml;
@@ -33,6 +34,18 @@ namespace QXEditorModule.Common
         }
     }
 
+    public class PriorityTypeList : IItemsSource
+    {
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
+        {
+
+            var types = new ItemCollection {
+                "Highest", "Very High", "High", "Above Normal", "Normal", "Low", "Very Low", "Lowest"
+            };
+            return types; ;
+        }
+    }
     public class NodeTypeListOut : IItemsSource
     {
 
@@ -40,7 +53,7 @@ namespace QXEditorModule.Common
         {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "SINK"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "TCP Client", "SINK"
             };
             return types; ;
         }
@@ -112,6 +125,44 @@ namespace QXEditorModule.Common
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
+
+        protected void Show(string[] fields)
+        {
+            foreach (string field in fields)
+            {
+                ShowHide(field, true);
+            }
+        }
+        protected void Hide(string[] fields)
+        {
+            foreach (string field in fields)
+            {
+                ShowHide(field, false);
+            }
+        }
+        protected void Show(string field)
+        {
+            ShowHide(field, true);
+        }
+        protected void Hide(string field)
+        {
+            ShowHide(field, false);
+        }
+        protected void ShowHide(string field, bool value)
+        {
+
+            try
+            {
+                PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[field];
+                BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+                FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
+                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Show/Hide Issue for {field}");
+            }
+        }
 
         protected string GetAttribute(string attribName)
         {
@@ -357,6 +408,11 @@ namespace QXEditorModule.Common
                         if (_node.Name == "input") view.RabbitIn(_node);
                         if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.RabbitOut(_node);
                         break;
+                    case "TCP Client":
+                        SetAttribute("type", "TCPCLIENT");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.TCPOUT(_node);
+                        break;
                     case "SINK":
                         if (_node.Name == "input")
                         {
@@ -420,6 +476,7 @@ namespace QXEditorModule.Common
         }
 
 
+        [Editor(typeof(FileNameSelector), typeof(FileNameSelector))]
         [RefreshProperties(RefreshProperties.All)]
         [CategoryAttribute("Optional - Transformation"), DisplayName("XSL Transform Style Sheet"), ReadOnly(false), Browsable(true), PropertyOrder(2), DescriptionAttribute("XSL StyleSheet to perform a transformation")]
         public string StyleSheet {
@@ -494,18 +551,64 @@ namespace QXEditorModule.Common
     public class MyNodeInPropertyGrid : MyNodePropertyGrid
     {
 
-        [CategoryAttribute("Optional"), DisplayName("Priority"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Input Priority ( 1 = highest )")]
-        public int Priority {
+
+        [CategoryAttribute("Required"), DisplayName("Priority"), Browsable(true), PropertyOrder(10), DescriptionAttribute("Input Priority"), ItemsSource(typeof(PriorityTypeList))]
+        public string Priority {
             get {
                 int val = GetIntAttribute("priority");
-                return Math.Max(val, 1);
+                switch (val)
+                {
+                    case 0:
+                        return "Lowest";
+                    case 1:
+                        return "VeryLow";
+                    case 2:
+                        return "Low";
+                    case 3:
+                        return "Normal";
+                    case 4:
+                        return "Above Normal";
+                    case 5:
+                        return "High";
+                    case 6:
+                        return "Very High";
+                    case 7:
+                        return "Highest";
+                    default:
+                        SetAttribute("priority", 3);
+                        return "Normal";
+                }
+
             }
             set {
-                if (value < 1)
+
+                switch (value)
                 {
-                    value = 1;
+                    case "Highest":
+                        SetAttribute("priority", 7);
+                        break;
+                    case "Very High":
+                        SetAttribute("priority", 6);
+                        break;
+                    case "High":
+                        SetAttribute("priority", 5);
+                        break;
+                    case "Above Normal":
+                        SetAttribute("priority", 4);
+                        break;
+                    case "Normal":
+                        SetAttribute("priority", 3);
+                        break;
+                    case "Low":
+                        SetAttribute("priority", 2);
+                        break;
+                    case "Very Low":
+                        SetAttribute("priority", 1);
+                        break;
+                    case "Lowest":
+                        SetAttribute("priority", 0);
+                        break;
                 }
-                SetAttribute("priority", value);
             }
         }
     }

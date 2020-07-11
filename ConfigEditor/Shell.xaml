@@ -14,6 +14,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <editorModule:CommandsBarView Name="commandBarView"  Grid.Row="0"></editorModule:CommandsBarView>
-        <editorModule:TreeEditorsView Grid.Row="1" x:Name="editorsView" Loaded="editorsView_Loaded"></editorModule:TreeEditorsView>
+        <editorModule:TreeEditorsView Grid.Row="1" x:Name="editorsView" Loaded="EditorsView_Loaded"></editorModule:TreeEditorsView>
     </Grid>
 </Window>

@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
     [DisplayName("Microsoft MQ Output Node")]
-    public class MSMQOUT : MyNodePropertyGrid {
+    public class MSMQOUT : MyNodePropertyGrid
+    {
 
 
-        public MSMQOUT(XmlNode dataModel, IView view) {
+        public MSMQOUT(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "MSMQ";
@@ -23,7 +26,14 @@ namespace QXEditorModule.GridDefinitions {
 
         [CategoryAttribute("Required"), DisplayName("Queue"), PropertyOrder(3), Browsable(true), DescriptionAttribute("MS MQ Queue Name")]
         public string Queue {
-            get { return GetAttribute("queue"); }
+            get {
+                string val = GetAttribute("queue");
+                if (val == null || val == "")
+                {
+                    val = @".\private$\Enter_Queue_Name_Here";
+                }
+                return val;
+            }
             set { SetAttribute("queue", value); }
         }
 
@@ -37,7 +47,8 @@ namespace QXEditorModule.GridDefinitions {
         public int MaxMessages {
             get { return GetIntAttribute("maxMessages"); }
             set {
-                if (value <= -1) {
+                if (value <= -1)
+                {
                     value = -1;
                 }
                 SetAttribute("maxMessages", value);

@@ -1,9 +1,12 @@
 ﻿using System.Windows;
 
-namespace QXEditorModule.Views {
-    public partial class QXPackageMsg : Window {
+namespace QXEditorModule.Views
+{
+    public partial class QXPackageMsg : Window
+    {
 
-        public QXPackageMsg(string serviceName, string serviceDisplayName, string serviceDescription, string fileName) {
+        public QXPackageMsg(string serviceName, string serviceDisplayName, string serviceDescription, string fileName)
+        {
             InitializeComponent();
             this.DataContext = this;
 
@@ -13,7 +16,8 @@ namespace QXEditorModule.Views {
             FileName = fileName;
         }
 
-        private void clickOK(object sender, RoutedEventArgs e) {
+        private void clickOK(object sender, RoutedEventArgs e)
+        {
             DialogResult = true;
         }
 

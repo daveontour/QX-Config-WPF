@@ -3,11 +3,14 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
     [DisplayName("Test Source Message Generator")]
-    public class TESTSOURCE : MyNodeInPropertyGrid {
+    public class TESTSOURCE : MyNodeInPropertyGrid
+    {
 
-        public TESTSOURCE(XmlNode dataModel, IView view) {
+        public TESTSOURCE(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "TESTSOURCE";
@@ -19,10 +22,18 @@ namespace QXEditorModule.GridDefinitions {
             set { SetType(value); }
         }
 
-        [CategoryAttribute("Required"), DisplayName("File Path"), Browsable(true), PropertyOrder(3), DescriptionAttribute("Path to the file to use")]
+
+        [Editor(typeof(FileNameSelector), typeof(FileNameSelector))]
+        [CategoryAttribute("Optional"), DisplayName("File Path"), Browsable(true), PropertyOrder(1), DescriptionAttribute("Path to the file to use")]
         public string Path {
             get { return GetAttribute("path"); }
             set { SetAttribute("path", value); }
+        }
+
+        [CategoryAttribute("Optional"), DisplayName("Test Text"), Browsable(true), PropertyOrder(2), DescriptionAttribute("The text to send. If a file or text is not specified, then an random string will be sent ")]
+        public string TestText {
+            get { return GetAttribute("testText"); }
+            set { SetAttribute("testText", value); }
         }
 
         [CategoryAttribute("Optional"), DisplayName("Number of Messages"), Browsable(true), PropertyOrder(3), DescriptionAttribute("Maximum Number of Messages to Send (default is unlimited)")]

@@ -12,12 +12,10 @@ namespace QueueExchange
     class QEHTTP : QueueAbstract, IDisposable
     {
 
-
         private string postURL;
         private readonly Dictionary<string, string> headers = new Dictionary<string, string>();
         private HttpListener listener;
-        private QEMSMQ serviceQueue;
-        private bool isXML;
+
 
         public QEHTTP(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
 
@@ -26,13 +24,6 @@ namespace QueueExchange
 
             OK_TO_RUN = false;
 
-            //try {
-            //    requestURL = definition.Attribute("requestURL").Value;
-            //} catch (Exception) {
-            //    if (definition.Name == "input") {
-            //        return false;
-            //    }
-            //}
             try
             {
                 postURL = definition.Attribute("postURL").Value;
@@ -45,64 +36,21 @@ namespace QueueExchange
                 }
             }
 
-            try
-            {
-                this.isXML = bool.Parse(definition.Attribute("isXML").Value);
-            }
-            catch (Exception)
-            {
-                this.isXML = true;
-            }
-            try
-            {
-                // Create a service queue manager to write to and read from the buffer queue                
-                if (definition.Name == "input")
-                {
-                    serviceQueue = new QEMSMQ(bufferQueueName, isXML);
-                    _ = Task.Run(() => StartSimpleListener());
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error($"HTTP Listener Error {ex.Message}");
-                bufferQueueName = null;
-                return false;
-            }
 
             OK_TO_RUN = true;
 
             return true;
-
         }
 
         public new void Stop()
         {
             OK_TO_RUN = false;
-
-            try
-            {
-                if (serviceQueue != null)
-                {
-                    serviceQueue.Stop();
-                }
-            }
-            catch (Exception)
-            {
-                //
-            }
         }
 
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+
+        public override async Task StartListener()
         {
-
-            // The HTTP listener placesany received messages on the service queue,
-            // So they are ready for the picking, just need to use the Listen method
-            // on the servic queue to get the message
-
-            ExchangeMessage xm = serviceQueue.Listen(immediateReturn, priorityWait);
-
-            logger.Trace(xm.payload);
-            return xm;
+            await Task.Run(() => StartSimpleListener());
         }
 
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
@@ -236,7 +184,6 @@ namespace QueueExchange
                     message = reader.ReadToEnd();
                 }
 
-
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
                 response.StatusCode = 200;
@@ -249,8 +196,7 @@ namespace QueueExchange
                 output.Write(buffer, 0, buffer.Length);
                 output.Close();
 
-                // serviceQueue.Send(new ExchangeMessage(message));
-                _ = Task.Run(() => serviceQueue.ServiceSend(new ExchangeMessage(message)));
+                SendToPipe(message);
             }
         }
 
@@ -259,7 +205,6 @@ namespace QueueExchange
             try
             {
                 listener.Close();
-                serviceQueue.Dispose();
             }
             catch { }
         }

@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Xml.Linq;
 
 namespace QueueExchange
 {
@@ -6,6 +7,12 @@ namespace QueueExchange
     {
         public QueueFactory() { }
 
+        internal QueueAbstract GetQueue(XElement ep, Progress<QueueMonitorMessage> monitorPipelineProgress, string inputQueueName)
+        {
+            QueueAbstract queue = GetQueue(ep, monitorPipelineProgress);
+            queue.pipeInputQueueName = inputQueueName;
+            return queue;
+        }
         public QueueAbstract GetQueue(XElement ep, System.IProgress<QueueMonitorMessage> monitorMessageProgress)
         {
 
@@ -38,6 +45,9 @@ namespace QueueExchange
                     break;
                 case "SINK":
                     queue = new QESink(ep, monitorMessageProgress);
+                    break;
+                case "TCPCLIENT":
+                    queue = new QETCPClient(ep, monitorMessageProgress);
                     break;
                 case "TESTSOURCE":
                     queue = new QESink(ep, monitorMessageProgress);
@@ -91,5 +101,7 @@ namespace QueueExchange
 
             return filter;
         }
+
+
     }
 }

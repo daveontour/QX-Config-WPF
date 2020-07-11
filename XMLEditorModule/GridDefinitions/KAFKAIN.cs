@@ -4,12 +4,15 @@ using System.Reflection;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
 
     [DisplayName("Kafka Input Node")]
-    public class KAFKAIN : MyNodeInPropertyGrid {
+    public class KAFKAIN : MyNodeInPropertyGrid
+    {
 
-        public KAFKAIN(XmlNode dataModel, IView view) {
+        public KAFKAIN(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "KAFKA";
@@ -40,13 +43,6 @@ namespace QXEditorModule.GridDefinitions {
             get { return GetAttribute("topic"); }
             set { SetAttribute("topic", value); }
         }
-
-        [CategoryAttribute("Required"), DisplayName("Buffer Queue"), PropertyOrder(6), Browsable(true), DescriptionAttribute("Local MS MQ Queue that is used as an intermediate buffer")]
-        public string Buffer {
-            get { return GetAttribute("bufferQueueName"); }
-            set { SetAttribute("bufferQueueName", value); }
-        }
-
 
         [CategoryAttribute("Optional"), DisplayName("Consumer Group"), Browsable(true), PropertyOrder(3), DescriptionAttribute("The Kafka Consumer Group for the connection")]
         public string ConsumerGroup {

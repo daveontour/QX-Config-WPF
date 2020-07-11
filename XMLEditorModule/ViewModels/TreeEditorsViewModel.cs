@@ -2,8 +2,10 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace QXEditorModule.ViewModels {
-    public class TreeEditorsViewModel : BaseViewModel {
+namespace QXEditorModule.ViewModels
+{
+    public class TreeEditorsViewModel : BaseViewModel
+    {
         // private int activeTabIndex;
         private ObservableCollection<TreeEditorViewModel> treeEditors = new ObservableCollection<TreeEditorViewModel>();
 
@@ -22,13 +24,16 @@ namespace QXEditorModule.ViewModels {
             set {
                 activeEditorIndex = value;
                 OnPropertyChanged("ActiveEditorIndex");
-                if (activeEditorIndex > -1 && activeEditorIndex < TreeEditors.Count) {
+                if (activeEditorIndex > -1 && activeEditorIndex < TreeEditors.Count)
+                {
                     CommandsBarView.executeMenuItem.IsEnabled = true;
                     CommandsBarView.exportMenuItem.IsEnabled = true;
                     CommandsBarView.saveMenuItem.IsEnabled = true;
                     CommandsBarView.saveAsMenuItem.IsEnabled = true;
                     ActiveEditor = TreeEditors[ActiveEditorIndex];
-                } else {
+                }
+                else
+                {
                     CommandsBarView.executeMenuItem.IsEnabled = false;
                     CommandsBarView.exportMenuItem.IsEnabled = false;
                     CommandsBarView.saveMenuItem.IsEnabled = false;
@@ -45,15 +50,20 @@ namespace QXEditorModule.ViewModels {
             }
         }
 
-        public void Add(TreeEditorViewModel treeEditor) {
+        public void Add(TreeEditorViewModel treeEditor)
+        {
             this.TreeEditors.Add(treeEditor);
             ActiveEditorIndex = this.TreeEditors.Count - 1;
 
         }
-        public void Remove(TreeEditorViewModel treeEditor) {
-            try {
+        public void Remove(TreeEditorViewModel treeEditor)
+        {
+            try
+            {
                 this.TreeEditors.Remove(treeEditor);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex);
             }
             ActiveEditorIndex = this.TreeEditors.Count - 1;

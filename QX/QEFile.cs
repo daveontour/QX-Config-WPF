@@ -13,54 +13,16 @@ namespace QueueExchange
 
         private string fullPath;
         private bool deleteAfterSend = true;
-        private QEMSMQ serviceQueue;
         private string fileFilter = "*.*";
         private FileSystemWatcher watcher;
         private bool isOutput = false;
         private readonly Queue<string> files = new Queue<string>();
+        public object sendLock = new object();
 
         public QEFile(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
         {
 
         }
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
-        {
-            logger.Info("Listen for files");
-            QXLog(id, "Looking for Message", null, "PROGRESS");
-
-            if (files.Count > 0)
-            {
-                ExchangeMessage xm;
-                string fileName = files.Dequeue();
-                try
-                {
-                    xm = new ExchangeMessage(File.ReadAllText(fileName, Encoding.UTF8));
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-                logger.Info($"Sending file {fileName}");
-
-                try
-                {
-                    if (deleteAfterSend)
-                    {
-                        File.Delete(fileName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-                return xm;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage mess)
         {
 
@@ -116,14 +78,6 @@ namespace QueueExchange
             try
             {
                 watcher.EnableRaisingEvents = false;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message);
-            }
-            try
-            {
-                serviceQueue.Stop();
             }
             catch (Exception ex)
             {
@@ -196,15 +150,22 @@ namespace QueueExchange
                 }
             }
 
-            if (definition.Name == "input")
-            {
-                logger.Trace("Starting FileWatcher");
-                // Create a service queue manager to write to and read from the buffer queue
-                serviceQueue = new QEMSMQ(bufferQueueName);
-                _ = Task.Run(() => Watch());
-            }
-
             return true;
+        }
+
+        override public async Task StartListener()
+        {
+            // First, process any existing files in the directory
+            await Task.Run(() =>
+            {
+                string[] files = Directory.GetFiles(fullPath, fileFilter);
+                foreach (string file in files)
+                {
+                    ProcessFile(file);
+                }
+            });
+
+            await Task.Run(() => Watch());
         }
 
         private async Task<bool> Watch()
@@ -234,41 +195,73 @@ namespace QueueExchange
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
+            FileSystemWatcher fsw = source as FileSystemWatcher;
 
-            logger.Info($"Change Detected - {e.ChangeType} {e.FullPath}");
 
-            if (File.Exists(e.FullPath))
+            lock (sendLock)
             {
-                if (e.ChangeType == WatcherChangeTypes.Changed)
+                logger.Info($"Change Detected - {e.ChangeType} {e.FullPath}");
+
+                if (File.Exists(e.FullPath))
                 {
-                    _ = Task.Run(() => ProcessFile(e.FullPath));
+                    if (e.ChangeType == WatcherChangeTypes.Changed)
+                    {
+                        _ = Task.Run(() => ProcessFile(e.FullPath));
+                    }
                 }
             }
+
         }
 
         private void ProcessFile(string fullPath)
         {
-            while (!IsFileReady(fullPath))
-            {
-                Thread.Sleep(5);
-            }
+
             logger.Info($"Received file {fullPath}");
 
             if (!File.Exists(fullPath))
             {
-                logger.Info($"File {fullPath} no longer exists");
+                logger.Warn($"File {fullPath} no longer exists");
                 return;
             }
 
+            int totalTime = 0;
+            while (!IsFileReady(fullPath) && totalTime < 5000)
+            {
+                Thread.Sleep(10);
+                totalTime += 10;
+                if (!File.Exists(fullPath))
+                {
+                    logger.Warn($"File {fullPath} no longer exists");
+                    return;
+                }
+            }
+
+            if (totalTime >= 5000)
+            {
+                logger.Warn($"Timeout waiting for file {fullPath} to be ready");
+                return;
+            }
+
+            if (!File.Exists(fullPath))
+            {
+                logger.Warn($"File {fullPath} no longer exists");
+                return;
+            }
+
+
+            SendToPipe(File.ReadAllText(fullPath, Encoding.UTF8));
+
             try
             {
-                files.Enqueue(fullPath);
+                if (deleteAfterSend)
+                {
+                    File.Delete(fullPath);
+                }
             }
             catch (Exception ex)
             {
-                logger.Error(ex);
+                Console.WriteLine(ex.Message);
             }
-
         }
 
         public static bool IsFileReady(string filename)
@@ -289,7 +282,6 @@ namespace QueueExchange
         {
             try
             {
-                serviceQueue.Dispose();
                 watcher.Dispose();
             }
             catch { }

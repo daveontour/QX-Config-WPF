@@ -2,11 +2,14 @@
 using System.Reflection;
 using System.Windows;
 
-namespace QXEditorModule.Views {
-    public partial class QXSplash : Window {
+namespace QXEditorModule.Views
+{
+    public partial class QXSplash : Window
+    {
 
 
-        public QXSplash() {
+        public QXSplash()
+        {
             InitializeComponent();
             this.DataContext = this;
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -21,7 +24,8 @@ namespace QXEditorModule.Views {
         }
 
 
-        private void clickOK(object sender, RoutedEventArgs e) {
+        private void ClickOK(object sender, RoutedEventArgs e)
+        {
             DialogResult = true;
         }
     }

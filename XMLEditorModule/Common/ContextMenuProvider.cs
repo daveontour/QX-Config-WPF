@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace QXEditorModule.Common {
+namespace QXEditorModule.Common
+{
 
-    public class ContextMenuProvider {
+    public class ContextMenuProvider
+    {
         public readonly Dictionary<ContextMenuType, MenuItem> ContextMenus = new Dictionary<ContextMenuType, MenuItem>();
 
-        public ContextMenuProvider() {
+        public ContextMenuProvider()
+        {
             ContextMenus.Add(ContextMenuType.Copy, new MenuItem { Header = "Copy" });
             ContextMenus.Add(ContextMenuType.Paste, new MenuItem { Header = "Paste" });
             ContextMenus.Add(ContextMenuType.Delete, new MenuItem { Header = "Delete" });
@@ -27,6 +30,7 @@ namespace QXEditorModule.Common {
             ContextMenus.Add(ContextMenuType.AddHTTPOutput, new MenuItem { Header = "HTTP POST Output Node" });
             ContextMenus.Add(ContextMenuType.AddKafkaOutput, new MenuItem { Header = "Kafka Topic Output Node" });
             ContextMenus.Add(ContextMenuType.AddRabbitOutput, new MenuItem { Header = "Rabbit MQ Output Node" });
+            ContextMenus.Add(ContextMenuType.AddTCPOutput, new MenuItem { Header = "TCP Client Output Node" });
             ContextMenus.Add(ContextMenuType.AddHTTPRest, new MenuItem { Header = "Rest Server Retrieval Output Node" });
             ContextMenus.Add(ContextMenuType.AddSINK, new MenuItem { Header = "Message Sink" });
 

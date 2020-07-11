@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
     [DisplayName("Sink Output - Black Hole For Messages")]
-    public class SINK : MyNodePropertyGrid {
+    public class SINK : MyNodePropertyGrid
+    {
 
 
-        public SINK(XmlNode dataModel, IView view) {
+        public SINK(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "SINK";

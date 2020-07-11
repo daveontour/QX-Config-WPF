@@ -3,13 +3,16 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
 
     [DisplayName("HTTP Post Output Node")]
-    public class HTTPOUT : MyNodePropertyGrid {
+    public class HTTPOUT : MyNodePropertyGrid
+    {
 
 
-        public HTTPOUT(XmlNode dataModel, IView view) {
+        public HTTPOUT(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "HTTP Post";

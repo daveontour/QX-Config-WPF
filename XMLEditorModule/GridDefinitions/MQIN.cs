@@ -4,13 +4,16 @@ using System.Reflection;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
+namespace QXEditorModule.GridDefinitions
+{
 
     [DisplayName("IBM MQ Input Node")]
     [RefreshProperties(System.ComponentModel.RefreshProperties.All)]
-    public class MQIN : MyNodeInPropertyGrid {
+    public class MQIN : MyNodeInPropertyGrid
+    {
 
-        public MQIN(XmlNode dataModel, IView view) {
+        public MQIN(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "MQ";
@@ -39,7 +42,10 @@ namespace QXEditorModule.GridDefinitions {
         }
         [CategoryAttribute("Required - Connection"), DisplayName("Queue"), ReadOnly(false), Browsable(true), PropertyOrder(2), DescriptionAttribute("MQ Queue Name")]
         public string Queue {
-            get { return GetAttribute("queue"); }
+            get {
+                string val = GetAttribute("queue");
+                return val;
+            }
             set { SetAttribute("queue", value); }
         }
 

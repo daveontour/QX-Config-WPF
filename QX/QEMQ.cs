@@ -125,57 +125,72 @@ namespace QueueExchange
         {
             OK_TO_RUN = false;
         }
-
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
+        override public async Task StartListener()
         {
+            await Task.Run(() =>
+              {
+                  while (OK_TO_RUN)
+                  {
+                      try
+                      {
+                          using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams))
+                          {
+                              var openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_FAIL_IF_QUIESCING;
+                              MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
 
-            if (immediateReturn)
-            {
-                getTimeout = priorityWait;
-            }
-            while (OK_TO_RUN)
-            {
-                try
-                {
-                    using (MQQueueManager queueManager = new MQQueueManager(qMgr, connectionParams))
-                    {
-                        var openOptions = MQC.MQOO_INPUT_AS_Q_DEF + MQC.MQOO_FAIL_IF_QUIESCING;
-                        MQQueue queue = queueManager.AccessQueue(queueName, openOptions);
+                              MQGetMessageOptions getOptions = new MQGetMessageOptions
+                              {
+                                  Options = MQC.MQGMO_WAIT,
+                                  WaitInterval = 30000
+                              };
 
-                        MQGetMessageOptions getOptions = new MQGetMessageOptions
-                        {
-                            WaitInterval = getTimeout,
-                            Options = MQC.MQGMO_WAIT
-                        };
+                              MQMessage msg = new MQMessage
+                              {
+                                  Format = MQC.MQFMT_STRING
+                              };
 
-                        MQMessage msg = new MQMessage
-                        {
-                            Format = MQC.MQFMT_STRING
-                        };
+                              queue.Get(msg, getOptions);
+                              queue.Close();
 
-                        queue.Get(msg, getOptions);
-                        queue.Close();
+                              string message = (msg.ReadString(msg.MessageLength));
+                              logger.Trace($"Messages recieved on {queueName}");
 
-                        return new ExchangeMessage(msg.ReadString(msg.MessageLength));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Exception occurs on read timeout or on failure to connect
-                    logger.Trace($"No messages on: {queueName} { ex.Message }");
-                    if (immediateReturn)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-            };
+                              SendToPipe(message);
+                          }
+                      }
+                      catch (IBM.WMQ.MQException exMQ)
+                      {
+                          if (exMQ.Message == "MQRC_Q_MGR_NOT_AVAILABLE")
+                          {
+                              logger.Error($"Queue {name}: Configured Queue Manager Not Available");
+                              logger.Error($"Host {qHost}");
+                              logger.Error($"Port {qPort}");
+                              logger.Error($"QMgr {qMgr}");
+                              logger.Error($"Channel {qSvrChan}");
+                              logger.Error($"Queue {queueName}");
 
-            return null;
+                              OK_TO_RUN = false;
+                              break;
+                          }
+                          if (exMQ.Message == "MQRC_NO_MSG_AVAILABLE")
+                          {
+                              logger.Info($"No Messages on {queueName}");
+                          }
+                          else
+                          {
+                              logger.Error($"MQ Exception On Input {queueName}: {exMQ.Message}");
+                          }
+
+                      }
+                      catch (Exception ex)
+                      {
+                          logger.Trace(ex.Message);
+                          logger.Info(ex, "Unhandled MQ listen Error");
+                      }
+                  }
+              });
         }
+
         public new async void Send(ExchangeMessage xm)
         {
             logger.Debug($"Sending to {xm.uuid} IBMMQ {queueName}");
@@ -208,7 +223,6 @@ namespace QueueExchange
                     mess.status = $"Unable to Send to {queueName}";
                     return mess;
                 }
-
             }
             catch (Exception ex)
             {
@@ -221,7 +235,6 @@ namespace QueueExchange
                 mess.status = $"Unable to Send to {queueName}";
                 return mess;
             }
-
         }
 
         public async Task<ExchangeMessage> SendMqStuff(ExchangeMessage xm)

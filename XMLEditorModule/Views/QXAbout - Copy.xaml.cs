@@ -2,11 +2,14 @@
 using System.Reflection;
 using System.Windows;
 
-namespace QXEditorModule.Views {
-    public partial class QXAbout : Window {
+namespace QXEditorModule.Views
+{
+    public partial class QXAbout : Window
+    {
 
 
-        public QXAbout() {
+        public QXAbout()
+        {
             InitializeComponent();
             this.DataContext = this;
             string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -21,7 +24,8 @@ namespace QXEditorModule.Views {
         }
 
 
-        private void clickOK(object sender, RoutedEventArgs e) {
+        private void clickOK(object sender, RoutedEventArgs e)
+        {
             DialogResult = true;
         }
     }

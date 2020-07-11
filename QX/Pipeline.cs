@@ -21,8 +21,7 @@ namespace QueueExchange
         public int recieved = 0;
         public int send = 0;
 
-        override
-        public String ToString()
+        override public String ToString()
         {
             return $"Key: {key}, Received: {recieved}, Sent:{send}";
         }
@@ -32,61 +31,59 @@ namespace QueueExchange
      */
     public class Pipeline : IDisposable
     {
+        private readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly NLog.Logger statLogger = NLog.LogManager.GetLogger("ContextStats");
 
-        protected readonly List<QueueAbstract> output = new List<QueueAbstract>();
-        protected readonly List<QueueAbstract> input = new List<QueueAbstract>();
-        protected readonly Dictionary<string, int> msgCount = new Dictionary<string, int>();
-        protected readonly Dictionary<string, ContextStats> statDict = new Dictionary<string, ContextStats>();
-        protected readonly QueueFactory queueFactory = new QueueFactory();  // Factory class that takes queue and filter defintions and returns the instantiated object
-        protected int throttleInterval = 0;
-        protected int priorityWait = 200; // If there is more than on input queue, this is the time in ms that polling of each input will wait
-        protected bool preWait = true;
-        protected int contextStatsInterval;
-        protected int msgRecieved = 0;
-        protected int maxMsgPerMinute;   // Maximum number of input messages that the pipe will process per minute
-        protected string maxMsgPerMinuteProfile;   // Maximum number of input messages that the pipe will process per minute
-        protected bool randomDistribution = false;   // Distribute to a single random output
-        protected bool roundRobinDistribution = false;  // Distribute to output based ona round robin basis
-        protected int nextOutput = 0;  // Keep track of the next output to send to when configured for round robin distribution
-        protected bool OK_TO_RUN = false;  // Flag to indicate whether the pipe should be running
-        protected bool outputIsolation = false;  // When there are multiple outputs they can be run in isolation so the pipe doesn't wait for the message to be processed by one input before moving on to the next
-                                                 //     protected bool enableLog = false;
-        protected readonly string contextCacheKeyXPath;
-        protected readonly double contextCacheExpiry = 10.0;
-        protected readonly MemoryCache _contextCache;
+        private readonly List<QueueAbstract> output = new List<QueueAbstract>();
+        private readonly List<QueueAbstract> input = new List<QueueAbstract>();
+        //private readonly Dictionary<string, int> msgCount = new Dictionary<string, int>();
+        private readonly Dictionary<string, ContextStats> statDict = new Dictionary<string, ContextStats>();
+        private readonly QueueFactory queueFactory = new QueueFactory();  // Factory class that takes queue and filter defintions and returns the instantiated object
 
-        protected readonly MemoryCache _OKToPass = new MemoryCache("OKToPass");
-        protected readonly MemoryCache _firstProcessedCleared = new MemoryCache("firstprocessed");
-        protected readonly MemoryCache _firstProcessedCompleted = new MemoryCache("firstprocessedcompleted");
-        protected readonly bool discardInCache = false;
-        protected readonly Dictionary<String, Queue<ExchangeMessage>> _bufferMemoryQueueDict = new Dictionary<String, Queue<ExchangeMessage>>();
-        protected readonly Dictionary<String, System.Timers.Timer> _bufferTimerDict = new Dictionary<String, System.Timers.Timer>();
-        protected readonly bool useMessageAsKey;
-        protected bool _disposed = false;
-        protected bool allAsyncInputs = true;
-        //public QXMonitor qMon = new QXMonitor();
+        private readonly MemoryCache _contextCache;
+        private readonly MemoryCache _firstProcessedCleared = new MemoryCache("firstprocessed");
+        private readonly MemoryCache _firstProcessedCompleted = new MemoryCache("firstprocessedcompleted");
+
+        private readonly bool discardInCache = false;
+        private readonly bool firstOnly;
+        private readonly string contextCacheKeyXPath;
+        private readonly double contextCacheExpiry = 10.0;
+        private readonly bool mostRecentOnly;
+        private readonly Dictionary<string, Queue<ExchangeMessage>> _bufferMemoryQueueDict = new Dictionary<string, Queue<ExchangeMessage>>();
+        private readonly Dictionary<string, System.Timers.Timer> _bufferTimerDict = new Dictionary<string, System.Timers.Timer>();
+        private readonly bool useMessageAsKey;
+
+        private int throttleInterval = 0;
+        private readonly int maxMsgPerMinute;   // Maximum number of input messages that the pipe will process per minute
+        private readonly string maxMsgPerMinuteProfile;   // Maximum number of input messages that the pipe will process per minute
+
+        private readonly bool randomDistribution = false;   // Distribute to a single random output
+        private readonly bool roundRobinDistribution = false;  // Distribute to output based ona round robin basis
+        private int nextOutput = 0;  // Keep track of the next output to send to when configured for round robin distribution
+        private readonly bool outputIsolation = false;  // When there are multiple outputs they can be run in isolation so the pipe doesn't wait for the message to be processed by one input before moving on to the next
+
+        private int msgRecieved = 0;
+        private bool OK_TO_RUN = false;  // Flag to indicate whether the pipe should be running
+                                         //     protected bool enableLog = false;
+        private bool _disposed = false;
 
         public string id;
-
         public string name;
-        protected static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        protected static NLog.Logger statLogger = NLog.LogManager.GetLogger("ContextStats");
-        protected bool firstOnly;
-        private IProgress<PipelineMonitorMessage> monitorMessageProgress;
-        private Progress<QueueMonitorMessage> monitorPipelineProgress;
-        private bool mostRecentOnly;
-        private System.Timers.Timer resetTimer;
+        private readonly string inputQueueName;
+        private readonly MessageQueue pipeInputQueue;
+
+        private readonly IProgress<PipelineMonitorMessage> monitorMessageProgress;
+        private readonly Progress<QueueMonitorMessage> monitorPipelineProgress;
+        private readonly System.Timers.Timer resetTimer;
         private int totalReceived = 0;
         private int totalSent = 0;
-        private string inputQueueName;
-        private MessageQueue pipeInputQueue;
 
         public Pipeline(XElement pipeConfig, IProgress<PipelineMonitorMessage> monitorMessageProgress)
         {
             this.monitorMessageProgress = monitorMessageProgress;
-
             monitorPipelineProgress = new Progress<QueueMonitorMessage>();
             monitorPipelineProgress.ProgressChanged += MonitorStatusMessage;
+
             try
             {
                 string dist = pipeConfig.Attribute("distribution").Value;
@@ -98,11 +95,11 @@ namespace QueueExchange
                 {
                     roundRobinDistribution = true;
                 }
-
             }
             catch
             {
-
+                randomDistribution = false;
+                roundRobinDistribution = false;
             }
 
             try
@@ -122,35 +119,6 @@ namespace QueueExchange
             {
                 outputIsolation = false;
             }
-
-            try
-            {
-                priorityWait = int.Parse(pipeConfig.Attribute("priorityWait").Value);
-            }
-            catch (Exception)
-            {
-                priorityWait = 1;
-            }
-
-            try
-            {
-                this.contextStatsInterval = int.Parse(pipeConfig.Attribute("contextStatsInterval").Value);
-            }
-            catch (Exception)
-            {
-                contextStatsInterval = 30000;
-            }
-
-
-            try
-            {
-                preWait = bool.Parse(pipeConfig.Attribute("preWait").Value);
-            }
-            catch (Exception)
-            {
-                preWait = true;
-            }
-
 
             try
             {
@@ -215,10 +183,11 @@ namespace QueueExchange
             IEnumerable<XElement> InEndPoints = from ep in pipeConfig.Descendants("input") select ep;
             foreach (XElement ep in InEndPoints)
             {
-                QueueAbstract queue = queueFactory.GetQueue(ep, monitorPipelineProgress);
-                queue.SetParentPipe(this);
+                QueueAbstract queue = queueFactory.GetQueue(ep, monitorPipelineProgress, inputQueueName);
+                //queue.SetParentPipe(this);
                 if (queue != null)
                 {
+
                     if (!queue.isValid)
                     {
                         logger.Warn($"Could not add Input Queue {queue.queueName} to {name}. Invalid Configuration");
@@ -231,37 +200,18 @@ namespace QueueExchange
                     logger.Error($"Could not proccess Input Queue {queue.queueName}");
                 }
             }
-            // Sort the input into priority order
-            input.Sort((x, y) => x.priority.CompareTo(y.priority));
 
 
             // The output queues. There may be multiple output queues for each input queue
             IEnumerable<XElement> OutEndPoints = from ep in pipeConfig.Descendants("output") select ep;
-            int disambiguate = 0;
+
             foreach (XElement ep in OutEndPoints)
             {
 
                 try
                 {
                     QueueAbstract queue = queueFactory.GetQueue(ep, monitorPipelineProgress);
-                    if (!queue.SupportsAsync())
-                    {
-                        this.allAsyncInputs = false;
-                    }
-                    // queue.SetMonitor(qMon, this);
-                    if (msgCount.ContainsKey(queue.queueName))
-                    {
-                        queue.queueName = $"{queue.queueName}-{disambiguate}";
-                        disambiguate++;
-                    }
-                    if (queue.queueName != null)
-                    {
-                        msgCount.Add(queue.queueName, 0);
-                    }
-                    else
-                    {
-                        msgCount.Add(queue.name, 0);
-                    }
+
                     if (queue != null)
                     {
                         if (!queue.isValid)
@@ -282,29 +232,27 @@ namespace QueueExchange
                 }
             }
 
-            if (this.allAsyncInputs)
-            // Create a queue that all the inputs will sent messages to
-            {
-                try
-                {
 
-                    if (!MessageQueue.Exists(inputQueueName))
-                    {
-                        using (MessageQueue t = MessageQueue.Create(inputQueueName))
-                        {
-                            this.pipeInputQueue = t;
-                            Console.WriteLine($"Created Input Queue {inputQueueName} for pipeline");
-                        }
-                    }
-                    else
-                    {
-                        this.pipeInputQueue = new MessageQueue(inputQueueName);
-                    }
-                }
-                catch (Exception ex)
+            // Create a queue that all the inputs will sent messages to
+            try
+            {
+
+                if (!MessageQueue.Exists(inputQueueName))
                 {
-                    Console.WriteLine(ex.Message);
+                    using (MessageQueue t = MessageQueue.Create(inputQueueName))
+                    {
+                        this.pipeInputQueue = t;
+                        logger.Info($"Created Input Queue {inputQueueName} for pipeline");
+                    }
                 }
+                else
+                {
+                    this.pipeInputQueue = new MessageQueue(inputQueueName);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
             }
 
             _contextCache = new MemoryCache(name);
@@ -354,15 +302,27 @@ namespace QueueExchange
                 this.useMessageAsKey = false;
             }
 
+
+
             //Output and reset context
             if (contextCacheKeyXPath != null)
             {
+                int contextStatsInterval;
+                try
+                {
+                    contextStatsInterval = int.Parse(pipeConfig.Attribute("contextStatsInterval").Value);
+                }
+                catch (Exception)
+                {
+                    contextStatsInterval = 30000;
+                }
+
                 resetTimer = new System.Timers.Timer()
                 {
                     AutoReset = true,
                     Interval = contextStatsInterval
                 };
-                logger.Info($"Context Cache Stats Interval set to {this.contextStatsInterval}");
+                logger.Info($"Context Cache Stats Interval set to {contextStatsInterval}");
                 resetTimer.Elapsed += (source, eventArgs) =>
                 {
                     statLogger.Info($"Total received: {this.totalReceived}, Total sent: {this.totalSent}");
@@ -389,11 +349,12 @@ namespace QueueExchange
                 };
                 resetTimer.Start();
             }
+
+
             /* Only allow if there are output queues configured
              * It is OK if there are no inputs defined. An output only queue may be
              * defined just to specifiy a maxMessages parameter on the queue for size maintenance
              */
-
             if (output.Count() > 0)
             {
                 OK_TO_RUN = true;
@@ -405,66 +366,9 @@ namespace QueueExchange
             }
         }
 
-
-
-        protected async Task<ExchangeMessage> GetMessage()
+        protected ExchangeMessage GetMessage()
         {
-
-            // All the inputs support async mode, so go wait for it
-            if (this.allAsyncInputs)
-            {
-                return new ExchangeMessage(GetAsyncMessageFromInputQueue());
-            }
-
-            // Goes through the input queues and return the message.
-            // After each message is returned, it always checks the queues 
-            // in priority order, so the highest priority will always be cleared 
-            // before messages are taken from the next highest queue
-
-            bool immediateReturn = false;
-            if (input.Count > 1)
-            {
-                // Flag to signal Input Listeners not to enter a permanaent wait cycle 
-                // for the message, but to return null on the first time out. 
-                // This is required for the prioritisation of input queues
-                immediateReturn = true;
-            }
-
-
-            while (true)
-            {
-                foreach (QueueAbstract inQ in input)
-                {
-                    ExchangeMessage xm = await Task.Run(() => inQ.ListenToQueue(immediateReturn, priorityWait));
-                    inQ.lastUsed = true;
-
-                    if (xm != null)
-                    {
-                        if (xm.payload != null)
-                        {
-                            QXLog("Message Received", xm.uuid, "PROGRESS");
-                            ReOrderInputs(inQ);
-                            return xm;
-                        }
-                        else
-                        {
-                            if (immediateReturn)
-                            {
-                                // Return null so the pipeline can check other higher priority inputs 
-                                ReOrderInputs(inQ);
-                                return null;
-                            }
-                            else
-                            {
-                                QXLog("NULL Message", "Message was null after filtering and transformation", "WARNING");
-                            }
-
-                            // If we get here, then the input isn't part of a prioity set, so 
-                            // Don't return anything so the loop continues to listen for messages to process
-                        }
-                    }
-                }
-            }
+            return new ExchangeMessage(GetAsyncMessageFromInputQueue());
         }
 
         private string GetAsyncMessageFromInputQueue()
@@ -477,13 +381,9 @@ namespace QueueExchange
                     {
                         using (Message msg = pipeInputQueue.Receive())
                         {
-                            // Wait for the next message on the input queue
-
-                            msg.Formatter = new ActiveXMessageFormatter();
-                            using (var reader = new StreamReader(msg.BodyStream))
-                            {
-                                return reader.ReadToEnd();
-                            }
+                            ActiveXMessageFormatter mft = new ActiveXMessageFormatter();
+                            string mess = mft.Read(msg) as string;
+                            return mess;
                         }
                     }
                     catch (MessageQueueException e)
@@ -509,24 +409,6 @@ namespace QueueExchange
 
             return null;
 
-        }
-
-        private void ReOrderInputs(QueueAbstract inQ)
-        {
-            //Rearranges the input list so the most recently used queue is put behind other
-            // queue of the same priority. 
-
-            int priority = inQ.priority;
-            input.Remove(inQ);
-            for (int i = 0; i < input.Count; i++)
-            {
-                if (input[i].priority > priority)
-                {
-                    input.Insert(i, inQ);
-                    return;
-                }
-            }
-            input.Add(inQ);
         }
 
         public void StopPipeLine()
@@ -585,7 +467,7 @@ namespace QueueExchange
                 logger.Error("**********************************");
                 logger.Error("* Message Throttle Profile Error *");
                 logger.Error("**********************************");
-                Console.WriteLine(e.Message);
+                logger.Error(e.Message);
             }
         }
 
@@ -613,13 +495,10 @@ namespace QueueExchange
                 PrepareProfileThreads();
             }
 
-            if (this.allAsyncInputs)
+            foreach (QueueAbstract inQ in input)
             {
-                foreach (QueueAbstract inQ in input)
-                {
-                    logger.Info($"Starting Async Listener for {inQ.name}");
-                    Task.Run(() => inQ.StartListener(this.inputQueueName));
-                }
+                logger.Info($"Starting Async Listener for {inQ.name}");
+                var t = Task.Run(() => inQ.StartListener());
             }
 
             logger.Info($"Pipe {name} running. Input Queues = {input.Count()}, Output Queues = {output.Count()}");
@@ -631,7 +510,7 @@ namespace QueueExchange
                 {
 
                     //Get the message from the input
-                    ExchangeMessage xm = await GetMessage();
+                    ExchangeMessage xm = GetMessage();
                     QXLog("Recieved Message", null, "PROGRESS");
 
                     if (throttleInterval <= 0)
@@ -669,7 +548,7 @@ namespace QueueExchange
                 return;
             }
 
-            string contextKeyValue = getContextKey(xm);
+            string contextKeyValue = GetContextKey(xm);
 
             if (contextKeyValue == null)
             {
@@ -711,8 +590,10 @@ namespace QueueExchange
                 }
                 else
                 {
-                    ContextStats v = new ContextStats();
-                    v.key = contextKeyValue;
+                    ContextStats v = new ContextStats
+                    {
+                        key = contextKeyValue
+                    };
                     statDict.Add(contextKeyValue, v);
                     stats = v;
                 }
@@ -803,7 +684,7 @@ namespace QueueExchange
                 logger.Error(ex);
             }
         }
-        private String getContextKey(ExchangeMessage xm)
+        private string GetContextKey(ExchangeMessage xm)
         {
 
             string contextKeyValue = null;
@@ -848,7 +729,6 @@ namespace QueueExchange
                 {
                     XmlNode node = doc.SelectSingleNode(contextCacheKeyXPath, ns);
                     contextKeyValue = node.InnerText;
-
                     logger.Info($"Context Key for Message = {contextKeyValue}");
                 }
                 catch
@@ -887,7 +767,6 @@ namespace QueueExchange
                 if (bufferMemoryQueue.Count != 0)
                 {
                     logger.Trace($"Injection Popper Timer Went Off for key = {contextKeyValue} - {bufferMemoryQueue.Count} Messages on queue");
-
 
                     _firstProcessedCompleted.AddOrGetExisting(contextKeyValue, contextKeyValue, DateTime.Now.AddHours(18));
                     _contextCache.AddOrGetExisting(contextKeyValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
@@ -1029,22 +908,22 @@ namespace QueueExchange
 
                         foreach (QueueAbstract q in output)
                         {
-                            logger.Info($"Sending message {xm?.uuid } to {q.name}");
+                            logger.Info($"-->{name} --> sending message {xm?.uuid } to {q.name}");
                             _ = await SendAndLog(q, xm);
 
-                            if (xm.sent)
-                            {
-                                if (q.queueName != null)
-                                {
-                                    msgCount[q.queueName] = msgCount[q.queueName] + 1;
-                                    logger.Trace($"{q.queueName} = {msgCount[q.queueName]}");
-                                }
-                                else
-                                {
-                                    msgCount[q.name] = msgCount[q.name] + 1;
-                                    logger.Trace($"{q.name} = {msgCount[q.name]}");
-                                }
-                            }
+                            //if (xm.sent)
+                            //{
+                            //    if (q.queueName != null)
+                            //    {
+                            //        msgCount[q.queueName] = msgCount[q.queueName] + 1;
+                            //        logger.Trace($"{q.queueName} = {msgCount[q.queueName]}");
+                            //    }
+                            //    else
+                            //    {
+                            //        msgCount[q.name] = msgCount[q.name] + 1;
+                            //        logger.Trace($"{q.name} = {msgCount[q.name]}");
+                            //    }
+                            //}
 
                         }
                         QXLog("Sync Message End", "Normal Distribution", "PROGRESS");
@@ -1058,18 +937,6 @@ namespace QueueExchange
             message = await queue.Send(message);
             return message;
         }
-        public static Stream GenerateStreamFromString(string s)
-        {
-            var stream = new MemoryStream();
-
-            using (var writer = new StreamWriter(stream))
-            {
-                writer.Write(s);
-                writer.Flush();
-            }
-            stream.Position = 0;
-            return stream;
-        }
 
         public void Dispose()
         {
@@ -1080,7 +947,6 @@ namespace QueueExchange
             }
             catch { }
         }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
@@ -1098,10 +964,12 @@ namespace QueueExchange
         }
         private void MonitorStatusMessage(object sender, QueueMonitorMessage e)
         {
-            PipelineMonitorMessage msg = new PipelineMonitorMessage(e);
-            msg.pipeID = this.id;
-            msg.pipeName = this.name;
-            msg.pipemessageType = "QUEUEMESSAGE";
+            PipelineMonitorMessage msg = new PipelineMonitorMessage(e)
+            {
+                pipeID = this.id,
+                pipeName = this.name,
+                pipemessageType = "QUEUEMESSAGE"
+            };
             monitorMessageProgress?.Report(msg);
         }
         public void QXLog(string topic, string message, string messageType)

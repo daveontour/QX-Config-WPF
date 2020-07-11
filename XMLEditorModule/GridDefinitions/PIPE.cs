@@ -106,10 +106,16 @@ namespace QXEditorModule.GridDefinitions
         }
 
         [RefreshProperties(RefreshProperties.All)]
-        [CategoryAttribute("Optional"), DisplayName("Pipe Input Queue Name"), Browsable(true), PropertyOrder(8), DescriptionAttribute("If alll the input nodes are Asynchronous capable (only MSMQ at the moment), then specify a queue name for the asynchronous nodes to write to which then becomes the input to the pipe")]
-        public string InputQueueNAme {
+        [CategoryAttribute("Required"), DisplayName("Pipe Input Queue Name"), Browsable(true), PropertyOrder(8), DescriptionAttribute("An 'internal' queue is used as an intermediary between the input nodes and the pipe. This is the queue to use")]
+        public string InputQueueName {
             get {
-                return GetAttribute("pipeInputQueueName");
+
+                string val = GetAttribute("pipeInputQueueName");
+                if (val == null || val == "")
+                {
+                    val = @".\private$\Enter_Queue_Name_Here";
+                }
+                return val;
             }
             set {
                 SetAttribute("pipeInputQueueName", value);
@@ -129,45 +135,16 @@ namespace QXEditorModule.GridDefinitions
                     SetAttribute("useMessageAsKey", "");
                     SetAttribute("contextCacheKeyXPath", "");
                     SetAttribute("contextCacheExpiry", "");
-                    //     SetAttribute("maxMsgPerMinute", "");
                     SetAttribute("discardInCache", "");
                 }
 
-
-                PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextKey"];
-                BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["UseMessageAsKey"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextExpiry"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["DiscardCacheItems"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["FirstOnly"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["MostRecentOnly"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextStatInterval"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
+                ShowHide("ContextKey", value);
+                ShowHide("UseMessageAsKey", value);
+                ShowHide("ContextExpiry", value);
+                ShowHide("DiscardCacheItems", value);
+                ShowHide("FirstOnly", value);
+                ShowHide("MostRecentOnly", value);
+                ShowHide("ContextStatInterval", value);
 
                 return value;
             }
@@ -176,47 +153,17 @@ namespace QXEditorModule.GridDefinitions
                 SetAttribute("useMessageAsKey", "");
                 SetAttribute("contextCacheKeyXPath", "");
                 SetAttribute("contextCacheExpiry", "");
-                //     SetAttribute("maxMsgPerMinute", "");
                 SetAttribute("discardInCache", "");
-
-                PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextKey"];
-                BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-
-                // Set the Descriptor's "Browsable" Attribute
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["UseMessageAsKey"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextExpiry"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["DiscardCacheItems"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["FirstOnly"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["MostRecentOnly"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["ContextStatInterval"];
-                theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-                isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-                isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-
                 SetAttribute("contextAware", value);
+
+                ShowHide("ContextKey", value);
+                ShowHide("UseMessageAsKey", value);
+                ShowHide("ContextExpiry", value);
+                ShowHide("DiscardCacheItems", value);
+                ShowHide("FirstOnly", value);
+                ShowHide("MostRecentOnly", value);
+                ShowHide("ContextStatInterval", value);
+
             }
         }
 

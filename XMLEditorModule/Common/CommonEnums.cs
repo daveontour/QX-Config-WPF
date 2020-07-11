@@ -1,9 +1,11 @@
 ﻿using System.Xml;
 
-namespace QXEditorModule.Common {
+namespace QXEditorModule.Common
+{
 
 
-    public enum ContextMenuType {
+    public enum ContextMenuType
+    {
         Cut,
         Copy,
         Paste,
@@ -32,13 +34,15 @@ namespace QXEditorModule.Common {
         AddMQOutput,
         AddFileOutput,
         AddHTTPOutput,
+        AddTCPOutput,
         AddHTTPRest,
         AddKafkaOutput,
         AddRabbitOutput,
         AddSINK
     }
 
-    public interface IView {
+    public interface IView
+    {
         //  Canvas selectedCanvas { get; set; }
 
         void DrawQXConfig();
@@ -60,6 +64,7 @@ namespace QXEditorModule.Common {
         void RestOut(XmlNode node);
         void HTTPOut(XmlNode node);
         void HTTPIn(XmlNode node);
+        void TCPOUT(XmlNode node);
         void RabbitOut(XmlNode node);
         void RabbitIn(XmlNode node);
         void SinkOut(XmlNode node);

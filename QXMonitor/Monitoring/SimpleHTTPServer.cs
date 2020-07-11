@@ -1,6 +1,4 @@
-﻿
-using QueueExchange.Monitoring;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -18,7 +16,7 @@ namespace QueueExchange
         "default.htm"
     };
 
-        private static IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
+        private static readonly IDictionary<string, string> _mimeTypeMappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
         #region extension to MIME type list
         {".asf", "video/x-ms-asf"},
         {".asx", "video/x-ms-asf"},
@@ -90,7 +88,7 @@ namespace QueueExchange
         private string _rootDirectory;
         private HttpListener _listener;
         private int _port;
-        
+
 
         public int Port {
             get { return _port; }
@@ -105,7 +103,7 @@ namespace QueueExchange
         public SimpleHTTPServer(string path, int port)
         {
             this.Initialize(path, port);
-         }
+        }
 
         /// <summary>
         /// Construct server with suitable port.
@@ -142,7 +140,7 @@ namespace QueueExchange
                     HttpListenerContext context = _listener.GetContext();
                     Process(context);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }
@@ -152,7 +150,7 @@ namespace QueueExchange
         private void Process(HttpListenerContext context)
         {
             string filename = context.Request.Url.AbsolutePath;
-            Console.WriteLine(filename);
+
             filename = filename.Substring(1);
 
             if (string.IsNullOrEmpty(filename))
@@ -176,8 +174,7 @@ namespace QueueExchange
                     Stream input = new FileStream(filename, FileMode.Open);
 
                     //Adding permanent http response headers
-                    string mime;
-                    context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(filename), out mime) ? mime : "application/octet-stream";
+                    context.Response.ContentType = _mimeTypeMappings.TryGetValue(Path.GetExtension(filename), out string mime) ? mime : "application/octet-stream";
                     context.Response.ContentLength64 = input.Length;
                     context.Response.AddHeader("Date", DateTime.Now.ToString("r"));
                     context.Response.AddHeader("Last-Modified", System.IO.File.GetLastWriteTime(filename).ToString("r"));
@@ -191,7 +188,7 @@ namespace QueueExchange
                     context.Response.StatusCode = (int)HttpStatusCode.OK;
                     context.Response.OutputStream.Flush();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }

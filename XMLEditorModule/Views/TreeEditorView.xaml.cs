@@ -15,8 +15,10 @@ using System.Windows.Shapes;
 using System.Xml;
 using Path = System.Windows.Shapes.Path;
 
-namespace QXEditorModule.Views {
-    public partial class TreeEditorView : UserControl, INotifyPropertyChanged, IView {
+namespace QXEditorModule.Views
+{
+    public partial class TreeEditorView : UserControl, INotifyPropertyChanged, IView
+    {
 
         private const int arrowHeadWidth = 5;
         private const int arrowHeadLength = 12;
@@ -32,25 +34,32 @@ namespace QXEditorModule.Views {
         public Dictionary<Canvas, XmlNode> canvasToNode = new Dictionary<Canvas, XmlNode>();
         public Canvas selectedCanvas;
 
-        protected void OnPropertyChanged(string propName) {
+        protected void OnPropertyChanged(string propName)
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
-        public TreeEditorView() {
+        public TreeEditorView()
+        {
             InitializeComponent();
             DataContextChanged += new DependencyPropertyChangedEventHandler(TreeEditorView_DataContextChanged);
             contextMenuProvider = new ContextMenuProvider();
             xmlTreeView.ContextMenu = new ContextMenu();
         }
 
-        private void BindUIElementToViewModel() {
+        private void BindUIElementToViewModel()
+        {
             //         this.DataContext = viewModel;
-            try {
+            try
+            {
                 viewModel.View = this as IView;
-                if (viewModel == null) {
+                if (viewModel == null)
+                {
                     return;
                 }
-            } catch {
+            }
+            catch
+            {
                 return;
             }
 
@@ -59,11 +68,14 @@ namespace QXEditorModule.Views {
             dataProvider.Document = viewModel.DataModel;
             dataProvider.Refresh();
             this.xmlTreeView.ContextMenu.Items.Clear();
-            try {
+            try
+            {
                 this.inputMenuItem.Items.Clear();
                 this.outputMenuItem.Items.Clear();
 
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
 
             }
             contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
@@ -115,6 +127,9 @@ namespace QXEditorModule.Views {
             contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
 
+            contextMenuProvider.ContextMenus[ContextMenuType.AddTCPOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddTCPOutput].CommandParameter = "TCPCLIENT";
+
             contextMenuProvider.ContextMenus[ContextMenuType.AddSINK].Command = ViewModel.AddTypeOutputCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddSINK].CommandParameter = "SINK";
 
@@ -137,6 +152,7 @@ namespace QXEditorModule.Views {
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaOutput]);
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPOutput]);
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPRest]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddTCPOutput]);
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput]);
             outputMenuItem.Items.Add(new Separator());
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddSINK]);
@@ -204,16 +220,20 @@ namespace QXEditorModule.Views {
             set {
 
                 // If there is a currently selected Canvas, then reset the background
-                if (this.selectedCanvas != null) {
-                    SolidColorBrush brush = new SolidColorBrush {
+                if (this.selectedCanvas != null)
+                {
+                    SolidColorBrush brush = new SolidColorBrush
+                    {
                         Color = Colors.Transparent
                     };
                     this.selectedCanvas.Background = brush;
 
 
                     // Check if the canvas contains the filter icon and reset that if required
-                    if (LogicalTreeHelper.FindLogicalNode(this.selectedCanvas, "filter") is Path path) {
-                        SolidColorBrush greenBrush = new SolidColorBrush {
+                    if (LogicalTreeHelper.FindLogicalNode(this.selectedCanvas, "filter") is Path path)
+                    {
+                        SolidColorBrush greenBrush = new SolidColorBrush
+                        {
                             Color = Color.FromArgb(255, 0, 0, 0)
                         };
                         path.Fill = greenBrush;
@@ -224,7 +244,8 @@ namespace QXEditorModule.Views {
             }
         }
 
-        private Canvas GetInputCanvas(double imHeight, string title) {
+        private Canvas GetInputCanvas(double imHeight, string title)
+        {
 
             double fs = 9;
             double h = imHeight - fs - 2;
@@ -240,7 +261,8 @@ namespace QXEditorModule.Views {
             path.Height = h;
             path.Width = w;
 
-            TextBlock txt = new TextBlock {
+            TextBlock txt = new TextBlock
+            {
                 Text = title,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontSize = fs
@@ -248,7 +270,8 @@ namespace QXEditorModule.Views {
             txt.SetValue(Canvas.LeftProperty, tX);
             txt.SetValue(Canvas.TopProperty, tY);
 
-            Canvas can = new Canvas {
+            Canvas can = new Canvas
+            {
                 Height = imHeight,
                 Width = w
             };
@@ -258,7 +281,8 @@ namespace QXEditorModule.Views {
             return can;
         }
 
-        private Canvas GetOutputCanvas(double imHeight, string title) {
+        private Canvas GetOutputCanvas(double imHeight, string title)
+        {
 
             double fs = 9;
             double h = imHeight - fs - 2;
@@ -278,7 +302,8 @@ namespace QXEditorModule.Views {
             //mySolidColorBrush.Color = Color.FromArgb(255, 128, 128, 128);
             //path.Fill = mySolidColorBrush;
 
-            TextBlock txt = new TextBlock {
+            TextBlock txt = new TextBlock
+            {
                 Text = title,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontSize = fs
@@ -286,7 +311,8 @@ namespace QXEditorModule.Views {
             txt.SetValue(Canvas.LeftProperty, tX);
             txt.SetValue(Canvas.TopProperty, tY);
 
-            Canvas can = new Canvas {
+            Canvas can = new Canvas
+            {
                 Height = imHeight,
                 Width = w
             };
@@ -296,9 +322,11 @@ namespace QXEditorModule.Views {
             return can;
         }
 
-        public Canvas GetMonitorCanvas() {
+        public Canvas GetMonitorCanvas()
+        {
 
-            Canvas can = new Canvas() {
+            Canvas can = new Canvas()
+            {
                 Height = 44,
                 Width = 30
             };
@@ -315,9 +343,11 @@ namespace QXEditorModule.Views {
             return can;
         }
 
-        public Canvas GetLoggerCanvas() {
+        public Canvas GetLoggerCanvas()
+        {
 
-            Canvas can = new Canvas() {
+            Canvas can = new Canvas()
+            {
                 Height = 44,
                 Width = 30
             };
@@ -334,8 +364,10 @@ namespace QXEditorModule.Views {
             return can;
         }
 
-        public Canvas GetNSCanvas() {
-            Canvas can = new Canvas() {
+        public Canvas GetNSCanvas()
+        {
+            Canvas can = new Canvas()
+            {
                 Height = 44,
                 Width = 44
             };
@@ -352,8 +384,10 @@ namespace QXEditorModule.Views {
             return can;
         }
 
-        public Canvas GetServiceCanvas() {
-            Canvas can = new Canvas() {
+        public Canvas GetServiceCanvas()
+        {
+            Canvas can = new Canvas()
+            {
                 Height = 44,
                 Width = 35
             };
@@ -369,36 +403,43 @@ namespace QXEditorModule.Views {
 
             return can;
         }
-        public void DrawConfig(XmlDocument xmlDoc) {
+        public void DrawConfig(XmlDocument xmlDoc)
+        {
 
             this.panel.Children.Clear();
             this.settingspanel.Children.Clear();
             this.canvasToNode.Clear();
             this.nodeToCanvas.Clear();
 
-            SolidColorBrush blackBrush = new SolidColorBrush {
+            SolidColorBrush blackBrush = new SolidColorBrush
+            {
                 Color = Colors.Black
             };
 
-            SolidColorBrush whiteBrush = new SolidColorBrush {
+            SolidColorBrush whiteBrush = new SolidColorBrush
+            {
                 Color = Colors.White
             };
 
-            SolidColorBrush bluishBrush = new SolidColorBrush {
+            SolidColorBrush bluishBrush = new SolidColorBrush
+            {
                 Color = Color.FromArgb(255, 135, 206, 250)
             };
 
-            SolidColorBrush transBrush = new SolidColorBrush {
+            SolidColorBrush transBrush = new SolidColorBrush
+            {
                 Color = Colors.Transparent
             };
 
-            SolidColorBrush aliceBrush = new SolidColorBrush {
+            SolidColorBrush aliceBrush = new SolidColorBrush
+            {
                 Color = Colors.AliceBlue
             };
 
 
             XmlNodeList monitors = xmlDoc.SelectNodes("//monitor");
-            foreach (XmlNode monitor in monitors) {
+            foreach (XmlNode monitor in monitors)
+            {
                 Canvas monitorCanvas = GetMonitorCanvas();
                 monitorCanvas.MouseDown += Can_MouseDown;
                 this.nodeToCanvas.Add(monitor, monitorCanvas);
@@ -412,7 +453,8 @@ namespace QXEditorModule.Views {
             }
 
             XmlNodeList srvs = xmlDoc.SelectNodes("//service");
-            foreach (XmlNode ns in srvs) {
+            foreach (XmlNode ns in srvs)
+            {
                 Canvas srvCanvas = GetServiceCanvas();
                 srvCanvas.PreviewMouseDown += Can_MouseDown;
                 this.nodeToCanvas.Add(ns, srvCanvas);
@@ -426,7 +468,8 @@ namespace QXEditorModule.Views {
             }
 
             XmlNodeList nss = xmlDoc.SelectNodes("//namespace");
-            foreach (XmlNode ns in nss) {
+            foreach (XmlNode ns in nss)
+            {
                 Canvas nsCanvas = GetNSCanvas();
                 nsCanvas.PreviewMouseDown += Can_MouseDown;
                 this.nodeToCanvas.Add(ns, nsCanvas);
@@ -459,9 +502,11 @@ namespace QXEditorModule.Views {
 
             int i = 0;
             XmlNodeList pipes = xmlDoc.SelectNodes("//pipe");
-            foreach (XmlNode pipeNode in pipes) {
+            foreach (XmlNode pipeNode in pipes)
+            {
 
-                Canvas canTop = new Canvas {
+                Canvas canTop = new Canvas
+                {
                     Height = 200,
                     Width = this.panel.Width,
                     Background = transBrush
@@ -475,7 +520,8 @@ namespace QXEditorModule.Views {
                 canTop.ContextMenu.Items.Add(topMenuProvider.ContextMenus[ContextMenuType.AddPipe]);
                 canTop.PreviewMouseRightButtonDown += delegate (object sender, MouseButtonEventArgs e) { CanCanvas_MouseDown(sender, xmlDoc.SelectSingleNode("//pipes")); };
 
-                Canvas pipeCan = new Canvas() {
+                Canvas pipeCan = new Canvas()
+                {
                     Height = 24,
                     Width = (double)canTop.Width / 3 + 4,
                     Background = transBrush,
@@ -488,7 +534,8 @@ namespace QXEditorModule.Views {
                 this.nodeToCanvas.Add(pipeNode, pipeCan);
                 this.canvasToNode.Add(pipeCan, pipeNode);
 
-                Rectangle rect = new Rectangle() {
+                Rectangle rect = new Rectangle()
+                {
                     Width = pipeCan.Width - 10,
                     Height = 16,
                 };
@@ -499,14 +546,16 @@ namespace QXEditorModule.Views {
                 rect.StrokeThickness = 1;
                 rect.Stroke = blackBrush;
 
-                TextBlock tb = new TextBlock {
+                TextBlock tb = new TextBlock
+                {
                     Text = pipeNode.Attributes["name"].Value,
                     FontSize = 12
                 };
                 tb.SetValue(Canvas.LeftProperty, 15.0);
                 tb.SetValue(Canvas.TopProperty, 4.0);
 
-                Ellipse end = new Ellipse() {
+                Ellipse end = new Ellipse()
+                {
                     Height = 16,
                     Width = 10,
                 };
@@ -516,7 +565,8 @@ namespace QXEditorModule.Views {
                 end.StrokeThickness = 1;
                 end.Stroke = blackBrush;
 
-                Ellipse end2 = new Ellipse() {
+                Ellipse end2 = new Ellipse()
+                {
                     Height = 16,
                     Width = 10,
                 };
@@ -542,14 +592,16 @@ namespace QXEditorModule.Views {
                 XmlNodeList inputNodes = pipeNode.SelectNodes("input");
                 int numInputs = inputNodes.Count;
 
-                if (numInputs > 0) {
+                if (numInputs > 0)
+                {
 
                     Tuple<int, int> si = GetSizing(inputNodes.Count, 200.0);
                     double imHeight = (double)si.Item1;
                     double space = (double)si.Item2;
 
                     int inNum = 0;
-                    foreach (XmlNode inNode in inputNodes) {
+                    foreach (XmlNode inNode in inputNodes)
+                    {
                         ConstructNode(canTop, inNode, imHeight, space, inNum, true);
                         inNum++;
                     }
@@ -560,14 +612,16 @@ namespace QXEditorModule.Views {
                 XmlNodeList outputNodes = pipeNode.SelectNodes("output");
                 int numOutputs = outputNodes.Count;
 
-                if (numOutputs > 0) {
+                if (numOutputs > 0)
+                {
                     // The size of the nodes
                     Tuple<int, int> si = GetSizing(outputNodes.Count, 200.0);
                     double imHeight = (double)si.Item1;
                     double space = (double)si.Item2;
 
                     int outNum = 0;
-                    foreach (XmlNode outNode in outputNodes) {
+                    foreach (XmlNode outNode in outputNodes)
+                    {
                         ConstructNode(canTop, outNode, imHeight, space, outNum, false);
                         outNum++;
                     }
@@ -578,7 +632,8 @@ namespace QXEditorModule.Views {
             }
         }
 
-        private ContextMenu GetPipeContextMenu() {
+        private ContextMenu GetPipeContextMenu()
+        {
 
             ContextMenu ctx = new ContextMenu();
             ContextMenuProvider menuProvider = new ContextMenuProvider();
@@ -626,6 +681,9 @@ namespace QXEditorModule.Views {
             menuProvider.ContextMenus[ContextMenuType.AddHTTPRest].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddHTTPRest].CommandParameter = "REST";
 
+            menuProvider.ContextMenus[ContextMenuType.AddTCPOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddTCPOutput].CommandParameter = "TCPCLIENT";
+
             menuProvider.ContextMenus[ContextMenuType.AddKafkaOutput].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddKafkaOutput].CommandParameter = "KAFKA";
 
@@ -657,6 +715,7 @@ namespace QXEditorModule.Views {
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddKafkaOutput]);
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddHTTPOutput]);
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddHTTPRest]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddTCPOutput]);
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput]);
             outputMenuItem.Items.Add(new Separator());
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddSINK]);
@@ -673,26 +732,33 @@ namespace QXEditorModule.Views {
 
         }
 
-        private void ConstructNode(Canvas canTop, XmlNode node, double imHeight, double space, int index, bool inNode) {
+        private void ConstructNode(Canvas canTop, XmlNode node, double imHeight, double space, int index, bool inNode)
+        {
 
-            SolidColorBrush blackBrush = new SolidColorBrush {
+            SolidColorBrush blackBrush = new SolidColorBrush
+            {
                 Color = Colors.Black
             };
 
-            SolidColorBrush transBrush = new SolidColorBrush {
+            SolidColorBrush transBrush = new SolidColorBrush
+            {
                 Color = Colors.Transparent
             };
 
             //The node canvas
             Canvas can = GetOutputCanvas((double)imHeight, node.Attributes["type"].Value);
 
-            if (inNode) {
+            if (inNode)
+            {
                 can = GetInputCanvas((double)imHeight, node.Attributes["type"].Value);
             }
 
-            if (inNode) {
+            if (inNode)
+            {
                 can.SetValue(Canvas.LeftProperty, (double)10);
-            } else {
+            }
+            else
+            {
                 can.SetValue(Canvas.LeftProperty, (double)(this.panel.Width - imHeight - 10));
             }
             can.SetValue(Canvas.TopProperty, (space / 2 + (space + imHeight) * index));
@@ -705,29 +771,37 @@ namespace QXEditorModule.Views {
 
             bool hasFilter = node.HasChildNodes;
             bool hasAltQueue = false;
-            if (hasFilter) {
-                hasAltQueue = node.FirstChild.SelectNodes("./altqueue").Item(0) != null ? true : false;
+            if (hasFilter)
+            {
+                hasAltQueue = node.FirstChild.SelectNodes("./altqueue").Item(0) != null;
             }
-            bool hasStyle = node.Attributes["stylesheet"] != null ? true : false;
+            bool hasStyle = node.Attributes["stylesheet"] != null;
 
             double filterCanvasOffset = 0.0;
 
             // Add Filter indicator if present
-            if (hasFilter) {
+            if (hasFilter)
+            {
 
                 // Calculate it's position
-                if (inNode) {
+                if (inNode)
+                {
                     filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0;
                 }
 
-                if (!inNode) {
-                    if (hasStyle) {
+                if (!inNode)
+                {
+                    if (hasStyle)
+                    {
                         filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 24.0;
-                    } else {
+                    }
+                    else
+                    {
                         filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 4.0;
                     }
 
-                    if (hasAltQueue) {
+                    if (hasAltQueue)
+                    {
                         filterCanvasOffset -= 20.0;
                     }
                 }
@@ -735,7 +809,8 @@ namespace QXEditorModule.Views {
 
                 XmlNode filterNode = node.FirstChild;
 
-                Canvas filterCanvas = new Canvas() {
+                Canvas filterCanvas = new Canvas()
+                {
                     Height = can.Height / 2,
                     Width = can.ActualWidth / 2,
                     Background = blackBrush
@@ -778,9 +853,11 @@ namespace QXEditorModule.Views {
 
                 XmlNode altqueue = filterNode.SelectNodes("./altqueue").Item(0);
 
-                if (hasAltQueue) {
+                if (hasAltQueue)
+                {
 
-                    Canvas altCanvas = new Canvas() {
+                    Canvas altCanvas = new Canvas()
+                    {
                         Height = 25,
                         Width = 25,
                         Background = transBrush
@@ -807,28 +884,36 @@ namespace QXEditorModule.Views {
             }
 
             // Add stylesheet indicator if present
-            if (hasStyle) {
+            if (hasStyle)
+            {
 
                 double styleCanvasOffset = 0.0;
 
                 // Calculate it's position
-                if (inNode) {
-                    if (hasFilter) {
+                if (inNode)
+                {
+                    if (hasFilter)
+                    {
                         styleCanvasOffset = filterCanvasOffset + 24.0;
-                        if (hasAltQueue) {
+                        if (hasAltQueue)
+                        {
                             styleCanvasOffset += 20.0;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         styleCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0;
                     }
                 }
 
-                if (!inNode) {
+                if (!inNode)
+                {
                     styleCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - 20.0;
                 }
 
 
-                Canvas transformCanvas = new Canvas() {
+                Canvas transformCanvas = new Canvas()
+                {
                     Height = can.Height / 2,
                     Width = can.ActualWidth / 2,
                     Background = blackBrush
@@ -863,11 +948,14 @@ namespace QXEditorModule.Views {
             Tuple<Polygon, Path> p;
 
 
-            if (inNode) {
+            if (inNode)
+            {
                 double startArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                 double startArrrowX = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4;
                 p = DrawLineArrow(new Point(startArrrowX, startArrrowY), new Point(this.panel.Width * 0.33, 100), arrowpath);
-            } else {
+            }
+            else
+            {
                 double stopArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                 double stopArrrowX = (double)can.GetValue(Canvas.LeftProperty) - 4;
                 p = DrawLineArrow(new Point(this.panel.Width * 0.66, 100), new Point(stopArrrowX, stopArrrowY), arrowpath);
@@ -877,65 +965,78 @@ namespace QXEditorModule.Views {
             canTop.Children.Add(p.Item2);
 
         }
-        private void Can_MouseDown(object sender, MouseButtonEventArgs e) {
+        private void Can_MouseDown(object sender, MouseButtonEventArgs e)
+        {
 
-            if (sender == null) {
+            if (sender == null)
+            {
                 return;
             }
             XmlNode node = this.canvasToNode[sender as Canvas];
             ViewModel.ViewAttributesCommand.Execute(node);
             HightLightCanvas(sender as Canvas);
 
-            if (LogicalTreeHelper.FindLogicalNode(sender as Canvas, "filter") is Path path) {
-                SolidColorBrush brush = new SolidColorBrush {
+            if (LogicalTreeHelper.FindLogicalNode(sender as Canvas, "filter") is Path path)
+            {
+                SolidColorBrush brush = new SolidColorBrush
+                {
                     Color = Colors.Red
                 };
                 path.Fill = brush;
             }
-            if (LogicalTreeHelper.FindLogicalNode(sender as Canvas, "outputnode") is Path path2) {
-                SolidColorBrush brush = new SolidColorBrush {
+            if (LogicalTreeHelper.FindLogicalNode(sender as Canvas, "outputnode") is Path path2)
+            {
+                SolidColorBrush brush = new SolidColorBrush
+                {
                     Color = Colors.Red
                 };
                 path2.Fill = brush;
             }
         }
 
-        private void CanCanvas_MouseDown(object sender, XmlNode node) {
-            if (sender == null) {
+        private void CanCanvas_MouseDown(object sender, XmlNode node)
+        {
+            if (sender == null)
+            {
                 return;
             }
             ViewModel.ViewAttributesCommand.Execute(node);
             HighlightNode(node);
         }
 
-        public Tuple<int, int> GetSizing(int num, double height) {
+        public Tuple<int, int> GetSizing(int num, double height)
+        {
 
             double spacing;
 
             int maxImageHeight = 50;
             int minSpacing = 2;
 
-            if (num * (maxImageHeight + minSpacing) <= height) {
+            if (num * (maxImageHeight + minSpacing) <= height)
+            {
                 spacing = (height - num * maxImageHeight) / num;
                 return Tuple.Create(maxImageHeight, Convert.ToInt32(spacing));
             }
 
             double imHeight = maxImageHeight;
-            while ((num * (imHeight + minSpacing)) > height) {
+            while ((num * (imHeight + minSpacing)) > height)
+            {
                 imHeight -= 1;
             }
 
             return Tuple.Create(Convert.ToInt32(imHeight), minSpacing);
         }
 
-        private T GetResourceCopy<T>(string key) {
+        private T GetResourceCopy<T>(string key)
+        {
             T model = (T)FindResource(key);
             return ElementClone<T>(model);
         }
         /// <summary>
         /// Clones an element.
         /// </summary>
-        public static T ElementClone<T>(T element) {
+        public static T ElementClone<T>(T element)
+        {
             //T clone = default(T);
             MemoryStream memStream = ElementToStream(element);
             T clone = ElementFromStream<T>(memStream);
@@ -945,7 +1046,8 @@ namespace QXEditorModule.Views {
         /// <summary>
         /// Saves an element as MemoryStream.
         /// </summary>
-        public static MemoryStream ElementToStream(object element) {
+        public static MemoryStream ElementToStream(object element)
+        {
             MemoryStream memStream = new MemoryStream();
             XamlWriter.Save(element, memStream);
             return memStream;
@@ -954,10 +1056,12 @@ namespace QXEditorModule.Views {
         /// <summary>
         /// Rebuilds an element from a MemoryStream.
         /// </summary>
-        public static T ElementFromStream<T>(MemoryStream elementAsStream) {
+        public static T ElementFromStream<T>(MemoryStream elementAsStream)
+        {
             object reconstructedElement = null;
 
-            if (elementAsStream.CanRead) {
+            if (elementAsStream.CanRead)
+            {
                 elementAsStream.Seek(0, SeekOrigin.Begin);
                 reconstructedElement = XamlReader.Load(elementAsStream);
                 elementAsStream.Close();
@@ -966,11 +1070,13 @@ namespace QXEditorModule.Views {
             return (T)reconstructedElement;
         }
 
-        private Tuple<Polygon, Path> DrawLineArrow(Point startPoint, Point endPoint, Path arrowpath) {
+        private Tuple<Polygon, Path> DrawLineArrow(Point startPoint, Point endPoint, Path arrowpath)
+        {
 
             GeometryGroup geometryGroup = new GeometryGroup();
             //line
-            LineGeometry line = new LineGeometry {
+            LineGeometry line = new LineGeometry
+            {
                 StartPoint = startPoint
             };
             double length = Math.Sqrt(Math.Abs(startPoint.X - endPoint.X) * Math.Abs(startPoint.X - endPoint.X) +
@@ -985,7 +1091,8 @@ namespace QXEditorModule.Views {
             arrowpath.Fill = Brushes.SteelBlue;
 
             //rotate
-            RotateTransform form = new RotateTransform {
+            RotateTransform form = new RotateTransform
+            {
                 CenterX = startPoint.X,
                 CenterY = startPoint.Y
             };
@@ -993,9 +1100,12 @@ namespace QXEditorModule.Views {
             double angle = Math.Asin(Math.Abs(startPoint.Y - endPoint.Y) / length);
             double angle2 = 180 / Math.PI * angle;
             //orientation
-            if (endPoint.Y > startPoint.Y) {
+            if (endPoint.Y > startPoint.Y)
+            {
                 angle2 = (endPoint.X > startPoint.X) ? angle2 : (180 - angle2);
-            } else {
+            }
+            else
+            {
                 angle2 = (endPoint.X > startPoint.X) ? -angle2 : -(180 - angle2);
             }
             form.Angle = angle2;
@@ -1009,7 +1119,8 @@ namespace QXEditorModule.Views {
             Point p2 = form.Transform(p2P);
             Point p3 = form.Transform(p3P);
 
-            Polygon p = new Polygon {
+            Polygon p = new Polygon
+            {
                 Stroke = Brushes.Black,
                 Fill = Brushes.SteelBlue,
                 StrokeThickness = 2,
@@ -1024,17 +1135,21 @@ namespace QXEditorModule.Views {
 
         }
 
-        public void RefreshDraw() {
+        public void RefreshDraw()
+        {
             DrawConfig(viewModel.DataModel);
         }
-        internal void ControlPropertyChange() {
+        internal void ControlPropertyChange()
+        {
             viewModel.OnPropertyChanged("XMLText");
             DrawConfig(viewModel.DataModel);
         }
 
-        void TreeEditorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+        void TreeEditorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
             ViewModel = e.NewValue as TreeEditorViewModel;
-            if (ViewModel != null) {
+            if (ViewModel != null)
+            {
                 pipeContextMenu = GetPipeContextMenu();
                 DrawConfig(viewModel.DataModel);
             }
@@ -1044,7 +1159,8 @@ namespace QXEditorModule.Views {
             get { return viewModel; }
             set {
                 viewModel = value;
-                this.Dispatcher.BeginInvoke((Action)delegate {
+                this.Dispatcher.BeginInvoke((Action)delegate
+                {
                     this.Cursor = Cursors.Wait;
                     BindUIElementToViewModel();
                     this.Cursor = Cursors.Arrow;
@@ -1052,31 +1168,34 @@ namespace QXEditorModule.Views {
             }
         }
 
-        // Canvas IView.selectedCanvas { get { return this.selectedCanvas; } set => throw new NotImplementedException(); }
-
         #region Selection Handling
-        private void XmlTreeView_Selected(object sender, RoutedEventArgs e) {
+        private void XmlTreeView_Selected(object sender, RoutedEventArgs e)
+        {
             XmlNode selectedItem = xmlTreeView.SelectedItem as XmlNode;
             ViewModel.ViewAttributesCommand.Execute(selectedItem);
         }
 
-        private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e) {
-            if (sender is TreeViewItem selectedItem) {
+        private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
+        {
+            if (sender is TreeViewItem selectedItem)
+            {
                 selectedItem.IsSelected = true;
             }
         }
 
-
-        private bool SelectTreeViewItem(ref TreeViewItem rootNode, XmlNode toBeSelectedNode) {
+        private bool SelectTreeViewItem(ref TreeViewItem rootNode, XmlNode toBeSelectedNode)
+        {
             bool isSelected = false;
             if (rootNode == null)
                 return isSelected;
 
-            if (!rootNode.IsExpanded) {
+            if (!rootNode.IsExpanded)
+            {
                 rootNode.Focus();
                 rootNode.IsExpanded = true;
             }
-            if (!(rootNode.Header is XmlNode tempNode)) {
+            if (!(rootNode.Header is XmlNode tempNode))
+            {
                 return isSelected;
             }
             if (tempNode == toBeSelectedNode)
@@ -1086,12 +1205,16 @@ namespace QXEditorModule.Views {
                 rootNode.IsExpanded = true;
                 isSelected = true;
                 return isSelected;
-            } else {
-                for (int i = 0; i < rootNode.Items.Count; i++) {
+            }
+            else
+            {
+                for (int i = 0; i < rootNode.Items.Count; i++)
+                {
                     TreeViewItem childItem = rootNode.ItemContainerGenerator.ContainerFromIndex(i) as TreeViewItem;
 
                     isSelected = SelectTreeViewItem(ref childItem, toBeSelectedNode);
-                    if (isSelected) {
+                    if (isSelected)
+                    {
                         break;
                     }
                 }
@@ -1101,29 +1224,37 @@ namespace QXEditorModule.Views {
 
         }
 
-        private bool SelectTreeViewItem(ref TreeViewItem rootNode, string elementName) {
+        private bool SelectTreeViewItem(ref TreeViewItem rootNode, string elementName)
+        {
             bool isSelected = false;
             if (rootNode == null)
                 return isSelected;
 
-            if (!rootNode.IsExpanded) {
+            if (!rootNode.IsExpanded)
+            {
                 rootNode.Focus();
                 rootNode.IsExpanded = true;
             }
-            if (!(rootNode.Header is XmlNode tempNode)) {
+            if (!(rootNode.Header is XmlNode tempNode))
+            {
                 return isSelected;
             }
-            if (string.Compare(tempNode.Name, elementName, true) == 0) {
+            if (string.Compare(tempNode.Name, elementName, true) == 0)
+            {
                 rootNode.IsSelected = true;
                 rootNode.IsExpanded = true;
                 isSelected = true;
                 return isSelected;
-            } else {
-                for (int i = 0; i < rootNode.Items.Count; i++) {
+            }
+            else
+            {
+                for (int i = 0; i < rootNode.Items.Count; i++)
+                {
                     TreeViewItem childItem = rootNode.ItemContainerGenerator.ContainerFromIndex(i) as TreeViewItem;
 
                     isSelected = SelectTreeViewItem(ref childItem, elementName);
-                    if (isSelected) {
+                    if (isSelected)
+                    {
                         break;
                     }
                 }
@@ -1134,25 +1265,33 @@ namespace QXEditorModule.Views {
         #endregion
 
 
-        public void DrawQXConfig() {
+        public void DrawQXConfig()
+        {
             DrawConfig(viewModel.DataModel);
         }
 
-        public void HightLightCanvas(XmlNode node) {
+        public void HightLightCanvas(XmlNode node)
+        {
 
 
 
-            if (node == null) {
+            if (node == null)
+            {
                 return;
             }
 
             Canvas c;
-            try {
+            try
+            {
                 c = this.nodeToCanvas[node];
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
 
-                if (this.selectedCanvas != null) {
-                    SolidColorBrush brush = new SolidColorBrush {
+                if (this.selectedCanvas != null)
+                {
+                    SolidColorBrush brush = new SolidColorBrush
+                    {
                         Color = Colors.Transparent
                     };
                     this.selectedCanvas.Background = brush;
@@ -1160,17 +1299,20 @@ namespace QXEditorModule.Views {
                 return;
             }
 
-            if (c == null) {
+            if (c == null)
+            {
                 return;
             }
 
-            if (c == SelectedCanvas) {
+            if (c == SelectedCanvas)
+            {
                 return;
             }
 
             SolidColorBrush highlightBrush = new SolidColorBrush();
 
-            switch (node.Name) {
+            switch (node.Name)
+            {
                 case "output":
                     highlightBrush.Color = Color.FromArgb(127, 255, 0, 0);
                     break;
@@ -1181,8 +1323,10 @@ namespace QXEditorModule.Views {
                     highlightBrush.Color = Color.FromArgb(127, 0, 0, 255);
                     break;
                 case "filter":
-                    if (LogicalTreeHelper.FindLogicalNode(c, "filter") is Path path) {
-                        SolidColorBrush brush = new SolidColorBrush {
+                    if (LogicalTreeHelper.FindLogicalNode(c, "filter") is Path path)
+                    {
+                        SolidColorBrush brush = new SolidColorBrush
+                        {
                             Color = Colors.DarkOrange
                         };
                         path.Fill = brush;
@@ -1202,11 +1346,14 @@ namespace QXEditorModule.Views {
             HighlightNode(node);
         }
 
-        public void HightLightCanvas(Canvas can) {
-            if (can == null || can == SelectedCanvas) {
+        public void HightLightCanvas(Canvas can)
+        {
+            if (can == null || can == SelectedCanvas)
+            {
                 return;
             }
-            SolidColorBrush brush = new SolidColorBrush {
+            SolidColorBrush brush = new SolidColorBrush
+            {
                 Color = Color.FromArgb(255, 255, 127, 200)
             };
             can.Background = brush;
@@ -1214,94 +1361,123 @@ namespace QXEditorModule.Views {
             HighlightNode(this.canvasToNode[can]);
         }
 
-        public void HighlightNode(XmlNode xmlNode) {
+        public void HighlightNode(XmlNode xmlNode)
+        {
 
             TreeViewItem rootNode = null;
-            try {
+            try
+            {
                 rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
-            } catch {
+            }
+            catch
+            {
 
             }
-            if (xmlNode == null) {
+            if (xmlNode == null)
+            {
                 SelectTreeViewItem(ref rootNode, "");
-            } else {
+            }
+            else
+            {
                 SelectTreeViewItem(ref rootNode, xmlNode);
             }
         }
 
-        public void UpdateParamBindings(string param) {
+        public void UpdateParamBindings(string param)
+        {
             viewModel.OnPropertyChanged(param);
         }
 
         #region updatePropertyGrid
 
-        public void MSMQIn(XmlNode node) {
+        public void MSMQIn(XmlNode node)
+        {
             viewModel.MyGrid = new MSMQIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void MSMQOut(XmlNode node) {
+        public void MSMQOut(XmlNode node)
+        {
             viewModel.MyGrid = new MSMQOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void MQInSource(XmlNode node) {
+        public void MQInSource(XmlNode node)
+        {
             viewModel.MyGrid = new MQIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void MQOutSource(XmlNode node) {
+        public void MQOutSource(XmlNode node)
+        {
             viewModel.MyGrid = new MQOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void FileInSource(XmlNode node) {
+        public void FileInSource(XmlNode node)
+        {
             viewModel.MyGrid = new FILEIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
-        public void FileOutSource(XmlNode node) {
+        public void FileOutSource(XmlNode node)
+        {
             viewModel.MyGrid = new FILEOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
-        public void KafkaIn(XmlNode node) {
+        public void KafkaIn(XmlNode node)
+        {
             viewModel.MyGrid = new KAFKAIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
-        public void KafkaOut(XmlNode node) {
+        public void KafkaOut(XmlNode node)
+        {
             viewModel.MyGrid = new KAFKAOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void RestOut(XmlNode node) {
+        public void RestOut(XmlNode node)
+        {
             viewModel.MyGrid = new RESTOUT(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
-        public void HTTPOut(XmlNode node) {
+        public void HTTPOut(XmlNode node)
+        {
             viewModel.MyGrid = new HTTPOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
-        public void HTTPIn(XmlNode node) {
+        public void HTTPIn(XmlNode node)
+        {
             viewModel.MyGrid = new HTTPIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
-        public void RabbitOut(XmlNode node) {
+        public void RabbitOut(XmlNode node)
+        {
             viewModel.MyGrid = new RABBITOUT(node, this);
             viewModel.OnPropertyChanged("myGrid");
         }
 
-        public void RabbitIn(XmlNode node) {
+        public void RabbitIn(XmlNode node)
+        {
             viewModel.MyGrid = new RABBITIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void SinkOut(XmlNode node) {
+        public void SinkOut(XmlNode node)
+        {
             viewModel.MyGrid = new SINK(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
-        public void TestSource(XmlNode node) {
+        public void TestSource(XmlNode node)
+        {
             viewModel.MyGrid = new TESTSOURCE(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
+        }
+
+        public void TCPOUT(XmlNode node)
+        {
+            viewModel.MyGrid = new TCPOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
 
@@ -1311,50 +1487,65 @@ namespace QXEditorModule.Views {
         /*
          * Updates the title in the graphical representation of the node when the type is changed
          */
-        public void UpdateSelectedNodeCanvas(XmlNode node) {
+        public void UpdateSelectedNodeCanvas(XmlNode node)
+        {
 
             // Dont update logger, monitor or namespace
             string name = node.Name;
-            if (name == "logger" || name == "monitor" || name == "namespace") {
+            if (name == "logger" || name == "monitor" || name == "namespace")
+            {
                 return;
             }
 
 
-            try {
+            try
+            {
                 Canvas can = this.nodeToCanvas[node];
-                foreach (var child in can.Children) {
-                    if (child is TextBlock) {
+                foreach (var child in can.Children)
+                {
+                    if (child is TextBlock)
+                    {
                         TextBlock tb = child as TextBlock;
                         tb.Text = node.Attributes["type"].Value;
                     }
                 }
-            } catch { }
+            }
+            catch { }
         }
 
         /*
          * Updates the title in the graphical representation of the pipe when the tpye is changed
          */
-        public void UpdateSelectedPipeCanvas(XmlNode node) {
+        public void UpdateSelectedPipeCanvas(XmlNode node)
+        {
 
-            try {
+            try
+            {
                 Canvas can = this.nodeToCanvas[node];
-                foreach (var child in can.Children) {
-                    if (child is TextBlock) {
+                foreach (var child in can.Children)
+                {
+                    if (child is TextBlock)
+                    {
                         TextBlock tb = child as TextBlock;
                         tb.Text = node.Attributes["name"].Value;
                     }
                 }
-            } catch { }
+            }
+            catch { }
         }
 
-        public void ChangeElementType(string value) {
+        public void ChangeElementType(string value)
+        {
             viewModel.ChangeElementType(value);
         }
-        public bool CanChangeElementType(string value) {
+        public bool CanChangeElementType(string value)
+        {
             return viewModel.CanChangeElementType(value);
         }
-        public void ChangeFilterType(string value) {
+        public void ChangeFilterType(string value)
+        {
             viewModel.ChangeFilterType(value);
         }
+
     }
 }

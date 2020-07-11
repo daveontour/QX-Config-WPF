@@ -10,7 +10,6 @@ namespace QueueExchange
     class QERabbitDefExchange : QueueAbstract, IDisposable
     {
 
-        public QEMSMQ serviceQueue;
         public QERabbitDefExchange(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
 
         public override bool SetUp()
@@ -27,54 +26,39 @@ namespace QueueExchange
                 return false;
             }
 
-            if (definition.Name == "input")
-            {
-                serviceQueue = new QEMSMQ(bufferQueueName);
-                OK_TO_RUN = true;
-                _ = Task.Run(() => StartListen());
-            }
+            OK_TO_RUN = true;
 
             return true;
         }
 
-        public override ExchangeMessage Listen(bool immediateReturn, int priorityWait)
-        {
-            // The serviceQueue is monitored and messages are returned as the appear on the queue
-            logger.Debug("Listening to Rabbit QUEUE");
-            return (serviceQueue.Listen(immediateReturn, priorityWait));
-        }
-
-        public void StartListen()
+        override async public Task StartListener()
         {
 
-            if (!OK_TO_RUN)
+            await Task.Run(() =>
             {
-                logger.Error("Rabbit Input not conffgured correctly to run");
-                return;
-            }
-
-            try
-            {
-                var factory = new ConnectionFactory() { HostName = connection };
-                var conn = factory.CreateConnection();
-                var channel = conn.CreateModel();
-
-                channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-
-                var consumer = new EventingBasicConsumer(channel);
-                consumer.Received += async (model, ea) =>
+                try
                 {
-                    _ = await serviceQueue.SendToOutputAsync(new ExchangeMessage(Encoding.UTF8.GetString(ea.Body)));
-                };
+                    var factory = new ConnectionFactory() { HostName = connection };
+                    var conn = factory.CreateConnection();
+                    var channel = conn.CreateModel();
 
-                // This returns straight away, so don't dispose of the channel
-                channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+                    channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.StackTrace);
-            }
+                    var consumer = new EventingBasicConsumer(channel);
+                    consumer.Received += (model, ea) =>
+                    {
+                        SendToPipe(Encoding.UTF8.GetString(ea.Body));
+                    };
+
+                    // This returns straight away, so don't dispose of the channel
+                    channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.StackTrace);
+                }
+            });
         }
 
         public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message)
@@ -153,11 +137,7 @@ namespace QueueExchange
 
         public void Dispose()
         {
-            try
-            {
-                serviceQueue.Dispose();
-            }
-            catch { }
+
         }
     }
 }

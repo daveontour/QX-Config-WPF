@@ -3,11 +3,14 @@ using System.ComponentModel;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions {
-    public class RESTOUT : MyNodePropertyGrid {
+namespace QXEditorModule.GridDefinitions
+{
+    public class RESTOUT : MyNodePropertyGrid
+    {
 
 
-        public RESTOUT(XmlNode dataModel, IView view) {
+        public RESTOUT(XmlNode dataModel, IView view)
+        {
             this._node = dataModel;
             this.view = view;
             this.type = "RESTFul";

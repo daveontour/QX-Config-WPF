@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Messaging;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -17,7 +16,7 @@ namespace QueueExchange
 
         public string name;
         protected string connection;
-        private IProgress<QueueMonitorMessage> monitorMessageProgress;
+        private readonly IProgress<QueueMonitorMessage> monitorMessageProgress;
         protected XElement definition;
         protected bool bTransform = false;
         protected bool createQueue = false;
@@ -26,7 +25,6 @@ namespace QueueExchange
         protected static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         protected int sendTimeout;
         protected int sendRetry;
-        protected int retryInterval = 2000;
         protected int maxRetry = 10;
         protected string xslVersion = "1.0";
         private readonly List<string> styleSheets = new List<string>();
@@ -34,45 +32,27 @@ namespace QueueExchange
         private readonly QueueFactory fact = new QueueFactory();
         public int priority = 0;
         public bool lastUsed = false;
-        protected int getTimeout = 5000;
+
         protected string bufferQueueName;
         public bool isLogger = false;
         public bool OK_TO_RUN = true;
-        private readonly QueueAbstract altQueue = null;  //If the filter fails, the message can be sent to the altQueue
+        private readonly QueueAbstract altQueue = null;
         private readonly IQueueFilter topLevelFilter = null;
         public bool isValid = false;
-        protected int pause = 0;
         protected static object undevlLock = new object();
         protected string xpathDestination = null;
         protected string xpathContentDestination;
         public string id;
-        //public bool sequentialDir;
-        //public QXMonitor qMon;
-        private Pipeline pipeParent;
+
+
         protected Monitor mon = Monitor.Instance;
+        protected MessagePriority mqPriority;
+        public string pipeInputQueueName;
 
-        // Instances have to implement these three methods to be used in the pipeline
-
-        // Set up the queue. This is called by the Constructor, after the definition XElement has bee
-        // stored and the filtering and transformation has been set up. 
         public abstract bool SetUp();
-
-        public void SetParentPipe(Pipeline pipeline)
-        {
-            this.pipeParent = pipeline;
-        }
-
-        // Just send the message 
         public abstract Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message);
 
-        // Just recieve the message
-        public abstract ExchangeMessage Listen(bool immediateReturn, int priorityWait = 200);
-
-        virtual public bool SupportsAsync()
-        {
-            return false;
-        }
-        virtual public async Task StartListener(string pipeInputQueue)
+        virtual public async Task StartListener()
         {
             await Task.Run(() => { });
         }
@@ -86,8 +66,6 @@ namespace QueueExchange
         {
 
         }
-        // Constructor to extract the common defintion and setup the transformation and filters
-        // Calls the instance specific SetUp method at the end to allow instanc e specific configuration.
         public QueueAbstract(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress)
         {
             this.monitorMessageProgress = monitorMessageProgress;
@@ -152,30 +130,6 @@ namespace QueueExchange
 
             try
             {
-                this.retryInterval = Convert.ToInt32(definition.Attribute("retryInterval").Value);
-            }
-            catch (Exception)
-            {
-                this.retryInterval = 2000;
-            }
-            try
-            {
-                this.getTimeout = Convert.ToInt32(definition.Attribute("getTimeout").Value);
-            }
-            catch (Exception)
-            {
-                this.getTimeout = 10000;
-            }
-            try
-            {
-                this.pause = Convert.ToInt32(definition.Attribute("pause").Value);
-            }
-            catch (Exception)
-            {
-                this.pause = 0;
-            }
-            try
-            {
                 this.maxRetry = Convert.ToInt32(definition.Attribute("maxRetry").Value);
             }
             catch (Exception)
@@ -185,10 +139,39 @@ namespace QueueExchange
             try
             {
                 this.priority = Convert.ToInt32(definition.Attribute("priority").Value);
+
+                switch (priority)
+                {
+                    case 0:
+                        mqPriority = MessagePriority.Lowest;
+                        break;
+                    case 1:
+                        mqPriority = MessagePriority.VeryLow;
+                        break;
+                    case 2:
+                        mqPriority = MessagePriority.Low;
+                        break;
+                    case 3:
+                        mqPriority = MessagePriority.Normal;
+                        break;
+                    case 4:
+                        mqPriority = MessagePriority.AboveNormal;
+                        break;
+                    case 5:
+                        mqPriority = MessagePriority.High;
+                        break;
+                    case 6:
+                        mqPriority = MessagePriority.VeryHigh;
+                        break;
+                    case 7:
+                        mqPriority = MessagePriority.Highest;
+                        break;
+                }
             }
             catch (Exception)
             {
-                this.priority = 0;
+                this.priority = 2;
+                mqPriority = MessagePriority.Normal;
             }
 
             try
@@ -274,7 +257,6 @@ namespace QueueExchange
             // Call the instance specific setup
             this.isValid = this.SetUp();
         }
-
         protected void CreateQueue(string qName)
         {
             CreateQueue(qName, createQueue);
@@ -300,7 +282,6 @@ namespace QueueExchange
                 }
             }
         }
-
         public async Task<ExchangeMessage> Send(ExchangeMessage xm)
         {
             //Do any filtering or transformation first.
@@ -332,49 +313,42 @@ namespace QueueExchange
                 return xm;
             }
         }
-
-        public async Task<ExchangeMessage> ServiceSend(ExchangeMessage xm)
+        public void SendToPipe(string message)
         {
-            xm = await SendToOutputAsync(xm);
-            return xm;
-        }
-
-        public ExchangeMessage ListenToQueue(bool immediateReturn, int priorityWait = 200)
-        {
-
-            // Get the message from the Input.
-            // This call is synchronous, so will only return when Listen returns
-            // The "immediateReturn" flag is to tell the Input to return straight away if
-            // there is no message availaable and not loop until a message is available.
-            // This is to support input queue priorities. 
-
-            ExchangeMessage xm = Listen(immediateReturn, priorityWait);
-
+            //Check to see if it passes filters and transformations
+            ExchangeMessage xm = new ExchangeMessage(message);
+            xm = PreAndPostProcess(xm);
             if (xm == null || xm.payload == null)
             {
-                return null;
+                logger.Info($"Message did not pass transformation");
+                return;
+            }
+            if (!xm.pass)
+            {
+                logger.Info($"Message did not pass filter");
+                return;
+            }
+            try
+            {
+                Message myMessage = new Message(message, new ActiveXMessageFormatter())
+                {
+                    Priority = mqPriority
+                };
+                MessageQueue pipeInputQueue = new MessageQueue(pipeInputQueueName);
+                pipeInputQueue.Send(myMessage);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                logger.Error(ex.StackTrace);
             }
 
-            QXLog(xm?.uuid, "Input Node", "Message Recieved", "PROGRESS");
-            // If the message is not null, then perform any filtering or transformation 
-            // before returning it
-
-            xm = PreAndPostProcess(xm);
-            QXLog(xm?.uuid, "Input Node", "PreProcessing Complete", "PROGRESS");
-            return xm;
         }
-
         public ExchangeMessage PreAndPostProcess(ExchangeMessage xm)
         {
 
             QXLog(xm?.uuid, "Output Node: Message Recieved From Pipe", null, "PROGRESS");
 
-            // Just a small unpublished hack to allow the Input/Output itself to 
-            // limit it's throughput. Preferred mechanism is to throttle the PipeLine itself
-            if (pause > 0)
-            {
-                Thread.Sleep(pause);
-            }
 
             // payload is the actual content of the message to be send
             string message = xm.payload;
@@ -393,12 +367,9 @@ namespace QueueExchange
                 {
                     if (altQueue != null)
                     {
-                        // Task.Run(() =>
-                        // {
                         logger.Info($"Sending to Alt Queue {altQueue.name}");
                         QXLog(xm?.uuid, "Message did not pass filter", "Sending to Alt Queue", "PROGRESS");
-                        altQueue.Send(xm);
-                        //   });
+                        Task.Run(async () => { _ = await altQueue.Send(xm); });
                     }
                     else
                     {
@@ -470,7 +441,6 @@ namespace QueueExchange
             QXLog(xm?.uuid, "Output Node: Post Processing Complete", null, "PROGRESS");
             return xm;
         }
-
         public string Transform(string message, string version)
         {
 
@@ -558,7 +528,6 @@ namespace QueueExchange
                 }
             }
         }
-
         protected ExchangeMessage SetDestinationFromMessage(ExchangeMessage mess)
         {
 
@@ -597,7 +566,6 @@ namespace QueueExchange
             mess.destinationSet = false;
             return mess;
         }
-
         protected string GetDestinationFromMessage(string message, bool path)
         {
             XmlDocument doc = new XmlDocument();
@@ -632,7 +600,6 @@ namespace QueueExchange
             }
             return topic;
         }
-
         public void SendToUndeliverableQueue(ExchangeMessage xm)
         {
 
@@ -681,7 +648,6 @@ namespace QueueExchange
                 }
             }
         }
-
         public void QXLog(string uuid, string topic, string message, string type)
         {
 
