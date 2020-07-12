@@ -70,6 +70,8 @@
       <DependentUpon>FolderNameSelector.xaml</DependentUpon>
     </Compile>
     <Compile Include="GridDefinitions\HTTPIN.cs" />
+    <Compile Include="GridDefinitions\SMTPOut.cs" />
+    <Compile Include="GridDefinitions\TCPIN.cs" />
     <Compile Include="GridDefinitions\TCPOUT.cs" />
     <Compile Include="GridDefinitions\HTTPOUT.cs" />
     <Compile Include="GridDefinitions\KAFKAIN.cs" />

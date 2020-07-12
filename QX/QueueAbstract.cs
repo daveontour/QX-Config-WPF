@@ -9,10 +9,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Xsl;
 
-namespace QueueExchange
-{
-    public abstract class QueueAbstract
-    {
+namespace QueueExchange {
+    public abstract class QueueAbstract {
 
         public string name;
         protected string connection;
@@ -52,96 +50,76 @@ namespace QueueExchange
         public abstract bool SetUp();
         public abstract Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message);
 
-        virtual public async Task StartListener()
-        {
+        virtual public async Task StartListener() {
             await Task.Run(() => { });
         }
 
-        public void Stop()
-        {
+        virtual public void Stop() {
 
         }
 
-        public QueueAbstract(string value)
-        {
+        public QueueAbstract(string value) {
 
         }
-        public QueueAbstract(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress)
-        {
+        public QueueAbstract(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) {
             this.monitorMessageProgress = monitorMessageProgress;
             this.definition = defn;
 
-            try
-            {
+            try {
                 var stylesheet = definition.Attribute("stylesheet").Value;
                 this.styleSheets = stylesheet.Split(',').ToList<string>();
                 this.bTransform = true;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.styleSheets = new List<string>();
                 this.bTransform = false;
             }
 
-            try
-            {
+            try {
                 this.queueName = definition.Attribute("queue").Value;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.queueName = "undefined";
             }
 
-            try
-            {
+            try {
                 this.id = definition.Attribute("id").Value;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.id = Guid.NewGuid().ToString();
             }
 
-            try
-            {
+            try {
                 this.name = definition.Attribute("name").Value;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.name = this.queueName;
             }
 
-            try
-            {
+            try {
                 this.createQueue = bool.Parse(definition.Attribute("createQueue").Value);
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.createQueue = false;
             }
 
-            try
-            {
+            try {
                 this.xslVersion = definition.Attribute("xslVersion").Value;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.xslVersion = "1.0";
             }
 
-            try
-            {
+            try {
                 this.maxRetry = Convert.ToInt32(definition.Attribute("maxRetry").Value);
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.maxRetry = 10;
             }
-            try
-            {
+            try {
                 this.priority = Convert.ToInt32(definition.Attribute("priority").Value);
 
-                switch (priority)
-                {
+                switch (priority) {
                     case 0:
                         mqPriority = MessagePriority.Lowest;
                         break;
@@ -168,61 +146,49 @@ namespace QueueExchange
                         break;
                 }
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 this.priority = 2;
                 mqPriority = MessagePriority.Normal;
             }
 
-            try
-            {
+            try {
                 undeliverableQueue = defn.Attribute("undeliverableQueue").Value;
                 CreateQueue(undeliverableQueue);
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 undeliverableQueue = null;
             }
 
-            try
-            {
+            try {
                 bufferQueueName = definition.Attribute("bufferQueueName").Value;
                 CreateQueue(bufferQueueName, true);
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 bufferQueueName = null;
             }
 
 
-            try
-            {
+            try {
                 xpathDestination = definition.Attribute("xpathDestination").Value;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 xpathDestination = null;
             }
-            try
-            {
+            try {
                 xpathContentDestination = definition.Attribute("xpathContentDestination").Value;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 xpathContentDestination = null;
             }
 
             // Add any filter expresion
             XElement filtersDefn = defn.Element("filter");
-            if (filtersDefn != null)
-            {
+            if (filtersDefn != null) {
                 // Add the alternate queue to send to if the expression fails (optional)
-                try
-                {
+                try {
                     altQueue = fact.GetQueue(filtersDefn.Element("altqueue"), this.monitorMessageProgress);
                 }
-                catch (Exception)
-                {
+                catch (Exception) {
                     altQueue = null;
                 }
 
@@ -235,21 +201,17 @@ namespace QueueExchange
                  */
 
                 // Cycle through the expressions types (and, or, not, xor) to see if any exist
-                foreach (string eType in Expression.expressionTypes)
-                {
+                foreach (string eType in Expression.expressionTypes) {
                     XElement exprDefn = filtersDefn.Element(eType);
-                    if (exprDefn != null)
-                    {
+                    if (exprDefn != null) {
                         expression = new Expression(exprDefn, this);
                     }
                 }
 
                 // Cycle through the data filter types (and, or, not, xor) to see if any exist
-                foreach (string fType in Expression.filterTypes)
-                {
+                foreach (string fType in Expression.filterTypes) {
                     XElement filtDefn = filtersDefn.Element(fType);
-                    if (filtDefn != null)
-                    {
+                    if (filtDefn != null) {
                         topLevelFilter = fact.GetFilter(filtDefn, this);
                     }
                 }
@@ -257,54 +219,43 @@ namespace QueueExchange
             // Call the instance specific setup
             this.isValid = this.SetUp();
         }
-        protected void CreateQueue(string qName)
-        {
+        protected void CreateQueue(string qName) {
             CreateQueue(qName, createQueue);
         }
-        protected void CreateQueue(string qName, bool createOK)
-        {
+        protected void CreateQueue(string qName, bool createOK) {
 
             // For local MSMQ queues only
-            if (!queueName.StartsWith("FormatName"))
-            {
+            if (!queueName.StartsWith("FormatName")) {
 
-                if (!qName.Contains("$"))
-                {
+                if (!qName.Contains("$")) {
                     qName = ".\\private$\\" + qName;
                 }
 
-                if (!MessageQueue.Exists(qName) && createOK)
-                {
-                    using (MessageQueue t = MessageQueue.Create(qName))
-                    {
+                if (!MessageQueue.Exists(qName) && createOK) {
+                    using (MessageQueue t = MessageQueue.Create(qName)) {
                         logger.Debug($"Queue Created for {qName}");
                     }
                 }
             }
         }
-        public async Task<ExchangeMessage> Send(ExchangeMessage xm)
-        {
+        public async Task<ExchangeMessage> Send(ExchangeMessage xm) {
             //Do any filtering or transformation first.
-            try
-            {
+            try {
                 xm = PreAndPostProcess(xm);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine(ex.Message);
                 return null;
             }
 
             // Check the result of the filtering and transformations
-            if (!xm.pass || xm.payload == null)
-            {
+            if (!xm.pass || xm.payload == null) {
                 xm.status = $"Message blocked by filter to {queueName}";
                 xm.pass = false;
                 QXLog(xm?.uuid, "Output Node", "Messages did not pass filter", "PROGRESS");
                 return xm;
             }
-            else
-            {
+            else {
                 QXLog(xm?.uuid, "Output Node", "Sending Message", "PROGRESS");
                 // Send it to the destination. 
                 // The state of the message should be updated by the particuar output
@@ -313,39 +264,32 @@ namespace QueueExchange
                 return xm;
             }
         }
-        public void SendToPipe(string message)
-        {
+        public void SendToPipe(string message) {
             //Check to see if it passes filters and transformations
             ExchangeMessage xm = new ExchangeMessage(message);
             xm = PreAndPostProcess(xm);
-            if (xm == null || xm.payload == null)
-            {
+            if (xm == null || xm.payload == null) {
                 logger.Info($"Message did not pass transformation");
                 return;
             }
-            if (!xm.pass)
-            {
+            if (!xm.pass) {
                 logger.Info($"Message did not pass filter");
                 return;
             }
-            try
-            {
-                Message myMessage = new Message(message, new ActiveXMessageFormatter())
-                {
+            try {
+                Message myMessage = new Message(message, new ActiveXMessageFormatter()) {
                     Priority = mqPriority
                 };
                 MessageQueue pipeInputQueue = new MessageQueue(pipeInputQueueName);
                 pipeInputQueue.Send(myMessage);
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 logger.Error(ex.Message);
                 logger.Error(ex.StackTrace);
             }
 
         }
-        public ExchangeMessage PreAndPostProcess(ExchangeMessage xm)
-        {
+        public ExchangeMessage PreAndPostProcess(ExchangeMessage xm) {
 
             QXLog(xm?.uuid, "Output Node: Message Recieved From Pipe", null, "PROGRESS");
 
@@ -357,77 +301,64 @@ namespace QueueExchange
             // transformed according to the configuration for each queue
 
             // The Expression object manages the evaluation of all the filters
-            if (expression != null)
-            {
+            if (expression != null) {
 
                 bool pass = expression.Pass(message);
 
                 logger.Info($"Top Expression Evaluated {pass}");
-                if (!pass)
-                {
-                    if (altQueue != null)
-                    {
+                if (!pass) {
+                    if (altQueue != null) {
                         logger.Info($"Sending to Alt Queue {altQueue.name}");
                         QXLog(xm?.uuid, "Message did not pass filter", "Sending to Alt Queue", "PROGRESS");
                         Task.Run(async () => { _ = await altQueue.Send(xm); });
                     }
-                    else
-                    {
+                    else {
                         QXLog(xm?.uuid, "Message did not pass filter", "No Alt Queue Configured", "WARNING");
                     }
                     xm.pass = false;
                     return xm;
                 }
-                else
-                {
+                else {
                     xm.pass = true;
                 }
             }
 
-            if (topLevelFilter != null)
-            {
+            if (topLevelFilter != null) {
 
                 bool pass = topLevelFilter.Pass(message);
 
                 logger.Info($"Top Filter Evaluated {pass}");
-                if (!pass)
-                {
-                    if (altQueue != null)
-                    {
+                if (!pass) {
+                    if (altQueue != null) {
                         logger.Info($"Sending to Alt Queue {altQueue.name}");
                         QXLog(xm?.uuid, "Message did not pass filter", "Sending to Alt Queue", "PROGRESS");
                         _ = altQueue.Send(xm);
                     }
-                    else
-                    {
+                    else {
                         QXLog(xm?.uuid, "Message did not pass filter", "No Alt Queue Configured", "WARNING");
                     }
                     xm.pass = false;
                     return xm;
                 }
-                else
-                {
+                else {
                     xm.pass = true;
                 }
             }
 
 
             // If a XSLT transform has been specified
-            if (bTransform)
-            {
+            if (bTransform) {
                 QXLog(xm?.uuid, "Starting Message Transformation", null, "PROGRESS");
                 message = Transform(message, xslVersion);
                 QXLog(xm?.uuid, "Message Transformation Complete", null, "PROGRESS");
 
                 xm.transformed = true;
             }
-            else
-            {
+            else {
                 xm.transformed = false;
             }
 
-            if (message == null || message.Length == 0)
-            {
+            if (message == null || message.Length == 0) {
                 logger.Info("Message blocked by XSL Transform of Zero Length");
                 xm.payload = null;
                 xm.status = "Message blocked by XSL Transform. Null or Zero Length";
@@ -441,30 +372,25 @@ namespace QueueExchange
             QXLog(xm?.uuid, "Output Node: Post Processing Complete", null, "PROGRESS");
             return xm;
         }
-        public string Transform(string message, string version)
-        {
+        public string Transform(string message, string version) {
 
             // XSLT Transformation can be either performed by the internal XSLT 1.0 processor
             // or via the SAXON processor, which supports XSLT 3.0
 
             logger.Info("Performing XSLT transform before sending to " + this.queueName);
 
-            if (version == "1.0")
-            {
+            if (version == "1.0") {
                 //Use the in built XSL 1.0 MS Processor
                 logger.Info("Performing XSLT transform using XSL 1.0 Processor");
 
-                try
-                {
+                try {
 
-                    foreach (string sheet in styleSheets)
-                    {
+                    foreach (string sheet in styleSheets) {
                         FileInfo xslt = new FileInfo(sheet);
                         XmlDocument doc = new XmlDocument();
                         doc.LoadXml(message);
                         XDocument newTree = new XDocument();
-                        using (XmlWriter writer = newTree.CreateWriter())
-                        {
+                        using (XmlWriter writer = newTree.CreateWriter()) {
                             // Load the style sheet.  
                             XslCompiledTransform xs = new XslCompiledTransform();
                             xs.Load(sheet);
@@ -475,8 +401,7 @@ namespace QueueExchange
                         message = newTree.ToString();
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     logger.Error("XSL 1.0 Transformation Error");
                     logger.Error(ex.Message);
                     return null;
@@ -486,15 +411,12 @@ namespace QueueExchange
 
 
             }
-            else
-            {
+            else {
                 //Use the SAXON 2.0/3.0 Processor (not as fast)
 
                 logger.Info("Performing XSLT transform using Saxon XSL 3.0 Processor");
-                try
-                {
-                    foreach (string sheet in styleSheets)
-                    {
+                try {
+                    foreach (string sheet in styleSheets) {
 
                         FileStream stream = File.Open(new FileInfo(sheet).ToString(), FileMode.Open);
 
@@ -520,44 +442,36 @@ namespace QueueExchange
                     logger.Info("XSLT transform using 3.0 Processor Complete");
                     return message;
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     logger.Error("XSL 3.0 Transformation Error");
                     logger.Error(ex.Message);
                     return null;
                 }
             }
         }
-        protected ExchangeMessage SetDestinationFromMessage(ExchangeMessage mess)
-        {
+        protected ExchangeMessage SetDestinationFromMessage(ExchangeMessage mess) {
 
-            if (xpathDestination != null)
-            {
+            if (xpathDestination != null) {
                 queueName = GetDestinationFromMessage(mess.payload, true);
-                if (queueName == null)
-                {
+                if (queueName == null) {
                     mess.status = "Destination could not be found in the XPATH expression";
                     mess.destinationSet = false;
                     return mess;
                 }
-                else
-                {
+                else {
                     mess.destinationSet = true;
                     return mess;
                 }
             }
 
-            if (xpathContentDestination != null)
-            {
+            if (xpathContentDestination != null) {
                 queueName = GetDestinationFromMessage(mess.payload, false);
-                if (queueName == null)
-                {
+                if (queueName == null) {
                     mess.status = "Destination Topic could not be found in the XPATH expression";
                     mess.destinationSet = false;
                     return mess;
                 }
-                else
-                {
+                else {
                     mess.destinationSet = true;
                     return mess;
                 }
@@ -566,50 +480,42 @@ namespace QueueExchange
             mess.destinationSet = false;
             return mess;
         }
-        protected string GetDestinationFromMessage(string message, bool path)
-        {
+        protected string GetDestinationFromMessage(string message, bool path) {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(message);
             XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
 
-            foreach (KeyValuePair<string, string> item in Exchange.nsDict)
-            {
+            foreach (KeyValuePair<string, string> item in Exchange.nsDict) {
                 ns.AddNamespace(item.Key, item.Value);
             }
 
 
             string topic;
 
-            try
-            {
-                if (path)
-                {
+            try {
+                if (path) {
                     XmlNode node = doc.SelectSingleNode(xpathDestination, ns);
                     topic = node.LocalName;
                 }
-                else
-                {
+                else {
                     XmlNode node = doc.SelectSingleNode(xpathContentDestination, ns);
                     topic = node.InnerText;
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 logger.Error($"XPATH KEY ERROR {ex.Message}");
                 return null;
             }
             return topic;
         }
-        public void SendToUndeliverableQueue(ExchangeMessage xm)
-        {
+        public void SendToUndeliverableQueue(ExchangeMessage xm) {
 
             // If messages cant be delivered, they can be sent to a local undeliverable queue
             // defined on a per queue basis. No reason why the one undeliverable queue cant be used
             // for all of the queue. 
 
 
-            if (isLogger)
-            {
+            if (isLogger) {
                 // If this is a logger, failure messages won't be sent to the undeliverable queue
                 logger.Error("Log Message could not be sent to logger");
                 return;
@@ -617,20 +523,16 @@ namespace QueueExchange
 
             QXLog(xm?.uuid, "Output Node Send Failure", "Message Could Not Be Delivered to the Output Node", "PROGRESS");
 
-            if (undeliverableQueue == null)
-            {
+            if (undeliverableQueue == null) {
                 logger.Debug($"No Undeliverable Message Queue has been defined for {queueName}");
                 QXLog(xm?.uuid, "Output Node Send Failure", "No Undeliverable Queue Defined", "WARNING");
 
                 return;
             }
 
-            lock (undevlLock)
-            {
-                try
-                {
-                    using (MessageQueue er = new MessageQueue(undeliverableQueue))
-                    {
+            lock (undevlLock) {
+                try {
+                    using (MessageQueue er = new MessageQueue(undeliverableQueue)) {
                         QXLog(xm?.uuid, "Output Node Send Failure", "Sending Message to Undeliverable Queue", "PROGRESS");
                         er.Send(xm);
                         QXLog(xm?.uuid, "Output Node Send Failure", "Message Sent to Undeliverable Queue", "PROGRESS");
@@ -639,8 +541,7 @@ namespace QueueExchange
                         logger.Info("Message Sent to Undeliverble Queue");
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     QXLog(xm?.uuid, "Output Node Send Failure", "Message Could Not Be Sent To Undeliverable Queue", "ERROR");
 
                     logger.Error("Unable to Send to Undeliverble Queue");
@@ -648,11 +549,9 @@ namespace QueueExchange
                 }
             }
         }
-        public void QXLog(string uuid, string topic, string message, string type)
-        {
+        public void QXLog(string uuid, string topic, string message, string type) {
 
-            try
-            {
+            try {
                 QueueMonitorMessage msg = new QueueMonitorMessage(id, name, uuid, topic, message, type);
 
                 this.monitorMessageProgress?.Report(msg);

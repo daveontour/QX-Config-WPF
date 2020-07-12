@@ -22,6 +22,7 @@ namespace QXEditorModule.Common
             ContextMenus.Add(ContextMenuType.AddHTTPInput, new MenuItem { Header = "HTTP POST Input Node" });
             ContextMenus.Add(ContextMenuType.AddKafkaInput, new MenuItem { Header = "Kafka Topic Input Node" });
             ContextMenus.Add(ContextMenuType.AddRabbitInput, new MenuItem { Header = "Rabbit MQ Input Node" });
+            ContextMenus.Add(ContextMenuType.AddTCPInput, new MenuItem { Header = "TCP Server Input Node" });
             ContextMenus.Add(ContextMenuType.AddTestInput, new MenuItem { Header = "Test Message Source" });
 
             ContextMenus.Add(ContextMenuType.AddMSMQOutput, new MenuItem { Header = "MS MQ Output Node" });
@@ -29,7 +30,8 @@ namespace QXEditorModule.Common
             ContextMenus.Add(ContextMenuType.AddFileOutput, new MenuItem { Header = "File Output Node" });
             ContextMenus.Add(ContextMenuType.AddHTTPOutput, new MenuItem { Header = "HTTP POST Output Node" });
             ContextMenus.Add(ContextMenuType.AddKafkaOutput, new MenuItem { Header = "Kafka Topic Output Node" });
-            ContextMenus.Add(ContextMenuType.AddRabbitOutput, new MenuItem { Header = "Rabbit MQ Output Node" });
+            ContextMenus.Add(ContextMenuType.AddRabbitOutput, new MenuItem { Header = "Rabbit MQ Output Node" }); 
+            ContextMenus.Add(ContextMenuType.AddSMTPOutput, new MenuItem { Header = "SMTP Output Node" });
             ContextMenus.Add(ContextMenuType.AddTCPOutput, new MenuItem { Header = "TCP Client Output Node" });
             ContextMenus.Add(ContextMenuType.AddHTTPRest, new MenuItem { Header = "Rest Server Retrieval Output Node" });
             ContextMenus.Add(ContextMenuType.AddSINK, new MenuItem { Header = "Message Sink" });

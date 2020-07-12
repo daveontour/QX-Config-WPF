@@ -1,27 +1,22 @@
 ﻿using System;
 using System.Xml.Linq;
 
-namespace QueueExchange
-{
-    public class QueueFactory
-    {
+namespace QueueExchange {
+    public class QueueFactory {
         public QueueFactory() { }
 
-        internal QueueAbstract GetQueue(XElement ep, Progress<QueueMonitorMessage> monitorPipelineProgress, string inputQueueName)
-        {
+        internal QueueAbstract GetQueue(XElement ep, Progress<QueueMonitorMessage> monitorPipelineProgress, string inputQueueName) {
             QueueAbstract queue = GetQueue(ep, monitorPipelineProgress);
             queue.pipeInputQueueName = inputQueueName;
             return queue;
         }
-        public QueueAbstract GetQueue(XElement ep, System.IProgress<QueueMonitorMessage> monitorMessageProgress)
-        {
+        public QueueAbstract GetQueue(XElement ep, System.IProgress<QueueMonitorMessage> monitorMessageProgress) {
 
             string queueType = ep.Attribute("type").Value;
 
             QueueAbstract queue;
 
-            switch (queueType)
-            {
+            switch (queueType) {
                 case "MSMQ":
                     queue = new QEMSMQ(ep, monitorMessageProgress);
                     break;
@@ -46,11 +41,15 @@ namespace QueueExchange
                 case "SINK":
                     queue = new QESink(ep, monitorMessageProgress);
                     break;
+                case "TCPSERVER":
                 case "TCPCLIENT":
-                    queue = new QETCPClient(ep, monitorMessageProgress);
+                    queue = new QETCP(ep, monitorMessageProgress);
                     break;
                 case "TESTSOURCE":
                     queue = new QESink(ep, monitorMessageProgress);
+                    break;
+                case "SMTP":
+                    queue = new QESMTP(ep, monitorMessageProgress);
                     break;
                 default:
                     queue = null;
@@ -60,15 +59,13 @@ namespace QueueExchange
             return queue;
         }
 
-        public IQueueFilter GetFilter(XElement ep, QueueAbstract queue)
-        {
+        public IQueueFilter GetFilter(XElement ep, QueueAbstract queue) {
 
             string type = ep.Name.ToString();
 
             IQueueFilter filter = null;
 
-            switch (type)
-            {
+            switch (type) {
                 case "xpexists":
                     filter = new FilterXPathExists(ep);
                     break;

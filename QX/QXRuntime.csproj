@@ -66,6 +66,9 @@
     <Reference Include="amqmdxcs, Version=8.0.0.7, Culture=neutral, PublicKeyToken=7a58d55a51981a15, processorArchitecture=MSIL">
       <HintPath>..\packages\WebSphereMqClient.8.0.0.7\lib\net20\amqmdxcs.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.5\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="Confluent.Kafka, Version=1.2.2.0, Culture=neutral, PublicKeyToken=12c514ca49093d1e, processorArchitecture=MSIL">
       <HintPath>..\packages\Confluent.Kafka.1.2.2\lib\net45\Confluent.Kafka.dll</HintPath>
     </Reference>
@@ -123,6 +126,9 @@
     <Reference Include="IBM.XMS.WMQI, Version=8.0.0.7, Culture=neutral, PublicKeyToken=d2666ab12fca862b, processorArchitecture=MSIL">
       <HintPath>..\packages\WebSphereMqClient.8.0.0.7\lib\net20\IBM.XMS.WMQI.dll</HintPath>
     </Reference>
+    <Reference Include="MailKit, Version=2.8.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>..\packages\MailKit.2.8.0\lib\net45\MailKit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
@@ -146,6 +152,9 @@
     </Reference>
     <Reference Include="Microsoft.Owin.Security, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.2.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="MimeKit, Version=2.9.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>..\packages\MimeKit.2.9.1\lib\net45\MimeKit.dll</HintPath>
     </Reference>
     <Reference Include="MQTTnet, Version=3.0.11.0, Culture=neutral, PublicKeyToken=b69712f52770c0a7, processorArchitecture=MSIL">
       <HintPath>..\packages\MQTTnet.3.0.11\lib\net452\MQTTnet.dll</HintPath>
@@ -240,7 +249,8 @@
     <Compile Include="QEMQ.cs" />
     <Compile Include="QEMSMQ.cs" />
     <Compile Include="QERabbitDefExchange.cs" />
-    <Compile Include="QETCPClient.cs" />
+    <Compile Include="QESMTP.cs" />
+    <Compile Include="QETCP.cs" />
     <Compile Include="QESink.cs" />
     <Compile Include="QueueAbstract.cs" />
     <Compile Include="QueueFactory.cs" />

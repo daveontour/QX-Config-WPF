@@ -6,39 +6,32 @@ using System.Xml;
 using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.Common
-{
+namespace QXEditorModule.Common {
 
 
-    public class GenericTypes
-    {
+    public class GenericTypes {
         public String Name { get; set; }
         public String Value { get; set; }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return Name;
         }
     }
 
-    public class NodeTypeList : IItemsSource
-    {
+    public class NodeTypeList : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP Post","Kafka", "Rabbit MQ",  "Test Source"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","Kafka", "Rabbit MQ", "TCP Server", "Test Source"
             };
             return types; ;
         }
     }
 
-    public class PriorityTypeList : IItemsSource
-    {
+    public class PriorityTypeList : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
                 "Highest", "Very High", "High", "Above Normal", "Normal", "Low", "Very Low", "Lowest"
@@ -46,24 +39,20 @@ namespace QXEditorModule.Common
             return types; ;
         }
     }
-    public class NodeTypeListOut : IItemsSource
-    {
+    public class NodeTypeListOut : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "TCP Client", "SINK"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "TCP Client", "SMTP", "SINK"
             };
             return types; ;
         }
     }
 
-    public class XSLTypeList : IItemsSource
-    {
+    public class XSLTypeList : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
                 "1.0", "2.0", "3.0"
@@ -72,11 +61,9 @@ namespace QXEditorModule.Common
         }
     }
 
-    public class OutputTypeList : IItemsSource
-    {
+    public class OutputTypeList : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
                 "Distribute to All", "Round Robin", "Random"
@@ -85,11 +72,9 @@ namespace QXEditorModule.Common
         }
     }
 
-    public class FilterTypeList : IItemsSource
-    {
+    public class FilterTypeList : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
                 "Data Contains Value", "Data Equals Value", "Data Matches Regex.", "Data Minimum Length", "XPath Exists","XPath Equals","XPath Matches", "XPath Date Within Offset", "Context Contains"
@@ -98,11 +83,9 @@ namespace QXEditorModule.Common
         }
     }
 
-    public class BooleanTypeList : IItemsSource
-    {
+    public class BooleanTypeList : IItemsSource {
 
-        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues()
-        {
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
                 "and", "or", "xor", "not"
@@ -120,93 +103,72 @@ namespace QXEditorModule.Common
     [CategoryOrder("Optional - Transformation", 6)]
     [CategoryOrder("Optional - Temporal Context Awareness", 7)]
     [RefreshProperties(RefreshProperties.All)]
-    public class MyPropertyGrid
-    {
+    public class MyPropertyGrid {
         public string type = "MSMQ";
         public XmlNode _node;
         public IView view;
 
-        protected void Show(string[] fields)
-        {
-            foreach (string field in fields)
-            {
+        protected void Show(string[] fields) {
+            foreach (string field in fields) {
                 ShowHide(field, true);
             }
         }
-        protected void Hide(string[] fields)
-        {
-            foreach (string field in fields)
-            {
+        protected void Hide(string[] fields) {
+            foreach (string field in fields) {
                 ShowHide(field, false);
             }
         }
-        protected void Show(string field)
-        {
+        protected void Show(string field) {
             ShowHide(field, true);
         }
-        protected void Hide(string field)
-        {
+        protected void Hide(string field) {
             ShowHide(field, false);
         }
-        protected void ShowHide(string field, bool value)
-        {
+        protected void ShowHide(string field, bool value) {
 
-            try
-            {
+            try {
                 PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[field];
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 Console.WriteLine($"Show/Hide Issue for {field}");
             }
         }
 
-        protected string GetAttribute(string attribName)
-        {
+        protected string GetAttribute(string attribName) {
 
-            if (_node.Attributes[attribName] != null)
-            {
+            if (_node.Attributes[attribName] != null) {
                 return _node.Attributes[attribName].Value;
             }
-            else
-            {
+            else {
                 return "";
             }
         }
 
-        protected bool GetBoolAttribute(string attribName)
-        {
+        protected bool GetBoolAttribute(string attribName) {
 
-            if (_node.Attributes[attribName] != null)
-            {
+            if (_node.Attributes[attribName] != null) {
                 return bool.Parse(_node.Attributes[attribName].Value);
             }
-            else
-            {
+            else {
                 return false;
             }
         }
 
-        protected bool GetBoolDefaultTrueAttribute(string attribName)
-        {
+        protected bool GetBoolDefaultTrueAttribute(string attribName) {
 
-            if (_node.Attributes[attribName] != null)
-            {
+            if (_node.Attributes[attribName] != null) {
                 return bool.Parse(_node.Attributes[attribName].Value);
             }
-            else
-            {
-                if (_node.Attributes[attribName] == null)
-                {
+            else {
+                if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = "True";
                     _node.Attributes.Append(newAttribute);
                 }
-                else
-                {
+                else {
                     _node.Attributes[attribName].Value = "True";
                 }
                 view.UpdateParamBindings("XMLText");
@@ -214,70 +176,73 @@ namespace QXEditorModule.Common
             }
         }
 
-        protected int GetIntAttribute(string attribName)
-        {
+        protected bool GetBoolDefaultFalseAttribute(XmlNode _node, string attribName) {
 
-            if (_node.Attributes[attribName] != null)
-            {
+            if (_node.Attributes[attribName] != null) {
+                return bool.Parse(_node.Attributes[attribName].Value);
+            }
+            else {
+                if (_node.Attributes[attribName] == null) {
+                    XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
+                    newAttribute.Value = "False";
+                    _node.Attributes.Append(newAttribute);
+                }
+                else {
+                    _node.Attributes[attribName].Value = "False";
+                }
+                view.UpdateParamBindings("XMLText");
+                return false;
+            }
+        }
+        protected int GetIntAttribute(string attribName) {
+
+            if (_node.Attributes[attribName] != null) {
                 int value;
-                try
-                {
+                try {
                     value = int.Parse(_node.Attributes[attribName].Value);
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     Console.WriteLine(e.Message);
                     value = -1;
                 }
 
                 return value;
             }
-            else
-            {
+            else {
                 return -1;
             }
         }
 
-        protected int GetIntAttribute(string attribName, int def)
-        {
+        protected int GetIntAttribute(string attribName, int def) {
 
-            if (_node.Attributes[attribName] != null)
-            {
+            if (_node.Attributes[attribName] != null) {
                 return int.Parse(_node.Attributes[attribName].Value);
             }
-            else
-            {
+            else {
                 return def;
             }
         }
 
 
-        protected void ClearAttributes()
-        {
+        protected void ClearAttributes() {
             _node.Attributes.RemoveAll();
             view.UpdateParamBindings("XMLText");
         }
-        protected void SetAttribute(string attribName, string value)
-        {
-            if (value == null || value == "")
-            {
-                try
-                {
+        protected void SetAttribute(string attribName, string value) {
+            if (value == null || value == "") {
+                try {
                     _node.Attributes.Remove(_node.Attributes[attribName]);
                 }
                 catch { }
             }
-            else
-            {
+            else {
 
-                if (_node.Attributes[attribName] == null)
-                {
+                if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value;
                     _node.Attributes.Append(newAttribute);
                 }
-                else
-                {
+                else {
                     _node.Attributes[attribName].Value = value;
                 }
             }
@@ -286,46 +251,36 @@ namespace QXEditorModule.Common
 
         }
 
-        protected void SetAbsoluteAttribute(string attribName, bool value)
-        {
-            if (_node.Attributes[attribName] != null)
-            {
+        protected void SetAbsoluteAttribute(string attribName, bool value) {
+            if (_node.Attributes[attribName] != null) {
                 _node.Attributes[attribName].Value = value.ToString();
             }
-            else
-            {
+            else {
 
-                if (_node.Attributes[attribName] == null)
-                {
+                if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value.ToString();
                     _node.Attributes.Append(newAttribute);
                 }
-                else
-                {
+                else {
                     _node.Attributes[attribName].Value = value.ToString();
                 }
             }
 
             view.UpdateParamBindings("XMLText");
         }
-        protected void SetAttribute(string attribName, bool value)
-        {
-            if ((!value) && _node.Attributes[attribName] != null)
-            {
+        protected void SetAttribute(string attribName, bool value) {
+            if ((!value) && _node.Attributes[attribName] != null) {
                 _node.Attributes.Remove(_node.Attributes[attribName]);
             }
-            else
-            {
+            else {
 
-                if (_node.Attributes[attribName] == null)
-                {
+                if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value.ToString();
                     _node.Attributes.Append(newAttribute);
                 }
-                else
-                {
+                else {
                     _node.Attributes[attribName].Value = value.ToString();
                 }
             }
@@ -333,23 +288,18 @@ namespace QXEditorModule.Common
             view.UpdateParamBindings("XMLText");
         }
 
-        protected void SetAttribute(string attribName, int value)
-        {
-            if ((value == -1) && _node.Attributes[attribName] != null)
-            {
+        protected void SetAttribute(string attribName, int value) {
+            if ((value == -1) && _node.Attributes[attribName] != null) {
                 _node.Attributes.Remove(_node.Attributes[attribName]);
             }
-            else
-            {
+            else {
 
-                if (_node.Attributes[attribName] == null)
-                {
+                if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value.ToString();
                     _node.Attributes.Append(newAttribute);
                 }
-                else
-                {
+                else {
                     _node.Attributes[attribName].Value = value.ToString();
                 }
             }
@@ -357,10 +307,8 @@ namespace QXEditorModule.Common
             view.UpdateParamBindings("XMLText");
         }
 
-        protected void SetType(string value)
-        {
-            if (this.type != value)
-            {
+        protected void SetType(string value) {
+            if (this.type != value) {
 
                 string n = GetAttribute("name");
                 string i = GetAttribute("id");
@@ -370,8 +318,7 @@ namespace QXEditorModule.Common
                 SetAttribute("name", n);
                 SetAttribute("id", i);
 
-                switch (value)
-                {
+                switch (value) {
                     case "IBM MQ":
                         SetAttribute("type", "MQ");
                         view.UpdateSelectedNodeCanvas(_node);
@@ -408,14 +355,23 @@ namespace QXEditorModule.Common
                         if (_node.Name == "input") view.RabbitIn(_node);
                         if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.RabbitOut(_node);
                         break;
+                    case "SMTP":
+                        SetAttribute("type", "SMTP");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.SMTPOut(_node);
+                        break;
+                    case "TCP Server":
+                        SetAttribute("type", "TCPSERVER");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "input") view.TCPIN(_node);
+                        break;
                     case "TCP Client":
                         SetAttribute("type", "TCPCLIENT");
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.TCPOUT(_node);
                         break;
                     case "SINK":
-                        if (_node.Name == "input")
-                        {
+                        if (_node.Name == "input") {
                             MessageBox.Show("The Sink Type Cannot Be Used as an Input Type", "Invalid Input Node Type");
                             break;
                         }
@@ -424,8 +380,7 @@ namespace QXEditorModule.Common
                         if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.SinkOut(_node);
                         break;
                     case "Test Source":
-                        if (_node.Name == "output")
-                        {
+                        if (_node.Name == "output") {
                             MessageBox.Show("The Test Source Type Cannot Be Used as an Output Type", "Invalid Output Node Type");
                             break;
                         }
@@ -435,8 +390,7 @@ namespace QXEditorModule.Common
                         break;
 
                     case "RESTful":
-                        if (_node.Name == "input")
-                        {
+                        if (_node.Name == "input") {
                             MessageBox.Show("The RESTful Type Cannot Be Used as an Input Type", "Invalid Input Node Type");
                             break;
                         }
@@ -451,8 +405,7 @@ namespace QXEditorModule.Common
     }
 
     // Base Class for the input and output types.
-    public class MyNodePropertyGrid : MyPropertyGrid
-    {
+    public class MyNodePropertyGrid : MyPropertyGrid {
 
 
         [CategoryAttribute("Required"), DisplayName("Name"), ReadOnly(false), Browsable(true), PropertyOrder(1), DescriptionAttribute("Name of the Output")]
@@ -462,12 +415,10 @@ namespace QXEditorModule.Common
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (_node.Name == "monitor")
-                {
+                if (_node.Name == "monitor") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
-                else
-                {
+                else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
                 return GetAttribute("name");
@@ -486,13 +437,11 @@ namespace QXEditorModule.Common
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (value == null || value == "")
-                {
+                if (value == null || value == "") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                     XSLType = "";
                 }
-                else
-                {
+                else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
                 return value;
@@ -503,13 +452,11 @@ namespace QXEditorModule.Common
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (value == null || value == "")
-                {
+                if (value == null || value == "") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                     XSLType = "";
                 }
-                else
-                {
+                else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
 
@@ -532,12 +479,10 @@ namespace QXEditorModule.Common
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                if (_node.Name == "monitor")
-                {
+                if (_node.Name == "monitor") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
-                else
-                {
+                else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
                 return value;
@@ -548,16 +493,14 @@ namespace QXEditorModule.Common
     }
 
     // Base Class for the input and output types.
-    public class MyNodeInPropertyGrid : MyNodePropertyGrid
-    {
+    public class MyNodeInPropertyGrid : MyNodePropertyGrid {
 
 
         [CategoryAttribute("Required"), DisplayName("Priority"), Browsable(true), PropertyOrder(10), DescriptionAttribute("Input Priority"), ItemsSource(typeof(PriorityTypeList))]
         public string Priority {
             get {
                 int val = GetIntAttribute("priority");
-                switch (val)
-                {
+                switch (val) {
                     case 0:
                         return "Lowest";
                     case 1:
@@ -582,8 +525,7 @@ namespace QXEditorModule.Common
             }
             set {
 
-                switch (value)
-                {
+                switch (value) {
                     case "Highest":
                         SetAttribute("priority", 7);
                         break;
@@ -616,10 +558,8 @@ namespace QXEditorModule.Common
 
 
     [DisplayName("Monitor")]
-    public class MonitorGrid : MyPropertyGrid
-    {
-        public MonitorGrid(XmlNode dataModel, IView view)
-        {
+    public class MonitorGrid : MyPropertyGrid {
+        public MonitorGrid(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
         }
@@ -642,10 +582,8 @@ namespace QXEditorModule.Common
 
 
     [DisplayName("Name Space Definition")]
-    public class NameSpaceGrid : MyPropertyGrid
-    {
-        public NameSpaceGrid(XmlNode dataModel, IView view)
-        {
+    public class NameSpaceGrid : MyPropertyGrid {
+        public NameSpaceGrid(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
         }
@@ -670,12 +608,10 @@ namespace QXEditorModule.Common
     }
 
 
-    public class Filter : MyPropertyGrid
-    {
+    public class Filter : MyPropertyGrid {
 
 
-        public Filter(XmlNode dataModel, IView view)
-        {
+        public Filter(XmlNode dataModel, IView view) {
             _node = dataModel;
             this.view = view;
             type = dataModel.Name;
@@ -685,12 +621,10 @@ namespace QXEditorModule.Common
         public string AltQueue {
             get {
 
-                if (_node.InnerXml.Contains("altqueue"))
-                {
+                if (_node.InnerXml.Contains("altqueue")) {
                     return "Alt Queue is Set (Select in Tree to Edit)";
                 }
-                else
-                {
+                else {
                     return "Alt Queue is Not Set (Right Click on Filter to Add)";
                 }
             }
@@ -699,18 +633,14 @@ namespace QXEditorModule.Common
         [DisplayName("Filter Type"), PropertyOrder(1), Browsable(true), DescriptionAttribute("Filters can either be a single data filter or a compound boolean expression made up of several data filters")]
         public string Type {
             get {
-                if (_node.InnerXml.Contains("<and>") || _node.InnerXml.Contains("<or>") || _node.InnerXml.Contains("<xor>") || _node.InnerXml.Contains("<not>"))
-                {
+                if (_node.InnerXml.Contains("<and>") || _node.InnerXml.Contains("<or>") || _node.InnerXml.Contains("<xor>") || _node.InnerXml.Contains("<not>")) {
                     return "Compound Boolean Expression (Select in Tree to Edit)";
                 }
-                else
-                {
-                    if ((_node.InnerXml.Contains("altqueue") && _node.ChildNodes.Count == 1) || !_node.HasChildNodes)
-                    {
+                else {
+                    if ((_node.InnerXml.Contains("altqueue") && _node.ChildNodes.Count == 1) || !_node.HasChildNodes) {
                         return "No Filter Has Been set Yet. (Right Click on Filter to Add)";
                     }
-                    else
-                    {
+                    else {
                         return "Simple Data Filter. (Select in Tree to Edit)";
                     }
                 }
@@ -719,12 +649,10 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Boolean Expression of Child Nodes")]
-    public class BooleanExpression : MyPropertyGrid
-    {
+    public class BooleanExpression : MyPropertyGrid {
 
 
-        public BooleanExpression(XmlNode dataModel, IView view)
-        {
+        public BooleanExpression(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -734,8 +662,7 @@ namespace QXEditorModule.Common
         public string Type {
             get { return this._node.Name; }
             set {
-                if (this.view.CanChangeElementType(value))
-                {
+                if (this.view.CanChangeElementType(value)) {
                     this.view.ChangeElementType(value);
                 }
             }
@@ -743,19 +670,15 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Data Contains Filter")]
-    public class ContainsFilter : MyPropertyGrid
-    {
+    public class ContainsFilter : MyPropertyGrid {
 
-        public ContainsFilter(XmlNode dataModel, IView view)
-        {
-            try
-            {
+        public ContainsFilter(XmlNode dataModel, IView view) {
+            try {
                 this._node = dataModel;
                 this.view = view;
                 this.type = dataModel.Name;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Console.WriteLine("ERROR IN FILTER GRID CONSTRUCTOR");
                 Console.WriteLine(e.Message);
             }
@@ -775,11 +698,9 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Data Equals Filter")]
-    public class EqualsFilter : MyPropertyGrid
-    {
+    public class EqualsFilter : MyPropertyGrid {
 
-        public EqualsFilter(XmlNode dataModel, IView view)
-        {
+        public EqualsFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -802,11 +723,9 @@ namespace QXEditorModule.Common
 
 
     [DisplayName("Data Matched RegEx Filter")]
-    public class MatchesFilter : MyPropertyGrid
-    {
+    public class MatchesFilter : MyPropertyGrid {
 
-        public MatchesFilter(XmlNode dataModel, IView view)
-        {
+        public MatchesFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -826,11 +745,9 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Data Minimum Length Filter")]
-    public class LengthFilter : MyPropertyGrid
-    {
+    public class LengthFilter : MyPropertyGrid {
 
-        public LengthFilter(XmlNode dataModel, IView view)
-        {
+        public LengthFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -849,11 +766,9 @@ namespace QXEditorModule.Common
         }
     }
     [DisplayName("XPath Exists Filter")]
-    public class XPExistsFilter : MyPropertyGrid
-    {
+    public class XPExistsFilter : MyPropertyGrid {
 
-        public XPExistsFilter(XmlNode dataModel, IView view)
-        {
+        public XPExistsFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -872,11 +787,9 @@ namespace QXEditorModule.Common
         }
     }
     [DisplayName("Value at XPath Matches RegEx Filter")]
-    public class XPMatchesFilter : MyPropertyGrid
-    {
+    public class XPMatchesFilter : MyPropertyGrid {
 
-        public XPMatchesFilter(XmlNode dataModel, IView view)
-        {
+        public XPMatchesFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -903,11 +816,9 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Value at XPath Equals Filter")]
-    public class XPEqualsFilter : MyPropertyGrid
-    {
+    public class XPEqualsFilter : MyPropertyGrid {
 
-        public XPEqualsFilter(XmlNode dataModel, IView view)
-        {
+        public XPEqualsFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -934,11 +845,9 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Date at XPath fall within Offset Filter")]
-    public class DateRangeFilter : MyPropertyGrid
-    {
+    public class DateRangeFilter : MyPropertyGrid {
 
-        public DateRangeFilter(XmlNode dataModel, IView view)
-        {
+        public DateRangeFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -970,11 +879,9 @@ namespace QXEditorModule.Common
     }
 
     [DisplayName("Temporal Context Cache")]
-    public class ContextFilter : MyPropertyGrid
-    {
+    public class ContextFilter : MyPropertyGrid {
 
-        public ContextFilter(XmlNode dataModel, IView view)
-        {
+        public ContextFilter(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
@@ -995,8 +902,7 @@ namespace QXEditorModule.Common
             set {
                 SetAttribute("useMessageAsKey", value);
 
-                if (ContextExpiry <= 0)
-                {
+                if (ContextExpiry <= 0) {
                     ContextExpiry = 10;
                 }
             }
@@ -1008,8 +914,7 @@ namespace QXEditorModule.Common
             get { return GetAttribute("contextCacheKeyXPath"); }
             set {
                 SetAttribute("contextCacheKeyXPath", value);
-                if (ContextExpiry <= 0)
-                {
+                if (ContextExpiry <= 0) {
                     ContextExpiry = 10;
                 }
             }
@@ -1019,8 +924,7 @@ namespace QXEditorModule.Common
         public int ContextExpiry {
             get { return GetIntAttribute("contextCacheExpiry"); }
             set {
-                if (value <= 0)
-                {
+                if (value <= 0) {
                     value = 1;
                 }
                 SetAttribute("contextCacheExpiry", value);
@@ -1030,11 +934,9 @@ namespace QXEditorModule.Common
 
 
     [DisplayName("Service Setting")]
-    public class ServiceSetting : MyPropertyGrid
-    {
+    public class ServiceSetting : MyPropertyGrid {
 
-        public ServiceSetting(XmlNode dataModel, IView view)
-        {
+        public ServiceSetting(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = dataModel.Name;
