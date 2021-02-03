@@ -5,10 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace QueueExchange
-{
-    class QESink : QueueAbstract
-    {
+namespace QueueExchange {
+    class QESink : QueueAbstract {
 
         /*
          * It's called SINK, but the factory class will also instantiate it for "TESTSOURCE" input
@@ -23,113 +21,82 @@ namespace QueueExchange
 
         private System.Timers.Timer _timer;
 
-        public QESink(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress)
-        {
+        public QESink(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) {
 
-            try
-            {
+            try {
                 fullPath = definition.Attribute("path").Value;
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 fullPath = null;
             }
 
-            try
-            {
+            try {
                 testText = definition.Attribute("testText").Value;
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 testText = null;
             }
 
-            try
-            {
+            try {
                 maxWait = Int32.Parse(definition.Attribute("maxWait").Value);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 maxWait = 60000;
             }
 
-            try
-            {
+            try {
                 fixedInterval = Int32.Parse(definition.Attribute("fixedInterval").Value);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 fixedInterval = -1;
             }
 
-            try
-            {
+            try {
                 maxMessages = Int32.Parse(definition.Attribute("maxMessages").Value);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 maxMessages = -1;
             }
         }
 
-        public override async Task StartListener()
-        {
+        public override async Task StartListener() {
             await Task.Run(() =>
             {
 
-                _timer = new System.Timers.Timer
-                {
+                _timer = new System.Timers.Timer {
                     AutoReset = false,
                     Enabled = true
                 };
                 _timer.Elapsed += (source, eventArgs) =>
                 {
                     string message;
-                    try
-                    {
+                    try {
                         // If a file has been specified, send a file
                         message = File.ReadAllText(fullPath, Encoding.UTF8);
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         message = testText;
                     }
 
-                    if (message == null)
-                    {
+                    if (message == null) {
                         message = Guid.NewGuid().ToString();
                     }
 
                     SendToPipe(message);
 
-                    if (fixedInterval > 0)
-                    {
+                    if (fixedInterval > 0) {
                         _timer.Interval = fixedInterval;
-                    }
-                    else
-                    {
+                    } else {
                         _timer.Interval = new Random().Next(maxWait);
                     }
 
-                    try
-                    {
+                    try {
 
-                        if (counter >= maxMessages && maxMessages > 0)
-                        {
+                        if (counter >= maxMessages && maxMessages > 0) {
                             _timer.Enabled = false;
                             _timer.Stop();
                             _timer.Close();
                             _timer.Dispose();
-                        }
-                        else
-                        {
+                        } else {
                             _timer.Start();
                             _timer.Enabled = true;
                         }
 
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         logger.Trace(e);
                     }
 
@@ -137,12 +104,9 @@ namespace QueueExchange
 
                 };
 
-                if (fixedInterval > 0)
-                {
+                if (fixedInterval > 0) {
                     _timer.Interval = fixedInterval;
-                }
-                else
-                {
+                } else {
                     _timer.Interval = new Random().Next(maxWait);
                 }
 
@@ -151,19 +115,16 @@ namespace QueueExchange
         }
 
 
-        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message)
-        {
-
-            // Do nothing with the message, just dump it.
-
-            logger.Trace($"Message sunk at {name}");
-            message.sent = true;
-            await Task.Run(() => { });
+        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message) {
+            await Task.Run(() =>
+            {
+                logger.Info($"Sunk Message");
+                message.sent = true;
+            });
             return null;
         }
 
-        public override bool SetUp()
-        {
+        public override bool SetUp() {
             return true;
         }
     }

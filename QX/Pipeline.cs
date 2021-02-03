@@ -48,6 +48,7 @@ namespace QueueExchange {
         private readonly Dictionary<string, Queue<ExchangeMessage>> _bufferMemoryQueueDict = new Dictionary<string, Queue<ExchangeMessage>>();
         private readonly Dictionary<string, System.Timers.Timer> _bufferTimerDict = new Dictionary<string, System.Timers.Timer>();
         private readonly bool useMessageAsKey;
+        private readonly bool contextAware = false;
 
         private int throttleInterval = 0;
         private readonly int maxMsgPerMinute;   // Maximum number of input messages that the pipe will process per minute
@@ -83,48 +84,46 @@ namespace QueueExchange {
                 string dist = pipeConfig.Attribute("distribution").Value;
                 if (dist == "random") {
                     randomDistribution = true;
-                }
-                else if (dist == "roundRobin") {
+                } else if (dist == "roundRobin") {
                     roundRobinDistribution = true;
                 }
-            }
-            catch {
+            } catch {
                 randomDistribution = false;
                 roundRobinDistribution = false;
             }
 
             try {
                 this.id = pipeConfig.Attribute("id").Value;
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 this.id = Guid.NewGuid().ToString();
             }
 
             try {
                 outputIsolation = bool.Parse(pipeConfig.Attribute("outputIsolation").Value);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 outputIsolation = false;
             }
 
             try {
-                mostRecentOnly = bool.Parse(pipeConfig.Attribute("mostRecentOnly").Value);
+                contextAware = bool.Parse(pipeConfig.Attribute("contextAware").Value);
+            } catch (Exception) {
+                contextAware = false;
             }
-            catch (Exception) {
+            try {
+                mostRecentOnly = bool.Parse(pipeConfig.Attribute("mostRecentOnly").Value);
+            } catch (Exception) {
                 mostRecentOnly = false;
             }
 
             try {
                 name = pipeConfig.Attribute("name").Value;
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 name = "Un Named PipeLine";
             }
 
             try {
                 inputQueueName = pipeConfig.Attribute("pipeInputQueueName").Value;
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 inputQueueName = null;
             }
 
@@ -134,20 +133,17 @@ namespace QueueExchange {
                 maxMsgPerMinute = int.Parse(pipeConfig.Attribute("maxMsgPerMinute").Value);
                 if (maxMsgPerMinute == -1) {
                     throttleInterval = 0;
-                }
-                else {
+                } else {
                     throttleInterval = 60000 / maxMsgPerMinute;
                 }
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 throttleInterval = 0;
             }
 
             // Configure a throttling time to limit the throughput of the pipeline
             try {
                 maxMsgPerMinuteProfile = pipeConfig.Attribute("maxMsgPerMinuteProfile").Value;
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 maxMsgPerMinuteProfile = null;
             }
             // QueueFactory takes the definition of each of the queues and creates the defined 
@@ -166,8 +162,7 @@ namespace QueueExchange {
                         continue;
                     }
                     input.Add(queue);
-                }
-                else {
+                } else {
                     logger.Error($"Could not proccess Input Queue {queue.queueName}");
                 }
             }
@@ -187,12 +182,10 @@ namespace QueueExchange {
                             continue;
                         }
                         output.Add(queue);
-                    }
-                    else {
+                    } else {
                         logger.Error($"Could not proccess Output Queue {queue.queueName}");
                     }
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     logger.Error(ex.Message);
                 }
             }
@@ -206,12 +199,10 @@ namespace QueueExchange {
                         this.pipeInputQueue = t;
                         logger.Info($"Created Input Queue {inputQueueName} for pipeline");
                     }
-                }
-                else {
+                } else {
                     this.pipeInputQueue = new MessageQueue(inputQueueName);
                 }
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 logger.Error(ex.Message);
             }
 
@@ -219,36 +210,31 @@ namespace QueueExchange {
 
             try {
                 contextCacheKeyXPath = pipeConfig.Attribute("contextCacheKeyXPath").Value;
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 contextCacheKeyXPath = null;
             }
 
             try {
                 this.contextCacheExpiry = double.Parse(pipeConfig.Attribute("contextCacheExpiry").Value);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 this.contextCacheExpiry = 10.0;
             }
 
             try {
                 this.discardInCache = bool.Parse(pipeConfig.Attribute("discardInCache").Value);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 this.discardInCache = false;
             }
 
             try {
                 this.firstOnly = bool.Parse(pipeConfig.Attribute("firstOnly").Value);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 this.firstOnly = false;
             }
 
             try {
                 this.useMessageAsKey = bool.Parse(pipeConfig.Attribute("useMessageAsKey").Value);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 this.useMessageAsKey = false;
             }
 
@@ -259,8 +245,7 @@ namespace QueueExchange {
                 int contextStatsInterval;
                 try {
                     contextStatsInterval = int.Parse(pipeConfig.Attribute("contextStatsInterval").Value);
-                }
-                catch (Exception) {
+                } catch (Exception) {
                     contextStatsInterval = 30000;
                 }
 
@@ -278,11 +263,9 @@ namespace QueueExchange {
                         foreach (var v in statDict.Values) {
                             statLogger.Info(v);
                         }
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         logger.Error($"Stats dictionary problem {ex.Message}");
-                    }
-                    finally {
+                    } finally {
                         statDict.Clear();
                     }
 
@@ -299,8 +282,7 @@ namespace QueueExchange {
              */
             if (output.Count() > 0) {
                 OK_TO_RUN = true;
-            }
-            else {
+            } else {
                 OK_TO_RUN = false;
                 logger.Warn($"No inputs or outputs defined for Pipeline {name}");
             }
@@ -319,18 +301,15 @@ namespace QueueExchange {
                             string mess = mft.Read(msg) as string;
                             return mess;
                         }
-                    }
-                    catch (MessageQueueException e) {
+                    } catch (MessageQueueException e) {
                         // Handle no message arriving in the queue.
                         if (e.MessageQueueErrorCode == MessageQueueErrorCode.IOTimeout) {
 
-                        }
-                        else {
+                        } else {
                             logger.Info($"Queue Error: {this.pipeInputQueue.Path} {e.StackTrace}");
                         }
 
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         logger.Trace(ex.Message);
                         logger.Info(ex, "Unhandled MSMQ listen Error");
                     }
@@ -345,16 +324,14 @@ namespace QueueExchange {
             foreach (QueueAbstract q in input) {
                 try {
                     q.Stop();
-                }
-                catch (Exception) {
+                } catch (Exception) {
                     //
                 }
             }
             foreach (QueueAbstract q in output) {
                 try {
                     q.Stop();
-                }
-                catch (Exception) {
+                } catch (Exception) {
                     //
                 }
             }
@@ -380,8 +357,7 @@ namespace QueueExchange {
                     resetTimer.Elapsed += (sender, e) => MyElapsedMethod(sender, e, intervalThrottleInterval, maxMess);
                     resetTimer.Start();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.Error("**********************************");
                 logger.Error("* Message Throttle Profile Error *");
                 logger.Error("**********************************");
@@ -425,17 +401,15 @@ namespace QueueExchange {
                     ExchangeMessage xm = GetMessage();
                     QXLog("Recieved Message", null, "PROGRESS");
 
-                    if (throttleInterval <= 0) {
+                    if (throttleInterval > 0 || contextAware == true) {
                         QXLog("Sending Message to Context Proceesor", null, "PROGRESS");
                         await ContextProcessorAsync(xm);
-                    }
-                    else {
+                    } else {
                         QXLog("Sending Message to Injector", null, "PROGRESS");
                         await InjectMessage(xm);
                         Thread.Sleep(throttleInterval);
                     }
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Console.WriteLine(ex.Message);
                 }
             }
@@ -466,12 +440,11 @@ namespace QueueExchange {
                 Queue<ExchangeMessage> bufferMemoryQueue = null;
                 System.Timers.Timer bufferPopperTimer = null;
 
-                try {
-                    // Get the buffer queue and popperTimer for this key
+
+                if (_bufferMemoryQueueDict.ContainsKey(contextKeyValue) && _bufferTimerDict.ContainsKey(contextKeyValue)) {
                     bufferMemoryQueue = _bufferMemoryQueueDict[contextKeyValue];
                     bufferPopperTimer = _bufferTimerDict[contextKeyValue];
-                }
-                catch (Exception) {
+                } else {
 
                     // They don't exist, so they need to be created.
                     logger.Trace($"Creating queue and timer for {contextKeyValue}");
@@ -488,8 +461,7 @@ namespace QueueExchange {
                 ContextStats stats = null;
                 if (statDict.ContainsKey(contextKeyValue)) {
                     stats = statDict[contextKeyValue];
-                }
-                else {
+                } else {
                     ContextStats v = new ContextStats {
                         key = contextKeyValue
                     };
@@ -502,7 +474,7 @@ namespace QueueExchange {
                 this.totalReceived++;
 
                 if (_contextCache.Contains(contextKeyValue) && this.discardInCache) {
-                    logger.Info("Message found in Cache, but discard configured");
+                    logger.Info($"Message found in Cache - Discarding. Message Hash {contextKeyValue}");
                     return;
                 }
 
@@ -528,8 +500,7 @@ namespace QueueExchange {
                             bufferPopperTimer.Start();
                         }
 
-                    }
-                    else {
+                    } else {
 
                         //It's in tha cache, 
                         if (!bufferPopperTimer.Enabled) {
@@ -554,8 +525,7 @@ namespace QueueExchange {
                             bufferPopperTimer.Enabled = true;
                             bufferPopperTimer.Start();
                         }
-                    }
-                    else {
+                    } else {
                         if (!bufferPopperTimer.Enabled) {
                             bufferPopperTimer.Interval = contextCacheExpiry * 1000;
                             bufferPopperTimer.Enabled = true;
@@ -565,8 +535,7 @@ namespace QueueExchange {
                     return;
                 }
 
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 logger.Error(ex);
             }
         }
@@ -584,15 +553,12 @@ namespace QueueExchange {
                     using (MemoryStream stream = new MemoryStream(byteArray)) {
                         byte[] hashValue = mySHA256.ComputeHash(stream);
                         contextKeyValue = BitConverter.ToString(hashValue);
-                        logger.Trace($"Message Hash {contextKeyValue}");
                     }
                     return contextKeyValue;
                 }
-            }
-            else if (contextCacheKeyXPath == "*") {
+            } else if (contextCacheKeyXPath == "*") {
                 return "ALL_MESSAGES";
-            }
-            else {
+            } else {
 
                 // Look at the XML to get the contextKey
                 XmlDocument doc = new XmlDocument();
@@ -608,8 +574,7 @@ namespace QueueExchange {
                     XmlNode node = doc.SelectSingleNode(contextCacheKeyXPath, ns);
                     contextKeyValue = node.InnerText;
                     logger.Info($"Context Key for Message = {contextKeyValue}");
-                }
-                catch {
+                } catch {
                     return null;
                 }
                 QXLog("Context Proceesor", $"Context Key Retrieves Context Key = {contextKeyValue}", "PROGRESS");
@@ -621,8 +586,7 @@ namespace QueueExchange {
 
             double interval = contextCacheExpiry * 1000 + 100.0;
 
-            logger.Info("Creating Popper Task");
-            logger.Info($"firstOnly= {firstOnly}, First Completed = {_firstProcessedCompleted.Contains(contextKeyValue)} ");
+            logger.Info($"Creating Popper Task. Message Hash: {contextKeyValue}");
 
             System.Timers.Timer bufferPopperTimer = new System.Timers.Timer {
                 Interval = interval,
@@ -634,7 +598,7 @@ namespace QueueExchange {
                 bufferPopperTimer.Enabled = false;
 
                 if (_firstProcessedCompleted.Contains(contextKeyValue)) {
-                    logger.Info("Pooper Expired - Marking it cleared <<<<<<<<<<<<<<<<<<");
+                    //  logger.Info("Pooper Expired - Marking it cleared <<<<<<<<<<<<<<<<<<");
                     _firstProcessedCleared.AddOrGetExisting(contextKeyValue, DateTime.Now.AddSeconds(this.contextCacheExpiry), DateTime.Now.AddSeconds(this.contextCacheExpiry));
                 }
 
@@ -646,14 +610,12 @@ namespace QueueExchange {
 
                     if (bufferMemoryQueue.Count > 0) {
                         await InjectMessage(bufferMemoryQueue.Dequeue());
-                    }
-                    else {
+                    } else {
                         return;
                     }
                     if (firstOnly && _firstProcessedCleared.Contains(contextKeyValue)) {
                         bufferPopperTimer.Interval = 10.0;
-                    }
-                    else {
+                    } else {
                         bufferPopperTimer.Interval = contextCacheExpiry * 1000;
                     }
                     bufferPopperTimer.AutoReset = true;
@@ -662,19 +624,16 @@ namespace QueueExchange {
                     try {
                         statDict[contextKeyValue].send++;
                         statLogger.Trace(statDict[contextKeyValue]);
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         logger.Error($"Stats dictionary problem {ex.Message}");
                     }
                     this.totalSent++;
-                }
-                else {
+                } else {
                     logger.Trace($"Reinjection Popper Timer Went Off for key = {contextKeyValue} - No Message to Process");
                     if (_firstProcessedCleared.Contains(contextKeyValue)) {
                         bufferPopperTimer.Enabled = false;
                         bufferPopperTimer.AutoReset = false;
-                    }
-                    else {
+                    } else {
                         bufferPopperTimer.Interval = contextCacheExpiry * 1000;
                         bufferPopperTimer.Enabled = true;
                         bufferPopperTimer.AutoReset = true;
@@ -713,15 +672,13 @@ namespace QueueExchange {
                         QXLog("Async Message Start", "Distribution to Random Output", "PROGRESS");
                         _ = Task.Run(() => SendAndLog(output[index], xm));
                         QXLog("Async Message End", "Distribution to Random Output", "PROGRESS");
-                    }
-                    else {
+                    } else {
                         QXLog("Sync Message Start", "Distribution to Random Output", "PROGRESS");
                         _ = await SendAndLog(output[index], xm);
                         QXLog("Sync Message End", "Distribution to Random Output", "PROGRESS");
                     }
 
-                }
-                else if (roundRobinDistribution) {
+                } else if (roundRobinDistribution) {
                     // Distributes the message only once to each queue in turn
                     int index = nextOutput % output.Count;
 
@@ -732,8 +689,7 @@ namespace QueueExchange {
                         QXLog("Async Message Start", "Distribution to Round Robin Output", "PROGRESS");
                         _ = Task.Run(() => SendAndLog(output[index], xm));
                         QXLog("Async Message End", "Distribution to Round Robin Output", "PROGRESS");
-                    }
-                    else {
+                    } else {
                         QXLog("Sync Message Start", "Distribution to Round Robin Output", "PROGRESS");
                         _ = await SendAndLog(output[index], xm);
                         QXLog("Sync Message End", "Distribution to Round Robin Output", "PROGRESS");
@@ -741,8 +697,7 @@ namespace QueueExchange {
 
                     nextOutput++;
 
-                }
-                else {
+                } else {
                     // Distribute the message to all the outputs
                     if (outputIsolation) {
                         // Wont wait for the Send to complete before completing
@@ -751,8 +706,7 @@ namespace QueueExchange {
                             _ = Task.Run(() => SendAndLog(q, xm));
                             QXLog("Async Message End", "Normal Distribution", "PROGRESS");
                         }
-                    }
-                    else {
+                    } else {
 
                         // Will wait for all Sends to complete before proceeding
                         QXLog("Sync Message Start", "Normal Distribution", "PROGRESS");
@@ -791,8 +745,7 @@ namespace QueueExchange {
             try {
                 Dispose(true);
                 GC.SuppressFinalize(this);
-            }
-            catch { }
+            } catch { }
         }
         protected virtual void Dispose(bool disposing) {
             if (!_disposed) {

@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace QXEditorModule.Common
-{
+namespace QXEditorModule.Common {
 
-    public class ContextMenuProvider
-    {
+    public class ContextMenuProvider {
         public readonly Dictionary<ContextMenuType, MenuItem> ContextMenus = new Dictionary<ContextMenuType, MenuItem>();
 
-        public ContextMenuProvider()
-        {
+        public ContextMenuProvider() {
             ContextMenus.Add(ContextMenuType.Copy, new MenuItem { Header = "Copy" });
             ContextMenus.Add(ContextMenuType.Paste, new MenuItem { Header = "Paste" });
             ContextMenus.Add(ContextMenuType.Delete, new MenuItem { Header = "Delete" });
@@ -22,6 +19,7 @@ namespace QXEditorModule.Common
             ContextMenus.Add(ContextMenuType.AddHTTPInput, new MenuItem { Header = "HTTP POST Input Node" });
             ContextMenus.Add(ContextMenuType.AddKafkaInput, new MenuItem { Header = "Kafka Topic Input Node" });
             ContextMenus.Add(ContextMenuType.AddRabbitInput, new MenuItem { Header = "Rabbit MQ Input Node" });
+            ContextMenus.Add(ContextMenuType.AddMQTTInput, new MenuItem { Header = "MQTT Subscriber Node" });
             ContextMenus.Add(ContextMenuType.AddTCPInput, new MenuItem { Header = "TCP Server Input Node" });
             ContextMenus.Add(ContextMenuType.AddTestInput, new MenuItem { Header = "Test Message Source" });
 
@@ -30,7 +28,9 @@ namespace QXEditorModule.Common
             ContextMenus.Add(ContextMenuType.AddFileOutput, new MenuItem { Header = "File Output Node" });
             ContextMenus.Add(ContextMenuType.AddHTTPOutput, new MenuItem { Header = "HTTP POST Output Node" });
             ContextMenus.Add(ContextMenuType.AddKafkaOutput, new MenuItem { Header = "Kafka Topic Output Node" });
-            ContextMenus.Add(ContextMenuType.AddRabbitOutput, new MenuItem { Header = "Rabbit MQ Output Node" }); 
+            ContextMenus.Add(ContextMenuType.AddRabbitOutput, new MenuItem { Header = "Rabbit MQ Output Node" });
+            ContextMenus.Add(ContextMenuType.AddMQTTOutput, new MenuItem { Header = "MQTT Publisher Node" });
+            ContextMenus.Add(ContextMenuType.AddFTPOutput, new MenuItem { Header = "FTP Node" });
             ContextMenus.Add(ContextMenuType.AddSMTPOutput, new MenuItem { Header = "SMTP Output Node" });
             ContextMenus.Add(ContextMenuType.AddTCPOutput, new MenuItem { Header = "TCP Client Output Node" });
             ContextMenus.Add(ContextMenuType.AddHTTPRest, new MenuItem { Header = "Rest Server Retrieval Output Node" });

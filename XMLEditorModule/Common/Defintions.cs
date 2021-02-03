@@ -23,7 +23,18 @@ namespace QXEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP Post","Kafka", "Rabbit MQ", "TCP Server", "Test Source"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","Kafka", "Rabbit MQ", "TCP Server", "MQTT Subscriber", "Test Source"
+            };
+            return types; ;
+        }
+    }
+
+    public class MQTTServerTypeList : IItemsSource {
+
+        public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
+
+            var types = new ItemCollection {
+                "Web Services Server", "TCP Server"
             };
             return types; ;
         }
@@ -44,7 +55,7 @@ namespace QXEditorModule.Common {
         public Xceed.Wpf.Toolkit.PropertyGrid.Attributes.ItemCollection GetValues() {
 
             var types = new ItemCollection {
-                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "TCP Client", "SMTP", "SINK"
+                "Microsoft MQ", "IBM MQ", "File","HTTP Post","RESTful","Kafka", "Rabbit MQ", "TCP Client", "MQTT Publisher","SMTP","FTP", "SINK"
             };
             return types; ;
         }
@@ -131,8 +142,7 @@ namespace QXEditorModule.Common {
                 BrowsableAttribute theDescriptorBrowsableAttribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
                 FieldInfo isBrowsable = theDescriptorBrowsableAttribute.GetType().GetField("Browsable", BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
                 isBrowsable.SetValue(theDescriptorBrowsableAttribute, value);
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 Console.WriteLine($"Show/Hide Issue for {field}");
             }
         }
@@ -141,8 +151,7 @@ namespace QXEditorModule.Common {
 
             if (_node.Attributes[attribName] != null) {
                 return _node.Attributes[attribName].Value;
-            }
-            else {
+            } else {
                 return "";
             }
         }
@@ -151,8 +160,7 @@ namespace QXEditorModule.Common {
 
             if (_node.Attributes[attribName] != null) {
                 return bool.Parse(_node.Attributes[attribName].Value);
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -161,14 +169,12 @@ namespace QXEditorModule.Common {
 
             if (_node.Attributes[attribName] != null) {
                 return bool.Parse(_node.Attributes[attribName].Value);
-            }
-            else {
+            } else {
                 if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = "True";
                     _node.Attributes.Append(newAttribute);
-                }
-                else {
+                } else {
                     _node.Attributes[attribName].Value = "True";
                 }
                 view.UpdateParamBindings("XMLText");
@@ -180,14 +186,12 @@ namespace QXEditorModule.Common {
 
             if (_node.Attributes[attribName] != null) {
                 return bool.Parse(_node.Attributes[attribName].Value);
-            }
-            else {
+            } else {
                 if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = "False";
                     _node.Attributes.Append(newAttribute);
-                }
-                else {
+                } else {
                     _node.Attributes[attribName].Value = "False";
                 }
                 view.UpdateParamBindings("XMLText");
@@ -200,15 +204,13 @@ namespace QXEditorModule.Common {
                 int value;
                 try {
                     value = int.Parse(_node.Attributes[attribName].Value);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Console.WriteLine(e.Message);
                     value = -1;
                 }
 
                 return value;
-            }
-            else {
+            } else {
                 return -1;
             }
         }
@@ -217,8 +219,7 @@ namespace QXEditorModule.Common {
 
             if (_node.Attributes[attribName] != null) {
                 return int.Parse(_node.Attributes[attribName].Value);
-            }
-            else {
+            } else {
                 return def;
             }
         }
@@ -232,17 +233,14 @@ namespace QXEditorModule.Common {
             if (value == null || value == "") {
                 try {
                     _node.Attributes.Remove(_node.Attributes[attribName]);
-                }
-                catch { }
-            }
-            else {
+                } catch { }
+            } else {
 
                 if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value;
                     _node.Attributes.Append(newAttribute);
-                }
-                else {
+                } else {
                     _node.Attributes[attribName].Value = value;
                 }
             }
@@ -254,15 +252,13 @@ namespace QXEditorModule.Common {
         protected void SetAbsoluteAttribute(string attribName, bool value) {
             if (_node.Attributes[attribName] != null) {
                 _node.Attributes[attribName].Value = value.ToString();
-            }
-            else {
+            } else {
 
                 if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value.ToString();
                     _node.Attributes.Append(newAttribute);
-                }
-                else {
+                } else {
                     _node.Attributes[attribName].Value = value.ToString();
                 }
             }
@@ -272,15 +268,13 @@ namespace QXEditorModule.Common {
         protected void SetAttribute(string attribName, bool value) {
             if ((!value) && _node.Attributes[attribName] != null) {
                 _node.Attributes.Remove(_node.Attributes[attribName]);
-            }
-            else {
+            } else {
 
                 if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value.ToString();
                     _node.Attributes.Append(newAttribute);
-                }
-                else {
+                } else {
                     _node.Attributes[attribName].Value = value.ToString();
                 }
             }
@@ -291,15 +285,13 @@ namespace QXEditorModule.Common {
         protected void SetAttribute(string attribName, int value) {
             if ((value == -1) && _node.Attributes[attribName] != null) {
                 _node.Attributes.Remove(_node.Attributes[attribName]);
-            }
-            else {
+            } else {
 
                 if (_node.Attributes[attribName] == null) {
                     XmlAttribute newAttribute = _node.OwnerDocument.CreateAttribute(attribName);
                     newAttribute.Value = value.ToString();
                     _node.Attributes.Append(newAttribute);
-                }
-                else {
+                } else {
                     _node.Attributes[attribName].Value = value.ToString();
                 }
             }
@@ -370,6 +362,18 @@ namespace QXEditorModule.Common {
                         view.UpdateSelectedNodeCanvas(_node);
                         if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.TCPOUT(_node);
                         break;
+                    case "MQTT Publisher":
+                    case "MQTT Subscriber":
+                        SetAttribute("type", "MQTT");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "input") view.MQTT(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.MQTT(_node);
+                        break;
+                    case "FTP":
+                        SetAttribute("type", "FTP");
+                        view.UpdateSelectedNodeCanvas(_node);
+                        if (_node.Name == "output" || _node.Name == "altqueue" || _node.Name == "monitor") view.FTP(_node);
+                        break;
                     case "SINK":
                         if (_node.Name == "input") {
                             MessageBox.Show("The Sink Type Cannot Be Used as an Input Type", "Invalid Input Node Type");
@@ -417,8 +421,7 @@ namespace QXEditorModule.Common {
 
                 if (_node.Name == "monitor") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
-                }
-                else {
+                } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
                 return GetAttribute("name");
@@ -440,8 +443,7 @@ namespace QXEditorModule.Common {
                 if (value == null || value == "") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                     XSLType = "";
-                }
-                else {
+                } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
                 return value;
@@ -455,8 +457,7 @@ namespace QXEditorModule.Common {
                 if (value == null || value == "") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                     XSLType = "";
-                }
-                else {
+                } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
                 }
 
@@ -481,8 +482,7 @@ namespace QXEditorModule.Common {
 
                 if (_node.Name == "monitor") {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, true);
-                }
-                else {
+                } else {
                     isBrowsable.SetValue(theDescriptorBrowsableAttribute, false);
                 }
                 return value;
@@ -623,8 +623,7 @@ namespace QXEditorModule.Common {
 
                 if (_node.InnerXml.Contains("altqueue")) {
                     return "Alt Queue is Set (Select in Tree to Edit)";
-                }
-                else {
+                } else {
                     return "Alt Queue is Not Set (Right Click on Filter to Add)";
                 }
             }
@@ -635,12 +634,10 @@ namespace QXEditorModule.Common {
             get {
                 if (_node.InnerXml.Contains("<and>") || _node.InnerXml.Contains("<or>") || _node.InnerXml.Contains("<xor>") || _node.InnerXml.Contains("<not>")) {
                     return "Compound Boolean Expression (Select in Tree to Edit)";
-                }
-                else {
+                } else {
                     if ((_node.InnerXml.Contains("altqueue") && _node.ChildNodes.Count == 1) || !_node.HasChildNodes) {
                         return "No Filter Has Been set Yet. (Right Click on Filter to Add)";
-                    }
-                    else {
+                    } else {
                         return "Simple Data Filter. (Select in Tree to Edit)";
                     }
                 }
@@ -677,8 +674,7 @@ namespace QXEditorModule.Common {
                 this._node = dataModel;
                 this.view = view;
                 this.type = dataModel.Name;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Console.WriteLine("ERROR IN FILTER GRID CONSTRUCTOR");
                 Console.WriteLine(e.Message);
             }

@@ -69,7 +69,6 @@
                     <Setter TargetName="text" Property="Text" Value="{Binding Path=Name}"></Setter>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Path=NodeType}" Value="Comment">
-                    <!--<Setter TargetName="text" Property="Visibility" Value="Collapsed"></Setter>-->
                     <Setter TargetName="text" Property="Text" Value="Comments"></Setter>
                 </DataTrigger>
             </HierarchicalDataTemplate.Triggers>

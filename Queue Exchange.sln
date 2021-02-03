@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QXRuntime", "QX\QXRuntime.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QXMonitor", "QXMonitor\QXMonitor.csproj", "{534C3044-525B-4B9B-89F9-02A21F2D58BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTT TEST", "MQTT TEST\MQTT TEST.csproj", "{34CD69B7-1BED-4C68-A503-63A7F719AA37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,18 @@ Global
 		{534C3044-525B-4B9B-89F9-02A21F2D58BB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{534C3044-525B-4B9B-89F9-02A21F2D58BB}.Release|x86.ActiveCfg = Release|Any CPU
 		{534C3044-525B-4B9B-89F9-02A21F2D58BB}.Release|x86.Build.0 = Release|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Debug|x86.Build.0 = Debug|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Release|x86.ActiveCfg = Release|Any CPU
+		{34CD69B7-1BED-4C68-A503-63A7F719AA37}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

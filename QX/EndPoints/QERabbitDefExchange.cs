@@ -5,40 +5,76 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace QueueExchange
-{
-    class QERabbitDefExchange : QueueAbstract, IDisposable
-    {
+namespace QueueExchange {
+    class QERabbitDefExchange : QueueAbstract, IDisposable {
+        private int port;
+        private string vhost;
+        private string pass;
+        private string user;
 
         public QERabbitDefExchange(XElement defn, IProgress<QueueMonitorMessage> monitorMessageProgress) : base(defn, monitorMessageProgress) { }
 
-        public override bool SetUp()
-        {
+        public override bool SetUp() {
             OK_TO_RUN = false;
 
-            try
-            {
+            try {
                 connection = definition.Attribute("connection").Value;
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 logger.Error("Connection not defined for RabbitMQ");
                 return false;
             }
+
+
+            try {
+                connection = definition.Attribute("connection").Value;
+            } catch (Exception) {
+                return false;
+            }
+            try {
+                queueName = definition.Attribute("queueName").Value;
+            } catch (Exception) {
+                queueName = null;
+            }
+
+            try {
+                user = definition.Attribute("rabbitUser").Value;
+            } catch (Exception) {
+                user = "guest";
+            }
+            try {
+                pass = definition.Attribute("rabbitPass").Value;
+            } catch (Exception) {
+                pass = "guest";
+            }
+            try {
+                vhost = definition.Attribute("rabbitVHost").Value;
+            } catch (Exception) {
+                vhost = "/";
+            }
+            try {
+                port = int.Parse(definition.Attribute("rabbitPort").Value);
+            } catch (Exception) {
+                port = 5672;
+            }
+
 
             OK_TO_RUN = true;
 
             return true;
         }
 
-        override async public Task StartListener()
-        {
+        override async public Task StartListener() {
 
             await Task.Run(() =>
             {
-                try
-                {
+                try {
                     var factory = new ConnectionFactory() { HostName = connection };
+                    factory.UserName = user;
+                    factory.Password = pass;
+                    factory.VirtualHost = vhost;
+                    factory.HostName = connection;
+                    factory.Port = port;
+
                     var conn = factory.CreateConnection();
                     var channel = conn.CreateModel();
 
@@ -53,38 +89,35 @@ namespace QueueExchange
                     // This returns straight away, so don't dispose of the channel
                     channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
 
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     logger.Error(ex.StackTrace);
                 }
             });
         }
 
-        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message)
-        {
+        public override async Task<ExchangeMessage> SendToOutputAsync(ExchangeMessage message) {
 
             await Task.Run(() => { });
 
 
             // Set the queueName bassed on the content of the message if configured
             message = SetDestinationFromMessage(message);
-            if (!message.destinationSet && queueName == null)
-            {
+            if (!message.destinationSet && queueName == null) {
                 message.sent = false;
                 return message;
             }
 
-            try
-            {
+            try {
                 var factory = new ConnectionFactory() { HostName = connection };
-                using (var conn = factory.CreateConnection())
-                {
-                    using (var channel = conn.CreateModel())
-                    {
+                factory.UserName = user;
+                factory.Password = pass;
+                factory.VirtualHost = vhost;
+                factory.HostName = connection;
+                factory.Port = port;
+                using (var conn = factory.CreateConnection()) {
+                    using (var channel = conn.CreateModel()) {
 
-                        try
-                        {
+                        try {
                             QueueDeclareOk ch = channel.QueueDeclare(queue: queueName,
                                                                      durable: true,
                                                                      exclusive: false,
@@ -92,9 +125,7 @@ namespace QueueExchange
                                                                      arguments: null);
 
 
-                        }
-                        catch (Exception ex)
-                        {
+                        } catch (Exception ex) {
                             logger.Error(ex.Message);
                             logger.Error(ex.StackTrace);
                             message.sent = false;
@@ -103,15 +134,12 @@ namespace QueueExchange
                         }
                         var body = Encoding.UTF8.GetBytes(message.payload);
 
-                        try
-                        {
+                        try {
                             channel.BasicPublish(exchange: "",
                                                  routingKey: queueName,
                                                  basicProperties: null,
                                                  body: body);
-                        }
-                        catch (Exception ex)
-                        {
+                        } catch (Exception ex) {
                             logger.Error(ex.Message);
                             logger.Error(ex.StackTrace);
                             SendToUndeliverableQueue(message);
@@ -126,17 +154,14 @@ namespace QueueExchange
 
                     }
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 logger.Error(e.Message);
                 message.sent = false;
                 return message;
             }
         }
 
-        public void Dispose()
-        {
+        public void Dispose() {
 
         }
     }

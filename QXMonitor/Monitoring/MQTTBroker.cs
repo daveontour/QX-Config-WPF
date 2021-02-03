@@ -7,14 +7,11 @@ using System;
 using System.Text;
 using System.Threading;
 
-namespace QueueExchange.Monitoring
-{
-    class MQTTBroker
-    {
-        private Thread _serverThread;
+namespace QueueExchange.Monitoring {
+    class MQTTBroker {
+        private readonly Thread _serverThread;
 
-        public MQTTBroker() : this(GlobalHost.ConnectionManager.GetHubContext<QXMonitorHub>().Clients)
-        {
+        public MQTTBroker() : this(GlobalHost.ConnectionManager.GetHubContext<QXMonitorHub>().Clients) {
 
         }
         private IHubConnectionContext<dynamic> Clients {
@@ -22,15 +19,13 @@ namespace QueueExchange.Monitoring
             set;
         }
 
-        public MQTTBroker(IHubConnectionContext<dynamic> clients)
-        {
+        public MQTTBroker(IHubConnectionContext<dynamic> clients) {
             Clients = clients;
             _serverThread = new Thread(this.StartListening);
             _serverThread.Start();
         }
 
-        public void StartListening()
-        {
+        public void StartListening() {
             MqttServerOptionsBuilder optionsBuilder = new MqttServerOptionsBuilder()
                     .WithConnectionBacklog(100)
                     .WithDefaultEndpointPort(5656)

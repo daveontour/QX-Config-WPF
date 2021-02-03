@@ -38,7 +38,10 @@ namespace QXEditorModule.Common {
         AddKafkaOutput,
         AddRabbitOutput,
         AddSINK,
-        AddSMTPOutput
+        AddSMTPOutput,
+        AddMQTTInput,
+        AddMQTTOutput,
+        AddFTPOutput
     }
 
     public interface IView {
@@ -71,5 +74,7 @@ namespace QXEditorModule.Common {
         void TestSource(XmlNode node);
         void RefreshDraw();
         void SMTPOut(XmlNode node);
+        void MQTT(XmlNode node);
+        void FTP(XmlNode node);
     }
 }

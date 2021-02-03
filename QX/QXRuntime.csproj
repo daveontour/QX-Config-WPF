@@ -72,6 +72,9 @@
     <Reference Include="Confluent.Kafka, Version=1.2.2.0, Culture=neutral, PublicKeyToken=12c514ca49093d1e, processorArchitecture=MSIL">
       <HintPath>..\packages\Confluent.Kafka.1.2.2\lib\net45\Confluent.Kafka.dll</HintPath>
     </Reference>
+    <Reference Include="FluentFTP, Version=33.0.3.0, Culture=neutral, PublicKeyToken=f4af092b1d8df44f, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentFTP.33.0.3\lib\net45\FluentFTP.dll</HintPath>
+    </Reference>
     <Reference Include="IBM.XMS, Version=8.0.0.7, Culture=neutral, PublicKeyToken=d2666ab12fca862b, processorArchitecture=MSIL">
       <HintPath>..\packages\WebSphereMqClient.8.0.0.7\lib\net20\IBM.XMS.dll</HintPath>
     </Reference>
@@ -199,6 +202,7 @@
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Cors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.0.0\lib\net45\System.Web.Cors.dll</HintPath>
     </Reference>
@@ -214,19 +218,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EndPoints\QEFTP.cs" />
     <Compile Include="Exchange.cs" />
     <Compile Include="ExchangeMonitorMessage.cs" />
     <Compile Include="ExchangeMessage.cs" />
-    <Compile Include="Expression.cs" />
-    <Compile Include="FilterBool.cs" />
-    <Compile Include="FilterEquals.cs" />
-    <Compile Include="FilterContextContains.cs" />
-    <Compile Include="FilterContains.cs" />
-    <Compile Include="FilterDateRange.cs" />
-    <Compile Include="FilterLength.cs" />
-    <Compile Include="FilterMatches.cs" />
-    <Compile Include="FilterXPathEquals.cs" />
-    <Compile Include="FilterXPathExists.cs" />
+    <Compile Include="Filters\Expression.cs" />
+    <Compile Include="Filters\FilterBool.cs" />
+    <Compile Include="Filters\FilterEquals.cs" />
+    <Compile Include="Filters\FilterContextContains.cs" />
+    <Compile Include="Filters\FilterContains.cs" />
+    <Compile Include="Filters\FilterDateRange.cs" />
+    <Compile Include="Filters\FilterLength.cs" />
+    <Compile Include="Filters\FilterMatches.cs" />
+    <Compile Include="Filters\FilterXPathEquals.cs" />
+    <Compile Include="Filters\FilterXPathExists.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="MonitorMessage.cs" />
     <Compile Include="Pipeline.cs" />
@@ -242,16 +247,17 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="QEFile.cs" />
-    <Compile Include="QERest.cs" />
-    <Compile Include="QEHttp.cs" />
-    <Compile Include="QEKafka.cs" />
-    <Compile Include="QEMQ.cs" />
-    <Compile Include="QEMSMQ.cs" />
-    <Compile Include="QERabbitDefExchange.cs" />
-    <Compile Include="QESMTP.cs" />
-    <Compile Include="QETCP.cs" />
-    <Compile Include="QESink.cs" />
+    <Compile Include="EndPoints\QEFile.cs" />
+    <Compile Include="EndPoints\QEMQTT.cs" />
+    <Compile Include="EndPoints\QERest.cs" />
+    <Compile Include="EndPoints\QEHttp.cs" />
+    <Compile Include="EndPoints\QEKafka.cs" />
+    <Compile Include="EndPoints\QEMQ.cs" />
+    <Compile Include="EndPoints\QEMSMQ.cs" />
+    <Compile Include="EndPoints\QERabbitDefExchange.cs" />
+    <Compile Include="EndPoints\QESMTP.cs" />
+    <Compile Include="EndPoints\QETCP.cs" />
+    <Compile Include="EndPoints\QESink.cs" />
     <Compile Include="QueueAbstract.cs" />
     <Compile Include="QueueFactory.cs" />
     <Compile Include="QXMonitor.cs" />

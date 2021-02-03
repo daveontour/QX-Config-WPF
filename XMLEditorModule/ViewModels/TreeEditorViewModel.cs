@@ -103,14 +103,12 @@ namespace QXEditorModule.ViewModels {
                 selectedElement = value;
                 try {
                     UpdatePropertiesPanel(selectedElement.DataModel);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Console.WriteLine(e.Message);
                 }
                 try {
                     View.HightLightCanvas(selectedElement.DataModel);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Console.WriteLine(e.Message);
                 }
             }
@@ -131,8 +129,7 @@ namespace QXEditorModule.ViewModels {
 
             try {
                 SelectedElement = new SelectedElementViewModel(newNode);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Console.WriteLine(e.Message);
             }
         }
@@ -160,6 +157,9 @@ namespace QXEditorModule.ViewModels {
                     case "RABBITDEFEX":
                         MyGrid = new RABBITIN(selectedItem, this.View);
                         break;
+                    case "MQTT":
+                        MyGrid = new MQTTIN(selectedItem, this.View);
+                        break;
                     case "TCPSERVER":
                         MyGrid = new TCPIN(selectedItem, this.View);
                         break;
@@ -167,8 +167,7 @@ namespace QXEditorModule.ViewModels {
                         MyGrid = new TESTSOURCE(selectedItem, this.View);
                         break;
                 }
-            }
-            else if (selectedItem.Name == "output" || selectedItem.Name == "altqueue") {
+            } else if (selectedItem.Name == "output" || selectedItem.Name == "altqueue") {
                 switch (selectedItem.Attributes["type"].Value) {
                     case "MSMQ":
                         MyGrid = new MSMQOUT(selectedItem, this.View);
@@ -194,57 +193,48 @@ namespace QXEditorModule.ViewModels {
                     case "RABBITDEFEX":
                         MyGrid = new RABBITOUT(selectedItem, this.View);
                         break;
+                    case "MQTT":
+                        MyGrid = new MQTTIN(selectedItem, this.View);
+                        break;
                     case "SMTP":
                         MyGrid = new SMTPOut(selectedItem, this.View);
+                        break;
+                    case "FTP":
+                        MyGrid = new FTPOut(selectedItem, this.View);
                         break;
                     case "SINK":
                         MyGrid = new SINK(selectedItem, this.View);
                         break;
                 }
-            }
-            else if (selectedItem.Name == "monitor") {
+            } else if (selectedItem.Name == "monitor") {
                 MyGrid = new MonitorGrid(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "filter") {
+            } else if (selectedItem.Name == "filter") {
                 MyGrid = new Filter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "pipe") {
+            } else if (selectedItem.Name == "pipe") {
                 MyGrid = new PIPE(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "namespace") {
+            } else if (selectedItem.Name == "namespace") {
                 MyGrid = new NameSpaceGrid(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "service") {
+            } else if (selectedItem.Name == "service") {
                 MyGrid = new ServiceSetting(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not") {
+            } else if (selectedItem.Name == "and" || selectedItem.Name == "or" || selectedItem.Name == "xor" || selectedItem.Name == "not") {
                 MyGrid = new BooleanExpression(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "contains") {
+            } else if (selectedItem.Name == "contains") {
                 MyGrid = new ContainsFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "equals") {
+            } else if (selectedItem.Name == "equals") {
                 MyGrid = new EqualsFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "matches") {
+            } else if (selectedItem.Name == "matches") {
                 MyGrid = new MatchesFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "length") {
+            } else if (selectedItem.Name == "length") {
                 MyGrid = new LengthFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "xpexists") {
+            } else if (selectedItem.Name == "xpexists") {
                 MyGrid = new XPExistsFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "xpmatches") {
+            } else if (selectedItem.Name == "xpmatches") {
                 MyGrid = new XPMatchesFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "xpequals") {
+            } else if (selectedItem.Name == "xpequals") {
                 MyGrid = new XPEqualsFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "dateRange") {
+            } else if (selectedItem.Name == "dateRange") {
                 MyGrid = new DateRangeFilter(selectedItem, this.View);
-            }
-            else if (selectedItem.Name == "contextContains") {
+            } else if (selectedItem.Name == "contextContains") {
                 MyGrid = new ContextFilter(selectedItem, this.View);
             }
 
@@ -284,8 +274,7 @@ namespace QXEditorModule.ViewModels {
             }
             if (SelectedElement.DataModel.Name == "pipes") {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -307,19 +296,16 @@ namespace QXEditorModule.ViewModels {
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
-            }
-            else {
+            } else {
                 XmlNode lastNode = null;
                 foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
                     if (n.Name == "output") {
                         SelectedElement.DataModel.InsertBefore(newNode, n);
                         break;
-                    }
-                    else {
+                    } else {
                         if (lastNode == null) {
                             SelectedElement.DataModel.AppendChild(newNode);
-                        }
-                        else {
+                        } else {
                             lastNode = n;
                         }
                     }
@@ -370,19 +356,16 @@ namespace QXEditorModule.ViewModels {
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
-            }
-            else {
+            } else {
                 XmlNode lastNode = null;
                 foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
                     if (n.Name == "output") {
                         SelectedElement.DataModel.InsertBefore(newNode, n);
                         break;
-                    }
-                    else {
+                    } else {
                         if (lastNode == null) {
                             SelectedElement.DataModel.AppendChild(newNode);
-                        }
-                        else {
+                        } else {
                             lastNode = n;
                         }
                     }
@@ -441,19 +424,16 @@ namespace QXEditorModule.ViewModels {
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
-            }
-            else {
+            } else {
                 XmlNode lastNode = null;
                 foreach (XmlNode n in SelectedElement.DataModel.ChildNodes) {
                     if (n.Name == "output") {
                         SelectedElement.DataModel.InsertBefore(newNode, n);
                         break;
-                    }
-                    else {
+                    } else {
                         if (lastNode == null) {
                             SelectedElement.DataModel.AppendChild(newNode);
-                        }
-                        else {
+                        } else {
                             lastNode = n;
                         }
                     }
@@ -476,8 +456,7 @@ namespace QXEditorModule.ViewModels {
             }
             if (SelectedElement.DataModel.Name == "pipe") {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -490,8 +469,7 @@ namespace QXEditorModule.ViewModels {
             }
             if (SelectedElement.DataModel.Name == "pipe") {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -527,8 +505,7 @@ namespace QXEditorModule.ViewModels {
             if (newNode.NodeType == XmlNodeType.Attribute) {
                 SelectedElement.DataModel.Attributes.Append(newNode as XmlAttribute);
                 TreeLeafSelected(SelectedElement.DataModel);
-            }
-            else {
+            } else {
                 SelectedElement.DataModel.AppendChild(newNode);
             }
 
@@ -544,8 +521,7 @@ namespace QXEditorModule.ViewModels {
             }
             if (SelectedElement.DataModel.Name == "input" || SelectedElement.DataModel.Name == "output") {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -569,8 +545,7 @@ namespace QXEditorModule.ViewModels {
 
             if (SelectedElement.DataModel.ChildNodes.Count == 0) {
                 SelectedElement.DataModel.AppendChild(newNode);
-            }
-            else {
+            } else {
                 SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
             }
 
@@ -673,8 +648,7 @@ namespace QXEditorModule.ViewModels {
             }
             if (SelectedElement.DataModel.Name == "settings") {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         }
@@ -695,12 +669,10 @@ namespace QXEditorModule.ViewModels {
 
             if (!SelectedElement.DataModel.HasChildNodes) {
                 SelectedElement.DataModel.AppendChild(newNode);
-            }
-            else {
+            } else {
                 if (SelectedElement.DataModel.FirstChild.Name == "monitor") {
                     SelectedElement.DataModel.InsertAfter(newNode, SelectedElement.DataModel.FirstChild);
-                }
-                else {
+                } else {
                     SelectedElement.DataModel.InsertBefore(newNode, SelectedElement.DataModel.FirstChild);
                 }
             }
@@ -802,8 +774,7 @@ namespace QXEditorModule.ViewModels {
             }
             if (SelectedElement.DataModel.Name == "pipes" || SelectedElement.DataModel.Name == "settings") {
                 return false;
-            }
-            else if (currentNode.NodeType == XmlNodeType.Text || currentNode.NodeType == XmlNodeType.Element) {
+            } else if (currentNode.NodeType == XmlNodeType.Text || currentNode.NodeType == XmlNodeType.Element) {
                 return true;
             }
             return false;
@@ -841,8 +812,7 @@ namespace QXEditorModule.ViewModels {
                 MyGrid = new BooleanExpression(SelectedElement.DataModel, this.View);
                 OnPropertyChanged("MyGrid");
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
         }
@@ -891,8 +861,7 @@ namespace QXEditorModule.ViewModels {
                     }
                     //              UnloadEditor();
                     return;
-                }
-                else {
+                } else {
                     return;
                 }
             }
@@ -933,15 +902,13 @@ namespace QXEditorModule.ViewModels {
 
                 try {
                     serviceName = serviceSettings.Attributes["serviceName"].Value;
-                }
-                catch (Exception) {
+                } catch (Exception) {
                     serviceName = "Queue Exchange Service";
                 }
 
                 try {
                     serviceDisplayName = serviceSettings.Attributes["serviceDisplayName"].Value;
-                }
-                catch (Exception) {
+                } catch (Exception) {
                     serviceDisplayName = "Queue Exchange Service";
                 }
                 string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -951,8 +918,7 @@ namespace QXEditorModule.ViewModels {
 
                 try {
                     serviceDescription = serviceSettings.Attributes["serviceDescription"].Value;
-                }
-                catch (Exception) {
+                } catch (Exception) {
                     serviceDescription = "Connects input nodes with output nodes";
                 }
 
@@ -968,8 +934,7 @@ namespace QXEditorModule.ViewModels {
                     doc.Save(sw);
                 }
 
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Console.WriteLine($"Setting Service Parameters Not Found in ExchangeConfig.xml - using defaults. Error Message  {e.Message}");
             }
 
@@ -1002,15 +967,13 @@ namespace QXEditorModule.ViewModels {
 
                     try {
                         serviceName = serviceSettings.Attributes["serviceName"].Value;
-                    }
-                    catch (Exception) {
+                    } catch (Exception) {
                         serviceName = "Queue Exchange Service";
                     }
 
                     try {
                         serviceDisplayName = serviceSettings.Attributes["serviceDisplayName"].Value;
-                    }
-                    catch (Exception) {
+                    } catch (Exception) {
                         serviceDisplayName = "Queue Exchange Service";
                     }
                     string version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -1020,8 +983,7 @@ namespace QXEditorModule.ViewModels {
 
                     try {
                         serviceDescription = serviceSettings.Attributes["serviceDescription"].Value;
-                    }
-                    catch (Exception) {
+                    } catch (Exception) {
                         serviceDescription = "Connects input nodes with output nodes";
                     }
 
@@ -1037,8 +999,7 @@ namespace QXEditorModule.ViewModels {
                         doc.Save(sw);
                     }
 
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Console.WriteLine($"Setting Service Parameters Not Found in ExchangeConfig.xml - using defaults. Error Message  {e.Message}");
                 }
 

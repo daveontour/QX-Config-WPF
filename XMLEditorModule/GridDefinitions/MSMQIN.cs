@@ -4,14 +4,11 @@ using System.Reflection;
 using System.Xml;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace QXEditorModule.GridDefinitions
-{
+namespace QXEditorModule.GridDefinitions {
     [DisplayName("Microsoft MQ Input Node")]
-    public class MSMQIN : MyNodeInPropertyGrid
-    {
+    public class MSMQIN : MyNodeInPropertyGrid {
 
-        public MSMQIN(XmlNode dataModel, IView view)
-        {
+        public MSMQIN(XmlNode dataModel, IView view) {
             this._node = dataModel;
             this.view = view;
             this.type = "MSMQ";
@@ -36,8 +33,7 @@ namespace QXEditorModule.GridDefinitions
         public string Queue {
             get {
                 string val = GetAttribute("queue");
-                if (val == null || val == "")
-                {
+                if (val == null || val == "") {
                     val = @".\private$\Enter_Queue_Name_Here";
                 }
                 return val;

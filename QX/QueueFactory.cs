@@ -51,6 +51,12 @@ namespace QueueExchange {
                 case "SMTP":
                     queue = new QESMTP(ep, monitorMessageProgress);
                     break;
+                case "MQTT":
+                    queue = new QEMQTT(ep, monitorMessageProgress);
+                    break;
+                case "FTP":
+                    queue = new QEFTP(ep, monitorMessageProgress);
+                    break;
                 default:
                     queue = null;
                     break;

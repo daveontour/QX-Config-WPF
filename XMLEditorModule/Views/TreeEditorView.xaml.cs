@@ -50,8 +50,7 @@ namespace QXEditorModule.Views {
                 if (viewModel == null) {
                     return;
                 }
-            }
-            catch {
+            } catch {
                 return;
             }
 
@@ -64,8 +63,7 @@ namespace QXEditorModule.Views {
                 this.inputMenuItem.Items.Clear();
                 this.outputMenuItem.Items.Clear();
 
-            }
-            catch (Exception) {
+            } catch (Exception) {
 
             }
             contextMenuProvider.ContextMenus[ContextMenuType.AddOutput].Command = ViewModel.AddOutputCommand;
@@ -91,6 +89,9 @@ namespace QXEditorModule.Views {
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitInput].Command = ViewModel.AddTypeInputCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitInput].CommandParameter = "RABBITDEFEX";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQTTInput].Command = ViewModel.AddTypeInputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQTTInput].CommandParameter = "MQTT";
 
             contextMenuProvider.ContextMenus[ContextMenuType.AddTCPInput].Command = ViewModel.AddTypeInputCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddTCPInput].CommandParameter = "TCPSERVER";
@@ -123,6 +124,12 @@ namespace QXEditorModule.Views {
             contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
 
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQTTOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddMQTTOutput].CommandParameter = "MQTT";
+
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFTPOutput].Command = ViewModel.AddTypeOutputCommand;
+            contextMenuProvider.ContextMenus[ContextMenuType.AddFTPOutput].CommandParameter = "FTP";
+
             contextMenuProvider.ContextMenus[ContextMenuType.AddTCPOutput].Command = ViewModel.AddTypeOutputCommand;
             contextMenuProvider.ContextMenus[ContextMenuType.AddTCPOutput].CommandParameter = "TCPCLIENT";
 
@@ -138,6 +145,7 @@ namespace QXEditorModule.Views {
             inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddKafkaInput]);
             inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddHTTPInput]);
             inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitInput]);
+            inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMQTTInput]);
             inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddTCPInput]);
             inputMenuItem.Items.Add(new Separator());
             inputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddTestInput]);
@@ -152,6 +160,8 @@ namespace QXEditorModule.Views {
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddTCPOutput]);
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddSMTPOutput]);
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddRabbitOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddMQTTOutput]);
+            outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddFTPOutput]);
             outputMenuItem.Items.Add(new Separator());
             outputMenuItem.Items.Add(contextMenuProvider.ContextMenus[ContextMenuType.AddSINK]);
 
@@ -614,6 +624,9 @@ namespace QXEditorModule.Views {
             menuProvider.ContextMenus[ContextMenuType.AddRabbitInput].Command = ViewModel.AddTypeInputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddRabbitInput].CommandParameter = "RABBITDEFEX";
 
+            menuProvider.ContextMenus[ContextMenuType.AddMQTTInput].Command = ViewModel.AddTypeInputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddMQTTInput].CommandParameter = "MQTT";
+
             menuProvider.ContextMenus[ContextMenuType.AddTCPInput].Command = ViewModel.AddTypeInputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddTCPInput].CommandParameter = "TCPSERVER";
 
@@ -647,6 +660,12 @@ namespace QXEditorModule.Views {
             menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput].CommandParameter = "RABBITDEFEX";
 
+            menuProvider.ContextMenus[ContextMenuType.AddMQTTOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddMQTTOutput].CommandParameter = "MQTT";
+
+            menuProvider.ContextMenus[ContextMenuType.AddFTPOutput].Command = ViewModel.AddTypeOutputCommand;
+            menuProvider.ContextMenus[ContextMenuType.AddFTPOutput].CommandParameter = "FTP";
+
             menuProvider.ContextMenus[ContextMenuType.AddSINK].Command = ViewModel.AddTypeOutputCommand;
             menuProvider.ContextMenus[ContextMenuType.AddSINK].CommandParameter = "SINK";
 
@@ -659,6 +678,7 @@ namespace QXEditorModule.Views {
             inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddKafkaInput]);
             inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddHTTPInput]);
             inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddRabbitInput]);
+            inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddMQTTInput]);
             inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddTCPInput]);
             inputMenuItem.Items.Add(new Separator());
             inputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddTestInput]);
@@ -673,6 +693,8 @@ namespace QXEditorModule.Views {
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddTCPOutput]);
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddSMTPOutput]);
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddRabbitOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddMQTTOutput]);
+            outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddFTPOutput]);
             outputMenuItem.Items.Add(new Separator());
             outputMenuItem.Items.Add(menuProvider.ContextMenus[ContextMenuType.AddSINK]);
 
@@ -705,8 +727,7 @@ namespace QXEditorModule.Views {
 
             if (inNode) {
                 can.SetValue(Canvas.LeftProperty, (double)10);
-            }
-            else {
+            } else {
                 can.SetValue(Canvas.LeftProperty, (double)(this.panel.Width - imHeight - 10));
             }
             can.SetValue(Canvas.TopProperty, (space / 2 + (space + imHeight) * index));
@@ -737,8 +758,7 @@ namespace QXEditorModule.Views {
                 if (!inNode) {
                     if (hasStyle) {
                         filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 24.0;
-                    }
-                    else {
+                    } else {
                         filterCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) - can.Width / 2 - 4.0;
                     }
 
@@ -833,8 +853,7 @@ namespace QXEditorModule.Views {
                         if (hasAltQueue) {
                             styleCanvasOffset += 20.0;
                         }
-                    }
-                    else {
+                    } else {
                         styleCanvasOffset = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4.0;
                     }
                 }
@@ -883,8 +902,7 @@ namespace QXEditorModule.Views {
                 double startArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                 double startArrrowX = (double)can.GetValue(Canvas.LeftProperty) + can.Width + 4;
                 p = DrawLineArrow(new Point(startArrrowX, startArrrowY), new Point(this.panel.Width * 0.33, 100), arrowpath);
-            }
-            else {
+            } else {
                 double stopArrrowY = (double)can.GetValue(Canvas.TopProperty) + imHeight / 2;
                 double stopArrrowX = (double)can.GetValue(Canvas.LeftProperty) - 4;
                 p = DrawLineArrow(new Point(this.panel.Width * 0.66, 100), new Point(stopArrrowX, stopArrrowY), arrowpath);
@@ -1012,8 +1030,7 @@ namespace QXEditorModule.Views {
             //orientation
             if (endPoint.Y > startPoint.Y) {
                 angle2 = (endPoint.X > startPoint.X) ? angle2 : (180 - angle2);
-            }
-            else {
+            } else {
                 angle2 = (endPoint.X > startPoint.X) ? -angle2 : -(180 - angle2);
             }
             form.Angle = angle2;
@@ -1102,8 +1119,7 @@ namespace QXEditorModule.Views {
                 rootNode.IsExpanded = true;
                 isSelected = true;
                 return isSelected;
-            }
-            else {
+            } else {
                 for (int i = 0; i < rootNode.Items.Count; i++) {
                     TreeViewItem childItem = rootNode.ItemContainerGenerator.ContainerFromIndex(i) as TreeViewItem;
 
@@ -1135,8 +1151,7 @@ namespace QXEditorModule.Views {
                 rootNode.IsExpanded = true;
                 isSelected = true;
                 return isSelected;
-            }
-            else {
+            } else {
                 for (int i = 0; i < rootNode.Items.Count; i++) {
                     TreeViewItem childItem = rootNode.ItemContainerGenerator.ContainerFromIndex(i) as TreeViewItem;
 
@@ -1167,8 +1182,7 @@ namespace QXEditorModule.Views {
             Canvas c;
             try {
                 c = this.nodeToCanvas[node];
-            }
-            catch (Exception) {
+            } catch (Exception) {
 
                 if (this.selectedCanvas != null) {
                     SolidColorBrush brush = new SolidColorBrush {
@@ -1238,14 +1252,12 @@ namespace QXEditorModule.Views {
             TreeViewItem rootNode = null;
             try {
                 rootNode = xmlTreeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
-            }
-            catch {
+            } catch {
 
             }
             if (xmlNode == null) {
                 SelectTreeViewItem(ref rootNode, "");
-            }
-            else {
+            } else {
                 SelectTreeViewItem(ref rootNode, xmlNode);
             }
         }
@@ -1302,6 +1314,17 @@ namespace QXEditorModule.Views {
             viewModel.MyGrid = new HTTPOUT(node, this);
             viewModel.OnPropertyChanged("MyGrid");
         }
+
+        public void MQTT(XmlNode node) {
+            viewModel.MyGrid = new MQTTIN(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
+        }
+
+        public void FTP(XmlNode node) {
+            viewModel.MyGrid = new FTPOut(node, this);
+            viewModel.OnPropertyChanged("MyGrid");
+        }
+
         public void HTTPIn(XmlNode node) {
             viewModel.MyGrid = new HTTPIN(node, this);
             viewModel.OnPropertyChanged("MyGrid");
@@ -1363,8 +1386,7 @@ namespace QXEditorModule.Views {
                         tb.Text = node.Attributes["type"].Value;
                     }
                 }
-            }
-            catch { }
+            } catch { }
         }
 
         /*
@@ -1380,8 +1402,7 @@ namespace QXEditorModule.Views {
                         tb.Text = node.Attributes["name"].Value;
                     }
                 }
-            }
-            catch { }
+            } catch { }
         }
 
         public void ChangeElementType(string value) {
